@@ -177,36 +177,37 @@ export default class Backend extends EventTarget {
 			return Promise.resolve();
 		}
 
-		return new Promise((resolve, reject) => {
-			var id = this.id.toLowerCase();
+		let id = this.id.toLowerCase();
 
-				this.accessToken = localStorage[`mavo:${id}token`];
+		if (passive) {
+			this.accessToken = localStorage[`mavo:${id}token`];
 
-				if (this.accessToken) {
-					resolve(this.accessToken);
-				}
-
+			if (this.accessToken) {
+				resolve(this.accessToken);
 			}
-			else {
-				// Show window
-				var popup = {
-					width: Math.min(1000, innerWidth - 100),
-					height: Math.min(800, innerHeight - 100)
-				};
+		}
+		else {
+			// Show window
+			var popup = {
+				width: Math.min(1000, innerWidth - 100),
+				height: Math.min(800, innerHeight - 100)
+			};
 
-				popup.top = (screen.height - popup.height)/2;
-				popup.left = (screen.width - popup.width)/2;
+			popup.top = (screen.height - popup.height)/2;
+			popup.left = (screen.width - popup.width)/2;
 
-				var state = {
-					url: location.href,
-					backend: this.id
-				};
+			var state = {
+				url: location.href,
+				backend: this.id
+			};
 
-				this.authPopup = open(`${this.constructor.oAuth}?client_id=${this.key}&state=${encodeURIComponent(JSON.stringify(state))}` + this.oAuthParams(),
-					"popup", `width=${popup.width},height=${popup.height},left=${popup.left},top=${popup.top}`);
+			this.authPopup = open(`${this.constructor.oAuth}?client_id=${this.key}&state=${encodeURIComponent(JSON.stringify(state))}` + this.oAuthParams(),
+				"popup", `width=${popup.width},height=${popup.height},left=${popup.left},top=${popup.top}`);
 
-				if (!this.authPopup) {
-					this.mavo.error(message);
+			if (!this.authPopup) {
+				var message = "Login popup was blocked! Please check your popup blocker settings.";
+				throw new Error(message);
+			}
 
 			return new Promise((resolve, reject) => {
 				addEventListener("message", evt => {
@@ -224,7 +225,6 @@ export default class Backend extends EventTarget {
 						hooks.run("backend-login-success", this);
 					}
 				});
-			}
 			});
 		}
 
