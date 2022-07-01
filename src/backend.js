@@ -17,14 +17,21 @@ export default class Backend extends EventTarget {
 		this.source = url;
 
 		// Backends that are not URL-based should just ignore this
-		this.url = new URL(this.source, Mavo.base);
+		this.url = new URL(this.source, o.urlBase);
 
 		this.options = o;
-		this.format = Mavo.Formats.create(o.format, this);
 
 		if (this.constructor.key ?? o.key) {
 			this.key = o.key ?? this.constructor.key;
 		}
+	}
+
+	async parse (data) {
+		return this.options.parse? this.options.parse(data) : JSON.parse(data);
+	}
+
+	async stringify (data) {
+		return this.options.stringify? this.options.stringify(data) : JSON.stringify(data);
 	}
 
 	updatePermissions(o) {
@@ -71,13 +78,15 @@ export default class Backend extends EventTarget {
 
 		response = response.replace(/^\ufeff/, ""); // Remove Unicode BOM
 
-		return this.format.parse(response);
+		let json = this.parse(response);
+
+		return json;
 	}
 
-	async store (data, {path, format = this.format} = {}) {
+	async store (data, {path} = {}) {
 		await this.ready;
 
-		var serialized = typeof data === "string"? data : await format.stringify(data);
+		let serialized = typeof data === "string"? data : await this.stringify(data);
 		await this.put(serialized, path);
 
 		return {data, serialized};
@@ -284,4 +293,6 @@ export default class Backend extends EventTarget {
 		Backend.types.push(Class);
 		return Class;
 	}
+
+	static hooks = hooks
 };

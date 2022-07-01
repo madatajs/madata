@@ -1,4 +1,6 @@
 import Backend from "./backend.js";
+import hooks from "./hooks.js";
+import {readFile} from "./util.js";
 
 export default class Github extends Backend {
 	id = "Github"
@@ -18,24 +20,18 @@ export default class Github extends Backend {
 		super.update(url, o);
 
 		// Extract info for username, repo, branch, filepath from URL
-		let extension = this.format.constructor.extensions[0] || ".json";
+		let extension = o.extension || ".json";
 
 		this.defaults = {
 			repo: "mv-data",
-			filename: `${this.mavo.id}${extension}`
+			filename: o.filename || "data" + extension,
 		};
 
-		this.info = _.parseURL(this.source, this.defaults);
+		this.info = Github.parseURL(this.source, this.defaults);
 
 		// If an author provided backend metadata, use them
 		// since they have higher priority
 		for (const prop in o) {
-			// Skip the format and mavo properties
-			// since they are already updated in the parent's update method
-			if (["format", "mavo"].includes(prop)) {
-				continue;
-			}
-
 			if (this.info.apiCall === "graphql" && prop === "query") {
 				// It makes sense to set/update the apiData property only for calls with GraphQL.
 				// Otherwise, it will break the Github#get method.
@@ -53,7 +49,7 @@ export default class Github extends Backend {
 	async get (url) {
 		if (this.isAuthenticated() || !this.path || url) {
 			// Authenticated or raw API call
-			let info = url? _.parseURL(url) : this.info;
+			let info = url? Github.parseURL(url) : this.info;
 
 			if (info.apiData) {
 				// GraphQL
@@ -122,7 +118,7 @@ export default class Github extends Backend {
 			else {
 				if (info.repo && response.content) {
 					// Fetching file contents
-					return _.atob(response.content);
+					return Github.atob(response.content);
 				}
 				else {
 					return response;
@@ -159,7 +155,7 @@ export default class Github extends Backend {
 	}
 
 	upload (file, path = this.path) {
-		return Mavo.readFile(file).then(dataURL => {
+		return readFile(file).then(dataURL => {
 				let base64 = dataURL.slice(5); // remove data:
 				let media = base64.match(/^\w+\/[\w+]+/)[0];
 				media = media.replace("+", "\\+"); // Fix for #608
@@ -192,7 +188,7 @@ export default class Github extends Backend {
 		               Promise.resolve(this.repoInfo)
 		             : this.request("user/repos", {name: this.repo}, "POST").then(repoInfo => this.repoInfo = repoInfo);
 
-		serialized = o.isEncoded? serialized : _.btoa(serialized);
+		serialized = o.isEncoded? serialized : Github.btoa(serialized);
 
 		return repoInfo.then(repoInfo => {
 				if (!this.canPush()) {
@@ -247,7 +243,7 @@ export default class Github extends Backend {
 			.then(fileInfo => {
 				const env = {context: this, fileInfo};
 
-				Mavo.hooks.run("gh-after-commit", env);
+				hooks.run("gh-after-commit", env);
 
 				return env.fileInfo;
 			});
@@ -329,7 +325,7 @@ export default class Github extends Backend {
 						}).then(repoInfo => {
 							const env = { context: this, repoInfo };
 
-							Mavo.hooks.run("gh-after-login", env);
+							hooks.run("gh-after-login", env);
 
 							return env.repoInfo;
 						});
@@ -427,7 +423,7 @@ export default class Github extends Backend {
 	}
 
 	static test (url) {
-		url = new URL(url, Mavo.base);
+		url = new URL(url, location);
 		return /^((api\.)?github\.com|raw\.githubusercontent\.com)/.test(url.host);
 	}
 
@@ -477,7 +473,7 @@ export default class Github extends Backend {
 			}
 		});
 
-		const url = new URL(source, Mavo.base);
+		const url = new URL(source, defaults.urlBase);
 		let path = url.pathname.slice(1).split("/");
 
 		ret.username = path.shift();
@@ -492,7 +488,7 @@ export default class Github extends Backend {
 			delete ret.repo;
 
 			ret.apiParams = url.search;
-			ret.apiData = Mavo.Functions.from(source, "#"); // url.* drops line breaks
+			ret.apiData = source.match(/#([\S\s]+)/)?.[1]; // url.hash drops line breaks
 
 			const apiCall = url.pathname.slice(1) + ret.apiParams;
 
