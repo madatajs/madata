@@ -8,7 +8,12 @@ export default class Local extends Backend {
 
 	constructor (url, o) {
 		super(url, o);
-		this.permissions.on(["read", "edit", "save"]);
+
+		this.updatePermissions({
+			read: true,
+			edit: true,
+			save: true
+		});
 		this.key = o.key;
 	}
 

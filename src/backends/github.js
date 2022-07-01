@@ -6,7 +6,10 @@ export default class Github extends Backend {
 	constructor (url, o) {
 		super(url, o);
 
-		this.permissions.on(["login", "read"]);
+		this.updatePermissions({
+			login: true,
+			read: true
+		});
 
 		this.login(true);
 	}
@@ -261,11 +264,10 @@ export default class Github extends Backend {
 			})
 			.then(u => {
 				if (this.user) {
-
-					this.permissions.on("logout");
+					this.updatePermissions({logout: true});
 
 					if (this.info.path) {
-						this.permissions.on(["edit", "save"]);
+						this.updatePermissions({edit: true, save: true});
 					}
 
 					if (this.repo) {

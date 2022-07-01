@@ -8,7 +8,7 @@ export default class Remote extends Backend {
 
 	constructor (url, o) {
 		super(url, o);
-		this.permissions.on("read");
+		this.updatePermissions({read: true});
 	}
 
 	static test (url) {

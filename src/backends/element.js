@@ -9,7 +9,11 @@ export default class Element extends Backend {
 	constructor (url, o) {
 		super(url, o);
 
-		this.permissions.on(["read", "edit", "save"]);
+		this.updatePermissions({
+			read: true,
+			edit: true,
+			save: true
+		});
 	}
 
 	update (url, o) {

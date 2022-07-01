@@ -8,7 +8,7 @@ export default class Backend extends EventTarget {
 		super();
 
 		// Permissions of this particular backend.
-		this.permissions = new Mavo.Permissions();
+		this.permissions = {};
 
 		this.update(url, o);
 	}
@@ -24,6 +24,25 @@ export default class Backend extends EventTarget {
 
 		if (this.constructor.key ?? o.key) {
 			this.key = o.key ?? this.constructor.key;
+		}
+	}
+
+	updatePermissions(o) {
+		let changed = [];
+
+		for (let permission in o) {
+			let previousValue = this.permissions[permission];
+			this.permissions[permission] = o[permission];
+
+			if (previousValue !== o[permission]) {
+				changed.push(permission);
+			}
+		}
+
+		if (changed) {
+			this.dispatchEvent(new CustomEvent("mv-permissionschange", {
+				detail: changed
+			}));
 		}
 	}
 
@@ -161,12 +180,12 @@ export default class Backend extends EventTarget {
 		return new Promise((resolve, reject) => {
 			var id = this.id.toLowerCase();
 
-			if (passive) {
 				this.accessToken = localStorage[`mavo:${id}token`];
 
 				if (this.accessToken) {
 					resolve(this.accessToken);
 				}
+
 			}
 			else {
 				// Show window
@@ -187,11 +206,9 @@ export default class Backend extends EventTarget {
 					"popup", `width=${popup.width},height=${popup.height},left=${popup.left},top=${popup.top}`);
 
 				if (!this.authPopup) {
-					var message = "Login popup was blocked! Please check your popup blocker settings.";
 					this.mavo.error(message);
-					reject(Error(message));
-				}
 
+			return new Promise((resolve, reject) => {
 				addEventListener("message", evt => {
 					if (evt.source === this.authPopup) {
 						if (evt.data.backend == this.id) {
@@ -208,7 +225,9 @@ export default class Backend extends EventTarget {
 					}
 				});
 			}
-		});
+			});
+		}
+
 	}
 
 	/**
@@ -221,7 +240,13 @@ export default class Backend extends EventTarget {
 			localStorage.removeItem(`mavo:${id}token`);
 			delete this.accessToken;
 
-			this.permissions.off(["edit", "add", "delete", "save"]).on("login");
+			this.updatePermissions({
+				edit: false,
+				add: false,
+				delete: false,
+				save: false,
+				login: true
+			});
 
 			this.dispatchEvent(new CustomEvent("mv-logout"));
 		}
