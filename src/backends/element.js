@@ -5,8 +5,6 @@ import {$} from "../util.js";
  * Save in an HTML element
  */
 export default class Element extends Backend {
-	id = "Element"
-
 	constructor (url, o) {
 		super(url, o);
 

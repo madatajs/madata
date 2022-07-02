@@ -4,8 +4,6 @@ import Backend from "../backend.js";
  * Store data in localStorage
  */
 export default class Local extends Backend {
-	id = "Local"
-
 	constructor (url, o) {
 		super(url, o);
 

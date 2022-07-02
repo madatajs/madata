@@ -101,11 +101,11 @@ export default class Backend extends EventTarget {
 	}
 
 	toString () {
-		return `${this.id} (${this.source})`;
+		return `${this.constructor.name} (${this.source})`;
 	}
 
 	equals (backend) {
-		return backend === this || (backend && this.id == backend.id && this.source == backend.source);
+		return backend === this || (backend && this.constructor == backend.constructor && this.source == backend.source);
 	}
 
 	// Return the appropriate backend(s) for this url

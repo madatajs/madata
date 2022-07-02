@@ -3,8 +3,6 @@ import hooks from "../hooks.js";
 import {readFile} from "../util.js";
 
 export default class Github extends OAuthBackend {
-	id = "Github"
-
 	constructor (url, o) {
 		super(url, o);
 

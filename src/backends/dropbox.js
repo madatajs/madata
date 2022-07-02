@@ -4,8 +4,6 @@ import {readFile} from "../util.js";
 
 
 export default class Dropbox extends OAuthBackend {
-	id = "Dropbox"
-
 	constructor (url, o) {
 		super(url, o);
 

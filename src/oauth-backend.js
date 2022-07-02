@@ -65,7 +65,7 @@ export default class OAuthBackend extends AuthBackend {
 			response = await fetch(call, req);
 		}
 		catch (err) {
-			throw new Error("Something went wrong while connecting to " + this.id, err);
+			throw new Error("Something went wrong while connecting to " + this.constructor.name, err);
 		}
 
 		if (response?.ok) {
@@ -91,7 +91,7 @@ export default class OAuthBackend extends AuthBackend {
 			return this.getUser();
 		}
 
-		let id = this.id.toLowerCase();
+		let id = this.constructor.name.toLowerCase();
 
 		this.accessToken = localStorage[`mavo:${id}token`];
 
@@ -125,7 +125,7 @@ export default class OAuthBackend extends AuthBackend {
 
 			var state = {
 				url: location.href,
-				backend: this.id
+				backend: this.constructor.name
 			};
 
 			this.authPopup = open(`${this.constructor.oAuth}?client_id=${this.key}&state=${encodeURIComponent(JSON.stringify(state))}` + this.oAuthParams(),
@@ -139,7 +139,7 @@ export default class OAuthBackend extends AuthBackend {
 			let accessToken = await new Promise((resolve, reject) => {
 				addEventListener("message", evt => {
 					if (evt.source === this.authPopup) {
-						if (evt.data.backend == this.id) {
+						if (evt.data.backend == this.constructor.name) {
 							resolve(evt.data.token);
 						}
 
@@ -166,7 +166,7 @@ export default class OAuthBackend extends AuthBackend {
 	 */
 	async logout () {
 		if (this.isAuthenticated()) {
-			var id = this.id.toLowerCase();
+			var id = this.constructor.name.toLowerCase();
 
 			localStorage.removeItem(`mavo:${id}token`);
 			delete this.accessToken;
