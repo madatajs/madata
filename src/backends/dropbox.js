@@ -1,0 +1,100 @@
+import OAuthBackend from "../oauth-backend.js";
+import hooks from "../hooks.js";
+import {readFile} from "../util.js";
+
+
+export default class Dropbox extends OAuthBackend {
+	id = "Dropbox"
+
+	constructor (url, o) {
+		super(url, o);
+
+		this.updatePermissions({ read: true });
+	}
+
+	update (url, o) {
+		super.update(url, o);
+
+		this.url = Dropbox.fixShareURL(this.url);
+	}
+
+	async upload (file, path) {
+		path = this.path.replace(/[^/]+$/, "") + path;
+
+		await this.put(file, path);
+		return this.getURL(path);
+	}
+
+	async getURL (path) {
+		let shareInfo = await this.request("sharing/create_shared_link_with_settings", {path}, "POST");
+		return Dropbox.fixShareURL(shareInfo.url);
+	}
+
+	/**
+	 * Saves a file to the backend.
+	 * @param {Object} file - An object with name & data keys
+	 * @return {Promise} A promise that resolves when the file is saved.
+	 */
+	put (serialized, path = this.path, o = {}) {
+		return this.request("https://content.dropboxapi.com/2/files/upload", serialized, "POST", {
+			headers: {
+				"Dropbox-API-Arg": JSON.stringify({
+					path,
+					mode: "overwrite"
+				}),
+				"Content-Type": "application/octet-stream"
+			}
+		});
+	}
+
+	oAuthParams = () => `&redirect_uri=${encodeURIComponent("https://auth.mavo.io")}&response_type=code`
+
+	async getUser () {
+		if (this.user) {
+			return this.user;
+		}
+
+		let info = await this.request("users/get_current_account", "null", "POST");
+
+		this.user = {
+			username: info.email,
+			name: info.name.display_name,
+			avatar: info.profile_photo_url,
+			info
+		};
+	}
+
+	async login ({passive = false} = {}) {
+		await super.login({passive});
+
+		if (this.user) {
+			// Check if can actually edit the file
+			// TODO move to load()?
+			let info = await this.request("sharing/get_shared_link_metadata", {
+				"url": this.source
+			}, "POST");
+
+			this.path = info.path_lower;
+			this.updatePermissions({edit: true, save: true});
+		}
+
+		return this.user;
+	}
+
+	static apiDomain = "https://api.dropboxapi.com/2/"
+	static oAuth = "https://www.dropbox.com/oauth2/authorize"
+	static key = "2mx6061p054bpbp"
+
+	static test (url) {
+		url = new URL(url, location);
+		return /dropbox.com/.test(url.host);
+	}
+
+	// Transform the dropbox shared URL into something raw and CORS-enabled
+	static fixShareURL = url => {
+		url = new URL(url, location);
+		url.hostname = "dl.dropboxusercontent.com";
+		url.search = url.search.replace(/\bdl=0|^$/, "raw=1");
+		return url;
+	}
+}
