@@ -1,8 +1,8 @@
-import Backend from "./backend.js";
-import hooks from "./hooks.js";
-import {readFile} from "./util.js";
+import OAuthBackend from "../oauth-backend.js";
+import hooks from "../hooks.js";
+import {readFile} from "../util.js";
 
-export default class Github extends Backend {
+export default class Github extends OAuthBackend {
 	id = "Github"
 
 	constructor (url, o) {
@@ -13,7 +13,7 @@ export default class Github extends Backend {
 			read: true
 		});
 
-		this.login(true);
+		this.login({passive: true});
 	}
 
 	update (url, o) {
@@ -43,7 +43,7 @@ export default class Github extends Backend {
 			this.info[prop] = o[prop];
 		}
 
-		$.extend(this, this.info);
+		Object.assign(this, this.info);
 	}
 
 	async get (url) {
@@ -164,7 +164,7 @@ export default class Github extends Backend {
 
 				return this.put(base64, path, {isEncoded: true});
 			})
-			.then(fileInfo => this.getURL(path, fileInfo.commit.sha));
+			.then(fileInfo => this.getFileURL(path, {sha: fileInfo.commit.sha}));
 	}
 
 	/**
@@ -173,7 +173,7 @@ export default class Github extends Backend {
 	 * @param {String} path - Optional file path
 	 * @return {Promise} A promise that resolves when the file is saved.
 	 */
-	put (serialized, path = this.path, o = {}) {
+	async put (serialized, path = this.path, o = {}) {
 		if (!path) {
 			// Raw API calls are read-only for now
 			return;
@@ -184,233 +184,209 @@ export default class Github extends Backend {
 		let commitPrefix = this.mavo.element.getAttribute("mv-github-commit-prefix") || "";
 
 		// Create repo if it doesn’t exist
-		let repoInfo = this.repoInfo?
-		               Promise.resolve(this.repoInfo)
-		             : this.request("user/repos", {name: this.repo}, "POST").then(repoInfo => this.repoInfo = repoInfo);
+		let repoInfo = this.repoInfo || await this.getRepoInfo();
 
 		serialized = o.isEncoded? serialized : Github.btoa(serialized);
 
-		return repoInfo.then(repoInfo => {
-				if (!this.canPush()) {
-					// Does not have permission to commit, create a fork
-					return this.request(`${repoCall}/forks`, {name: this.repo}, "POST")
-						.then(forkInfo => {
-							fileCall = `repos/${forkInfo.full_name}/contents/${path}`;
-							return this.forkInfo = forkInfo;
-						})
-						.then(forkInfo => {
-							// Ensure that fork is created (they take a while)
-							let timeout;
-							let test = (resolve, reject) => {
-								clearTimeout(timeout);
-								this.request(`repos/${forkInfo.full_name}/commits`, {until: "1970-01-01T00:00:00Z"}, "HEAD")
-									.then(x => {
-										resolve(forkInfo);
-									})
-									.catch(x => {
-										// Try again after 1 second
-										timeout = setTimeout(test, 1000);
-									});
-							};
+		if (!this.canPush()) {
+			// Does not have permission to commit, create a fork
+			let forkInfo = await this.request(`${repoCall}/forks`, {name: this.repo}, "POST");
 
-							return new Promise(test);
-						});
-				}
+			fileCall = `repos/${forkInfo.full_name}/contents/${path}`;
+			this.forkInfo = forkInfo;
 
-				return repoInfo;
-			})
-			.then(repoInfo => {
-				return this.request(fileCall, {
-					ref: this.branch
-				}).then(fileInfo => this.request(fileCall, {
-					message: commitPrefix + this.mavo._("gh-updated-file", {name: fileInfo.name || "file"}),
-					content: serialized,
-					branch: this.branch,
-					sha: fileInfo.sha
-				}, "PUT"), xhr => {
-					if (xhr.status == 404) {
-						// File does not exist, create it
-						return this.request(fileCall, {
-							message: commitPrefix + "Created file",
-							content: serialized,
-							branch: this.branch
-						}, "PUT");
-					}
+			// Ensure that fork is created (they take a while)
+			let timeout;
+			let test = (resolve, reject) => {
+				clearTimeout(timeout);
+				this.request(`repos/${forkInfo.full_name}/commits`, {until: "1970-01-01T00:00:00Z"}, "HEAD")
+					.then(x => {
+						resolve(forkInfo);
+					})
+					.catch(x => {
+						// Try again after 1 second
+						timeout = setTimeout(test, 1000);
+					});
+			};
 
-					return xhr;
-				});
-			})
-			.then(fileInfo => {
-				const env = {context: this, fileInfo};
+			repoInfo = new Promise(test);
+		}
 
-				hooks.run("gh-after-commit", env);
-
-				return env.fileInfo;
+		try {
+			let fileInfo = await this.request(fileCall, {
+				ref: this.branch
 			});
+
+			fileInfo = this.request(fileCall, {
+				message: commitPrefix + `Updated ${fileInfo.name || "file"}`,
+				content: serialized,
+				branch: this.branch,
+				sha: fileInfo.sha
+			}, "PUT");
+		}
+		catch (e) {
+			if (xhr.status == 404) {
+				// File does not exist, create it
+				fileInfo = await this.request(fileCall, {
+					message: commitPrefix + "Created file",
+					content: serialized,
+					branch: this.branch
+				}, "PUT");
+			}
+		}
+
+		const env = {context: this, fileInfo};
+
+		hooks.run("gh-after-commit", env);
+
+		return env.fileInfo;
 	}
 
-	login (passive) {
-		return this.oAuthenticate(passive)
-			.then(() => this.getUser())
-			.catch(xhr => {
-				if (xhr.status == 401) {
-					// Unauthorized. Access token we have is invalid, discard it
-					this.logout();
-				}
-			})
-			.then(u => {
-				if (this.user) {
-					this.updatePermissions({logout: true});
+	async getRepoInfo(repo = `${this.username}/${this.repo}`) {
+		// return this.request("user/repos", {name: this.repo}, "POST");
+		return this.request(`repos/${repo}`);
+	}
 
-					if (this.info.path) {
-						this.updatePermissions({edit: true, save: true});
-					}
+	/**
+	 * Find forks of a repo by the current user
+	 *
+	 * @param {*} repo
+	 * @memberof Github
+	 */
+	async getMyFork(repoInfo = this.repoInfo) {
+		let myRepoCount = this.user.public_repos + this.user.total_private_repos;
 
-					if (this.repo) {
-						return this.request(`repos/${this.username}/${this.repo}`)
-						.then(repoInfo => {
-							if (this.branch === undefined) {
-								this.branch = repoInfo.default_branch;
+		if (myRepoCount < repoInfo.forks) {
+			// Search which of this user's repo is a fork of the repo in question
+			let query = `query {
+				viewer {
+					name
+						repositories(last: 100, isFork: true) {
+						nodes {
+							url
+							parent {
+								nameWithOwner
 							}
-
-							this.repoInfo = repoInfo;
-
-							if (!this.mavo.source) { // if url doesn't have source, check for forks
-								if (!this.canPush()) { // Check if current user has a fork of this repo, and display dialog to switch
-									if (this.user.info.public_repos < repoInfo.forks) { // graphql search of current user's forks
-										let query = `query {
-													  viewer {
-													    name
-													      repositories(last: 100, isFork: true) {
-													      nodes {
-													        url
-													        parent {
-													          nameWithOwner
-													        }
-													      }
-													    }
-													  }
-													}`;
-										return this.request("https://api.github.com/graphql", {query: query}, "POST")
-										.then(data => {
-											let repos = data.data.viewer.repositories.nodes;
-
-											for (let i in repos) {
-												if (repos[i].parent.nameWithOwner === repoInfo.full_name) {
-													this.switchToMyForkDialog(repos[i].url);
-
-													return repoInfo;
-												}
-											}
-
-											return repoInfo;
-										});
-									}
-									else { // search forks of this repo
-										return this.request(repoInfo.forks_url)
-										.then(forks => {
-											for (let i in forks) {
-												if (forks[i].owner.login === this.user.username) {
-													this.switchToMyForkDialog(forks[i].html_url);
-
-													return repoInfo;
-												}
-											}
-											return repoInfo;
-										});
-									}
-								}
-							}
-							return repoInfo;
-						}).then(repoInfo => {
-							const env = { context: this, repoInfo };
-
-							hooks.run("gh-after-login", env);
-
-							return env.repoInfo;
-						});
+						}
 					}
 				}
-			});
+			}`;
+			let data = await this.request("https://api.github.com/graphql", {query: query}, "POST")
+
+			let repos = data.data.viewer.repositories.nodes;
+
+			for (let i in repos) {
+				if (repos[i].parent.nameWithOwner === repoInfo.full_name) {
+					return repos[i].url;
+				}
+			}
+		}
+		else {
+			// Search which of the forks of the repo in question belongs to the current user
+			let forks = await this.request(repoInfo.forks_url);
+
+			for (let fork of forks) {
+				if (fork.owner.login === this.user.username) {
+					return fork.html_url;
+				}
+			}
+		}
+	}
+
+	async login ({passive = false} = {}) {
+		let user = super.login({passive});
+
+		this.updatePermissions({edit: true, save: true});
+
+		if (this.repo) {
+			let repoInfo = this.getRepoInfo();
+
+			if (this.branch === undefined) {
+				this.branch = repoInfo.default_branch;
+			}
+
+			const env = { context: this, repoInfo };
+
+			hooks.run("gh-after-login", env);
+
+			this.repoInfo = env.repoInfo;
+		}
+
+		return user;
 	}
 
 	canPush () {
+		this.repoInfo ||= this.getRepoInfo();
+
 		if (this.repoInfo) {
 			return this.repoInfo.permissions.push;
 		}
 
-		// Repo does not exist so we can't check permissions
+		// Repo does not exist yet so we can't check permissions
 		// Just check if authenticated user is the same as our URL username
+		// TODO if username is an org, check if user has repo creation permissions
 		return this.user?.username?.toLowerCase() == this.username.toLowerCase();
 	}
 
 	oAuthParams = () => "&scope=repo"
 
-	logout () {
-		return this.oAuthLogout().then(() => {
-			this.user = null;
-		});
-	}
-
-	getUser () {
+	async getUser () {
 		if (this.user) {
-			return Promise.resolve(this.user);
+			return this.user;
 		}
 
-		return this.request("user").then(info => {
-			this.user = {
-				username: info.login,
-				name: info.name || info.login,
-				avatar: info.avatar_url,
-				url: "https://github.com/" + info.login,
-				info
-			};
+		let info = await this.request("user");
 
-			this.dispatchEvent(new CustomEvent("mv-login"));
-		});
+		this.user = {
+			username: info.login,
+			name: info.name || info.login,
+			avatar: info.avatar_url,
+			url: "https://github.com/" + info.login,
+			...info
+		};
+
+		return this.user;
 	}
 
-	getURL (path = this.path, sha) {
-		let repoInfo = this.forkInfo || this.repoInfo;
+	async getPagesInfo (repoInfo) {
 		let repo = repoInfo.full_name;
-		path = path.replace(/ /g, "%20");
-
-		repoInfo.pagesInfo = repoInfo.pagesInfo || this.request(`repos/${repo}/pages`, {}, "GET", {
+		return repoInfo.pagesInfo = repoInfo.pagesInfo || this.request(`repos/${repo}/pages`, {}, "GET", {
 			headers: {
 				"Accept": "application/vnd.github.mister-fantastic-preview+json"
 			}
 		});
-
-		return repoInfo.pagesInfo.then(pagesInfo => pagesInfo.html_url + path)
-			.catch(xhr => {
-				// No Github Pages, return jsdelivr URLs
-				return `https://cdn.jsdelivr.net/gh/${repo}@${sha || this.branch || "latest"}/${path}`;
-			});
 	}
 
-	switchToMyForkDialog (forkURL) {
-			let params = (new URL(location)).searchParams;
-			params.append(`${this.mavo.id}-storage`, forkURL + "/" + this.path);
+	async getRepoURL (repoInfo = this.repoInfo, {
+		sha = this.branch || "latest",
+	} = {}) {
+		if (this.options.repoURL) {
+			return this.options.repoURL;
+		}
 
-			this.notice = this.mavo.message(`
-			${this.mavo._("gh-login-fork-options")}
-			<form onsubmit="return false">
-				<a href="${location.pathname}?${params}"><button>${this.mavo._("gh-use-my-fork")}</button></a>
-			</form>`, {
-				classes: "mv-inline",
-				dismiss: ["button", "submit"]
-			});
+		try {
+			let pagesInfo = await this.getPagesInfo(repoInfo);
 
-			this.notice.closed.then(form => {
-				if (!form) {
-					return;
-				}
+			if (pagesInfo) {
+				return pagesInfo.html_url;
+			}
+		}
+		catch(e) {}
 
-				history.pushState({}, "", `${location.pathname}?${params}`);
-				location.replace(`${location.pathname}?${params}`);
+		return `https://cdn.jsdelivr.net/gh/${repoInfo.full_name}@${sha}/`
+	}
 
-			});
-			return;
+	/**
+	 * Get a public URL for a file in a repo
+	 */
+	async getFileURL (path = this.path, {repoInfo = this.repoInfo, ...options} = {}) {
+		let repoURL = this.getRepoURL(repoInfo, options);
+
+		if (!repoURL.endsWith("/")) {
+			repoURL += "/";
+		}
+
+		return repoURL + path;
 	}
 
 	static apiDomain = "https://api.github.com/"

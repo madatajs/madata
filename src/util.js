@@ -17,4 +17,8 @@ export function readFile (file, format = "DataURL") {
 		reader.onerror = reader.onabort = reject;
 		reader["readAs" + format](file);
 	});
-},
+}
+
+export function $(selector, context = document) {
+	return context.querySelector(selector);
+}

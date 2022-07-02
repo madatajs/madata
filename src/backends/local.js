@@ -1,4 +1,4 @@
-import Backend from "./backend.js";
+import Backend from "../backend.js";
 
 /**
  * Store data in localStorage

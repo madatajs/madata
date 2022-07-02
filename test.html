@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Madata test</title>
+	<style>
+		header:not(.logged-in) .if-logged-in,
+		header.logged-in .if-logged-out {
+			display: none;
+		}
+
+		#my_avatar {
+			width: 1.2em;
+			height: 1.2em;
+		}
+	</style>
+</head>
+<body>
+<header id="header">
+	<img src="" alt="" id="my_avatar" class="if-logged-in">
+	<span id="my_username" class="if-logged-in"></span>
+
+	<button id="login_button" class="if-logged-out">Login</button>
+	<button id="logout_button" class="if-logged-in">Logout</button>
+</header>
+
+<script type="module">
+import Backend from "./src/index.js";
+
+let backend = Backend.create("https://github.com/LeaVerou/leaverou.github.io/blob/master/countries.json");
+
+backend.addEventListener("mv-login", evt => {
+	header.classList.add("logged-in");
+
+	let user = backend.user;
+	my_username.textContent = user.username;
+	my_avatar.src = user.avatar;
+});
+
+backend.addEventListener("mv-logout", evt => {
+	header.classList.remove("logged-in");
+});
+
+login_button.onclick = evt => backend.login();
+logout_button.onclick = evt => backend.logout();
+
+let json = await backend.load();
+
+console.log(json);
+</script>
+</body>
+</html>

@@ -1,4 +1,5 @@
 import Backend from "../backend.js";
+import {$} from "../util.js";
 
 /**
  * Save in an HTML element
@@ -21,11 +22,12 @@ export default class Element extends Backend {
 
 		this.observer?.disconnect();
 
-		this.element = $(this.source) ?? $.create("script", {
-			type: "application/json",
-			id: this.source.slice(1),
-			inside: document.body
-		});
+		this.element = $(this.source);
+
+		if (!this.element) {
+			document.body.insertAdjacentHTML("beforeend", `<script type="application/json" id="${this.source.slice(1)}"></script>`);
+			this.element = document.body.lastChild;
+		}
 
 		this.observer = this.observer ?? new MutationObserver(records => {
 			this.dispatchEvent(new CustomEvent("mv-remotedatachange"));
