@@ -5,10 +5,20 @@ import Backend from "./backend.js";
 export default class AuthBackend extends Backend {
 	constructor (url, o = {}) {
 		super(url, o);
+
+		this.updatePermissions({
+			login: true
+		});
 	}
 
 	isAuthenticated () {
 		return !!this.user;
+	}
+
+	async getUser () {
+		if (this.user) {
+			return this.user;
+		}
 	}
 
 	async login () {}

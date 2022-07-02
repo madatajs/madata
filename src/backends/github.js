@@ -8,12 +8,7 @@ export default class Github extends OAuthBackend {
 	constructor (url, o) {
 		super(url, o);
 
-		this.updatePermissions({
-			login: true,
-			read: true
-		});
-
-		this.login({passive: true});
+		this.updatePermissions({ read: true });
 	}
 
 	update (url, o) {
@@ -299,6 +294,7 @@ export default class Github extends OAuthBackend {
 		this.updatePermissions({edit: true, save: true});
 
 		if (this.repo) {
+			// TODO move to load()?
 			let repoInfo = this.getRepoInfo();
 
 			if (this.branch === undefined) {
@@ -337,15 +333,13 @@ export default class Github extends OAuthBackend {
 
 		let info = await this.request("user");
 
-		this.user = {
+		return this.user = {
 			username: info.login,
 			name: info.name || info.login,
 			avatar: info.avatar_url,
 			url: "https://github.com/" + info.login,
 			...info
 		};
-
-		return this.user;
 	}
 
 	async getPagesInfo (repoInfo) {

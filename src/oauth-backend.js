@@ -9,6 +9,8 @@ import {type} from "./util.js";
 export default class OAuthBackend extends AuthBackend {
 	constructor (url, o = {}) {
 		super(url, o);
+
+		this.login(true);
 	}
 
 	isAuthenticated () {
