@@ -12,25 +12,35 @@ export default class Local extends Backend {
 			edit: true,
 			save: true
 		});
-		this.key = o.key;
 	}
 
-	get () {
-		return Promise[this.key in localStorage? "resolve" : "reject"](localStorage[this.key]);
+	async get () {
+		if (this.file.key in localStorage) {
+			return localStorage[this.file.key];
+		}
+
+		throw null;
 	}
 
-	put (serialized) {
+	async put (serialized) {
 		if (!serialized) {
-			delete localStorage[this.key];
+			delete localStorage[this.file.key];
 		}
 		else {
-			localStorage[this.key] = serialized;
+			localStorage[this.file.key] = serialized;
 		}
 
-		return Promise.resolve(serialized);
+		return serialized;
 	}
 
-	static test (value) {
-		return value == "local";
+	static parseURL(source) {
+		const url = new URL(source);
+		let key = url.pathname;
+		return {key};
+	}
+
+	static test (source) {
+		let url = new URL(source);
+		return url.protocol == "local:";
 	}
 }

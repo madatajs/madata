@@ -13,6 +13,14 @@ export default class OAuthBackend extends AuthBackend {
 		this.login(true);
 	}
 
+	update(url, o) {
+		super.update(url, o);
+
+		if (this.constructor.key ?? o.key) {
+			this.key = o.key ?? this.constructor.key;
+		}
+	}
+
 	isAuthenticated () {
 		return !!this.accessToken;
 	}

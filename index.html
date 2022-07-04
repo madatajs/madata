@@ -29,7 +29,7 @@
 <script type="module">
 import Backend from "./src/index.js";
 
-let backend = Backend.create("https://github.com/LeaVerou/leaverou.github.io/blob/master/countries.json");
+let backend = Backend.create("https://github.com/mavoweb/data/test.json");
 
 backend.addEventListener("mv-login", evt => {
 	header.classList.add("logged-in");
@@ -49,6 +49,11 @@ logout_button.onclick = evt => backend.logout();
 let json = await backend.load();
 
 console.log(json);
+
+json ||= {test: 0};
+json.test++
+
+backend.store(json);
 </script>
 </body>
 </html>

@@ -13,7 +13,7 @@ export default class Dropbox extends OAuthBackend {
 	update (url, o) {
 		super.update(url, o);
 
-		this.url = Dropbox.fixShareURL(this.url);
+		this.file.url = Dropbox.#fixShareURL(this.url);
 	}
 
 	async upload (file, path) {
@@ -25,7 +25,7 @@ export default class Dropbox extends OAuthBackend {
 
 	async getURL (path) {
 		let shareInfo = await this.request("sharing/create_shared_link_with_settings", {path}, "POST");
-		return Dropbox.fixShareURL(shareInfo.url);
+		return Dropbox.#fixShareURL(shareInfo.url);
 	}
 
 	/**
@@ -89,7 +89,7 @@ export default class Dropbox extends OAuthBackend {
 	}
 
 	// Transform the dropbox shared URL into something raw and CORS-enabled
-	static fixShareURL = url => {
+	static #fixShareURL = url => {
 		url = new URL(url, location);
 		url.hostname = "dl.dropboxusercontent.com";
 		url.search = url.search.replace(/\bdl=0|^$/, "raw=1");

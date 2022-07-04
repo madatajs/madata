@@ -1,6 +1,5 @@
 import hooks from './hooks.js';
 
-
 /**
  * Base class for all backends
  */
@@ -16,14 +15,14 @@ export default class Backend extends EventTarget {
 
 	update (url, o = {}) {
 		this.source = url;
-
-		// Backends that are not URL-based should just ignore this
-		this.url = new URL(this.source, o.urlBase);
-
+		this.file = this.constructor.parseURL(url);
 		this.options = o;
 
-		if (this.constructor.key ?? o.key) {
-			this.key = o.key ?? this.constructor.key;
+		// Options object has higher priority than url
+		for (let prop in this.file) {
+			if (prop in o) {
+				this.file[prop] = o[prop];
+			}
 		}
 	}
 
@@ -61,11 +60,14 @@ export default class Backend extends EventTarget {
 
 		try {
 			let response = await fetch(url.href);
-			return response.ok? response.text() : Promise.reject(response);
+
+			if (response.ok) {
+				return response.text();
+			}
 		}
-		catch (e) {
-			return null;
-		}
+		catch (e) {}
+
+		return null;
 	}
 
 	async load () {
@@ -84,21 +86,28 @@ export default class Backend extends EventTarget {
 		return json;
 	}
 
-	async store (data, {path} = {}) {
+	async store (data, {url, path, ...o} = {}) {
 		await this.ready;
 
 		let serialized = typeof data === "string"? data : await this.stringify(data);
-		await this.put(serialized, path);
+		let file;
 
-		return {data, serialized};
+		if (url) {
+			file = this.constructor.parseURL(url);
+		}
+		else {
+			file = this.file;
+		}
+
+		let fileInfo = await this.put(serialized, {file, ...o});
+
+		// TODO add data and serialized onto fileInfo so we can just return a single value?
+
+		return {data, serialized, fileInfo};
 	}
 
 	// To be be overriden by subclasses
 	ready = Promise.resolve()
-
-	put () {
-		return Promise.reject();
-	}
 
 	toString () {
 		return `${this.constructor.name} (${this.source})`;
@@ -108,17 +117,35 @@ export default class Backend extends EventTarget {
 		return backend === this || (backend && this.constructor == backend.constructor && this.source == backend.source);
 	}
 
+	static parseURL(source) {
+		let url = new URL(source, location);
+		return {url};
+	}
+
 	// Return the appropriate backend(s) for this url
 	static create (url, o = {}) {
 		let Class;
 
 		if (o.type) {
-			// Using get() for case-insensitive property lookup
 			Class = Backend[o.type];
 		}
 
 		if (url && !Class) {
-			Class = Backend.types.find(c => c.test(url, o)) || Backend.Remote;
+			for (let backend of Backend.types) {
+				if (backend.test(url, o)) {
+					Class = backend;
+
+					// TODO check if backend is a descendant class of this
+					// This allows calling create on child classes to narrow the scope of the search
+
+					break;
+				}
+			}
+
+			if (!Class) {
+				// No backend found, fall back to basic read-only URL loading
+				Class = Backend.Remote
+			}
 		}
 
 		// Can we re-use the existing object perhaps?

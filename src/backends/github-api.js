@@ -9,11 +9,11 @@ export default class GithubAPI extends Github {
 	}
 
 	async get (url) {
-		let info = url? Github.parseURL(url) : this.info;
+		let call = url? GithubAPI.parseURL(url) : this.info;
 
-		if (info.query) {
+		if (call.query) {
 			// GraphQL
-			let response = await this.request(this.url, { query: info.query }, "POST");
+			let response = await this.request(this.url, { query: call.query }, "POST");
 			if (response.errors?.length) {
 				throw new Error(response.errors.map(x => x.message).join("\n"));
 			}
@@ -27,12 +27,12 @@ export default class GithubAPI extends Github {
 				"Accept": "application/vnd.github.squirrel-girl-preview"
 			}
 		};
-		let response = await this.request(info.apiCall, {ref:this.branch}, "GET", req);
+		let response = await this.request(call.apiCall, {ref:this.branch}, "GET", req);
 
 		// Raw API call
 		let json = await response.json();
 
-		let params = new URL(info.apiCall, this.constructor.apiDomain).searchParams;
+		let params = new URL(call.apiCall, this.constructor.apiDomain).searchParams;
 		let maxPages = params.get("max_pages") - 1; /* subtract 1 because we already fetched a page */
 
 		if (maxPages > 0 && params.get("page") === null && Array.isArray(json)) {
@@ -72,7 +72,7 @@ export default class GithubAPI extends Github {
 
 	static test (url) {
 		url = new URL(url, location);
-		return /^api\.github\.com/.test(url.host);
+		return url.host === "api.github.com";
 	}
 
 	static parseURL (source) {

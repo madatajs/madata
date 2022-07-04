@@ -22,3 +22,7 @@ export function readFile (file, format = "DataURL") {
 export function $(selector, context = document) {
 	return context.querySelector(selector);
 }
+
+export function delay(ms) {
+	return new Promise(resolve => setTimeout(resolve, ms));
+}
