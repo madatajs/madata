@@ -2,7 +2,7 @@ import Github from "./github.js";
 import hooks from "../../src/hooks.js";
 import {readFile, delay} from "../../src/util.js";
 
-export default class GithubRepos extends Github {
+export default class GithubFile extends Github {
 	async get (url) {
 		let file = url? this.constructor.parseURL(url) : this.file;
 
