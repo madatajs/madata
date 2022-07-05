@@ -1,6 +1,6 @@
 import Github from "./github.js";
-import hooks from "../hooks.js";
-import {readFile, delay} from "../util.js";
+import hooks from "../../src/hooks.js";
+import {readFile, delay} from "../../src/util.js";
 
 export default class GithubRepos extends Github {
 	async get (url) {

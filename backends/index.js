@@ -1,7 +1,7 @@
 /**
  * Export all backends and register them
  */
-import Backend from "../backend.js";
+import Backend from "../src/backend.js";
 import * as backends from "./index-fn.js";
 
 for (let name in backends) {

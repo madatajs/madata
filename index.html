@@ -26,6 +26,12 @@
 	<button id="logout_button" class="if-logged-in">Logout</button>
 </header>
 
+<label>
+	Test value: <input type="text" id="test_value">
+</label>
+
+<button id="save_button">Save</button>
+
 <script type="module">
 import Backend from "./src/index.js";
 
@@ -48,12 +54,13 @@ logout_button.onclick = evt => backend.logout();
 
 let json = await backend.load();
 
-console.log(json);
+test_value.value = json.test;
 
-json ||= {test: 0};
-json.test++
+save_button.addEventListener("click", evt => {
+	json.test = +test_value.value;
+	backend.store(json);
+});
 
-backend.store(json);
 </script>
 </body>
 </html>

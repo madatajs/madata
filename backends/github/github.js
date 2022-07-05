@@ -1,4 +1,4 @@
-import OAuthBackend from "../oauth-backend.js";
+import OAuthBackend from "../../src/oauth-backend.js";
 
 export default class Github extends OAuthBackend {
 	constructor (url, o) {

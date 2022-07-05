@@ -1,4 +1,4 @@
-import Backend from "../backend.js";
+import Backend from "../src/backend.js";
 
 /**
  * Load from a remote URL, no save
