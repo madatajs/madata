@@ -73,7 +73,7 @@ export default class OAuthBackend extends AuthBackend {
 			response = await fetch(call, req);
 		}
 		catch (err) {
-			throw new Error("Something went wrong while connecting to " + this.constructor.name, err);
+			throw new Error(this.constructor.phrase("something_went_wrong_while_connecting", this.constructor.name), err);
 		}
 
 		if (response?.ok) {
@@ -140,8 +140,7 @@ export default class OAuthBackend extends AuthBackend {
 				"popup", `width=${popup.width},height=${popup.height},left=${popup.left},top=${popup.top}`);
 
 			if (!this.authPopup) {
-				var message = "Login popup was blocked! Please check your popup blocker settings.";
-				throw new Error(message);
+				throw new Error(this.constructor.phrase("popup_blocked"));
 			}
 
 			let accessToken = await new Promise((resolve, reject) => {
@@ -152,7 +151,7 @@ export default class OAuthBackend extends AuthBackend {
 						}
 
 						if (!this.accessToken) {
-							reject(Error("Authentication error"));
+							reject(Error(this.constructor.phrase("authentication_error")));
 						}
 					}
 				});
@@ -196,5 +195,10 @@ export default class OAuthBackend extends AuthBackend {
 
 	static get tokenKey () {
 		return `mavo:${this.name.toLowerCase()}token`;
+	}
+
+	static phrases = {
+		"popup_blocked": "Login popup was blocked! Please check your popup blocker settings.",
+		"something_went_wrong_while_connecting": name => "Something went wrong while connecting to " + name,
 	}
 }

@@ -166,4 +166,25 @@ export default class Backend extends EventTarget {
 	}
 
 	static hooks = hooks
+
+	static phrase (id, ...args) {
+		let ret = this.phrases?.[id];
+
+		if (ret) {
+			if (typeof ret === "function") {
+				return ret(...args);
+			}
+
+			return ret;
+		}
+
+		// Not found, look in ancestors
+		let parent = Object.getPrototypeOf(this);
+		if (parent.phrase) {
+			return parent.phrase(id, ...args);
+		}
+
+		// We're on the root class and still can't find it
+		return id + " " + args.join(" ");
+	}
 };

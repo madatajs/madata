@@ -23,4 +23,8 @@ export default class AuthBackend extends Backend {
 
 	async login () {}
 	async logout () {}
+
+	static phrases = {
+		"authentication_error": "Authentication error",
+	}
 }

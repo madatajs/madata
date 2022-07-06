@@ -102,7 +102,7 @@ export default class GithubFile extends Github {
 			});
 
 			fileInfo = await this.request(fileCall, {
-				message: commitPrefix + `Updated ${fileInfo.name || "file"}`,
+				message: commitPrefix + this.constructor.phrase("updated_file", fileInfo.name || file.path),
 				content: serialized,
 				branch: this.file.branch,
 				sha: fileInfo.sha
@@ -110,10 +110,9 @@ export default class GithubFile extends Github {
 		}
 		catch (err) {
 			if (err.status == 404) {
-				console.log("does not exist")
 				// File does not exist, create it
 				fileInfo = await this.request(fileCall, {
-					message: commitPrefix + "Created file",
+					message: commitPrefix + this.constructor.phrase("created_file", file.path),
 					content: serialized,
 					branch: this.file.branch
 				}, "PUT");
@@ -196,7 +195,7 @@ export default class GithubFile extends Github {
 	/**
 	 * Find forks of a repo by the current user
 	 *
-	 * @param {*} repo
+	 * @param {Object} repoInfo
 	 * @memberof Github
 	 */
 	async getMyFork(repoInfo = this.file.repoInfo) {
@@ -303,6 +302,11 @@ export default class GithubFile extends Github {
 	static defaults = {
 		repo: "mv-data",
 		path: "data.json",
+	}
+
+	static phrases = {
+		"updated_file": (name = "file") => "Updated " + name,
+		"created_file": (name = "file") => "Created " + name,
 	}
 
 	static test (url) {
