@@ -16,8 +16,8 @@ export default class OAuthBackend extends AuthBackend {
 	update(url, o) {
 		super.update(url, o);
 
-		if (this.constructor.key ?? o.key) {
-			this.key = o.key ?? this.constructor.key;
+		if (this.constructor.apiKey ?? o.apiKey) {
+			this.apiKey = o.apiKey ?? this.constructor.apiKey;
 		}
 	}
 
@@ -136,7 +136,7 @@ export default class OAuthBackend extends AuthBackend {
 				backend: this.constructor.name
 			};
 
-			this.authPopup = open(`${this.constructor.oAuth}?client_id=${this.key}&state=${encodeURIComponent(JSON.stringify(state))}` + this.oAuthParams(),
+			this.authPopup = open(`${this.constructor.oAuth}?client_id=${this.apiKey}&state=${encodeURIComponent(JSON.stringify(state))}` + this.oAuthParams(),
 				"popup", `width=${popup.width},height=${popup.height},left=${popup.left},top=${popup.top}`);
 
 			if (!this.authPopup) {

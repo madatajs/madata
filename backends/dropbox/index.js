@@ -81,7 +81,7 @@ export default class Dropbox extends OAuthBackend {
 
 	static apiDomain = "https://api.dropboxapi.com/2/"
 	static oAuth = "https://www.dropbox.com/oauth2/authorize"
-	static key = "2mx6061p054bpbp"
+	static apiKey = "2mx6061p054bpbp"
 
 	static test (url) {
 		url = new URL(url, location);
