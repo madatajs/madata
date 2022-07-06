@@ -82,19 +82,26 @@ export default class GithubFile extends Github {
 			}
 		}
 
-		let fileCall = `repos/${file.owner}/${file.repo}/contents/${file.path}`;
-
 		if (this.canPush(file) === false) {
-			// Does not have permission to commit, create a fork
-			let forkInfo = await this.fork(file);
+			if (this.options.allowForking) {
+				// Does not have permission to commit, create a fork
+				let forkInfo = await this.fork(file);
 
-			fileCall = `repos/${forkInfo.full_name}/contents/${file.path}`;
-			file.forkInfo = forkInfo;
+				file.forked = true;
+				file.original = Object.assign({}, file);
+				file.owner = forkInfo.owner.login;
+				file.repo = forkInfo.name;
+				file.repoInfo = forkInfo;
+			}
+			else {
+				throw new Error(this.constructor.phrase("no_push_permission", `${file.owner}/${file.repo}`));
+			}
 		}
 
 		serialized = isEncoded? serialized : toBase64(serialized);
 
 		let fileInfo;
+		let fileCall = `repos/${file.owner}/${file.repo}/contents/${file.path}`;
 
 		try {
 			fileInfo = await this.request(fileCall, {
@@ -307,6 +314,7 @@ export default class GithubFile extends Github {
 	static phrases = {
 		"updated_file": (name = "file") => "Updated " + name,
 		"created_file": (name = "file") => "Created " + name,
+		"no_push_permission": (repo) => `You do not have permission to write to repository ${repo}`,
 	}
 
 	static test (url) {
