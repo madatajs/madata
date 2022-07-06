@@ -67,8 +67,6 @@ export default class GithubFile extends Github {
 	 * @return {Promise} A promise that resolves when the file is saved.
 	 */
 	 async put (serialized, {file = this.file, path, isEncoded, ...o} = {}) {
-		let commitPrefix = this.options.commitPrefix || "";
-
 		if (path) {
 			file = Object.assign({}, file, {path});
 		}
@@ -102,6 +100,7 @@ export default class GithubFile extends Github {
 
 		let fileInfo;
 		let fileCall = `repos/${file.owner}/${file.repo}/contents/${file.path}`;
+		let commitPrefix = this.options.commitPrefix || "";
 
 		try {
 			fileInfo = await this.request(fileCall, {
@@ -203,19 +202,19 @@ export default class GithubFile extends Github {
 	 * Find forks of a repo by the current user
 	 *
 	 * @param {Object} repoInfo
-	 * @memberof Github
+	 * @returns {Object} repoInfo object about the fork or null
 	 */
 	async getMyFork(repoInfo = this.file.repoInfo) {
 		let myRepoCount = this.user.public_repos + this.user.total_private_repos;
 
 		if (myRepoCount < repoInfo.forks) {
-			// Search which of this user's repo is a fork of the repo in question
+			// Search which of this user's repos is a fork of the repo in question
 			let query = `query {
 				viewer {
 					name
 						repositories(last: 100, isFork: true) {
 						nodes {
-							url
+							nameWithOwner
 							parent {
 								nameWithOwner
 							}
@@ -229,7 +228,8 @@ export default class GithubFile extends Github {
 
 			for (let i in repos) {
 				if (repos[i].parent.nameWithOwner === repoInfo.full_name) {
-					return repos[i].url;
+					let [owner, repo] = repos[i].nameWithOwner.split("/");
+					return this.getRepoInfo({owner, repo});
 				}
 			}
 		}
@@ -239,14 +239,32 @@ export default class GithubFile extends Github {
 
 			for (let fork of forks) {
 				if (fork.owner.login === this.user.username) {
-					return fork.html_url;
+					return fork;
 				}
 			}
 		}
+
+		return null;
 	}
 
-	async fork (file = this.file) {
-		let repoCall = `repos/${file.owner}/${file.repo}`;
+	/**
+	 * Fork a repo, or return a fork if one already exists
+	 * @param [repoInfo]
+	 * @param {options} [options]
+	 * @param [options.force=false] {Boolean} Force a new repo to be created. If false, will try to find an existing fork of the repo.
+	 * @returns
+	 */
+	async fork (repoInfo = this.file.repoInfo, {force = false} = {}) {
+		let repoCall = `repos/${repoInfo.full_name}`;
+
+		if (!force) {
+			// Check if we have an existing fork
+			let forkInfo = await this.getMyFork(repoInfo);
+
+			if (forkInfo) {
+				return forkInfo;
+			}
+		}
 
 		// Does not have permission to commit, create a fork
 		// FIXME what if I already have a repo with that name?
@@ -265,7 +283,7 @@ export default class GithubFile extends Github {
 		return forkInfo;
 	}
 
-	async getPagesInfo (repoInfo) {
+	async getPagesInfo (repoInfo = this.file.repoInfo) {
 		let repo = repoInfo.full_name;
 		return repoInfo.pagesInfo = repoInfo.pagesInfo || this.request(`repos/${repo}/pages`, {}, "GET", {
 			headers: {
@@ -337,10 +355,14 @@ export default class GithubFile extends Github {
 			path: undefined,
 		};
 
-		if (ret.repo) {
-			// If we don't have a repo, we won't have a branch or a file path either
-			if (!/raw.githubusercontent.com$/.test(url.host) && path[0] == "blob") {
+		if (ret.repo) { // If we don't have a repo, we won't have a branch or a file path either
+			let hasBranch = url.host === "raw.githubusercontent.com" || path[0] === "blob";
+
+			if (url.host !== "raw.githubusercontent.com" && path[0] === "blob") {
 				path.shift(); // drop "blob"
+			}
+
+			if (hasBranch) {
 				ret.branch = path.shift();
 			}
 
