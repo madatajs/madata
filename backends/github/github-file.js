@@ -311,7 +311,7 @@ export default class GithubFile extends Github {
 
 	static test (url) {
 		url = new URL(url, location);
-		return /^(github\.com|raw\.githubusercontent\.com)/.test(url.host);
+		return ["github.com", "raw.githubusercontent.com"].includes(url.host);
 	}
 
 	/**
