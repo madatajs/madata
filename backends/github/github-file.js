@@ -83,7 +83,7 @@ export default class GithubFile extends Github {
 		if ((await this.canPush(file)) === false) {
 			if (this.options.allowForking) {
 				// Does not have permission to commit, create a fork
-				let forkInfo = await this.fork(file.repoInfo);
+				let forkInfo = await this.fork(file);
 
 				file.forked = true;
 				file.original = Object.assign({}, file);
@@ -249,17 +249,17 @@ export default class GithubFile extends Github {
 
 	/**
 	 * Fork a repo, or return a fork if one already exists
-	 * @param [repoInfo]
+	 * @param [file]
 	 * @param {options} [options]
 	 * @param [options.force=false] {Boolean} Force a new repo to be created. If false, will try to find an existing fork of the repo.
 	 * @returns
 	 */
-	async fork (repoInfo = this.file.repoInfo, {force = false} = {}) {
-		let repoCall = `repos/${repoInfo.full_name}`;
+	async fork (file = this.file, {force = false} = {}) {
+		let repoCall = `repos/${file.repoInfo.full_name}`;
 
 		if (!force) {
 			// Check if we have an existing fork
-			let forkInfo = await this.getMyFork(repoInfo);
+			let forkInfo = await this.getMyFork(file.repoInfo);
 
 			if (forkInfo) {
 				return forkInfo;
@@ -268,7 +268,7 @@ export default class GithubFile extends Github {
 
 		// Does not have permission to commit, create a fork
 		// FIXME what if I already have a repo with that name?
-		let forkInfo = await this.request(`${repoCall}/forks`, {name: this.file.repo}, "POST");
+		let forkInfo = await this.request(`${repoCall}/forks`, {name: file.repo}, "POST");
 
 		// Ensure that fork is created (they take a while) by requesting commits every second up to 5 minutes
 		for (let i = 0; i < 300; i++) {
