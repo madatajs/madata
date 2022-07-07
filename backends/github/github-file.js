@@ -34,7 +34,7 @@ export default class GithubFile extends Github {
 		}
 		else {
 			// Unauthenticated, use simple GET request to avoid rate limit
-			url = new URL(`https://raw.githubusercontent.com/${file.username}/${file.repo}/${file.branch || "main"}/${file.path}`);
+			url = new URL(`https://raw.githubusercontent.com/${file.owner}/${file.repo}/${file.branch || "main"}/${file.path}`);
 			url.searchParams.set("timestamp", Date.now()); // ensure fresh copy
 
 			let response = await fetch(url.href);
@@ -46,7 +46,7 @@ export default class GithubFile extends Github {
 			else {
 				if (response.status === 404 && !file.branch) {
 					// Possibly using older default branch "master", try again and store branch name
-					url.pathname = `/${file.username}/${file.repo}/master/${file.path}`;
+					url.pathname = `/${file.owner}/${file.repo}/master/${file.path}`;
 					response = await fetch(url.href);
 
 					if (response.ok) {
