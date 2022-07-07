@@ -205,7 +205,7 @@ export default class GithubFile extends Github {
 	 * @returns {Object} repoInfo object about the fork or null
 	 */
 	async getMyFork(repoInfo = this.file.repoInfo) {
-		let myRepoCount = this.user.public_repos;
+		let myRepoCount = this.user.public_repos + this.user.total_private_repos;
 
 		if (myRepoCount < repoInfo.forks) {
 			// Search which of this user's repos is a fork of the repo in question
