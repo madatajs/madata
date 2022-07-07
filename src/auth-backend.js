@@ -9,6 +9,8 @@ export default class AuthBackend extends Backend {
 		this.updatePermissions({
 			login: true
 		});
+
+		this.login({passive: true});
 	}
 
 	isAuthenticated () {

@@ -9,8 +9,6 @@ import {type} from "./util.js";
 export default class OAuthBackend extends AuthBackend {
 	constructor (url, o = {}) {
 		super(url, o);
-
-		this.login(true);
 	}
 
 	update(url, o) {
@@ -89,17 +87,29 @@ export default class OAuthBackend extends AuthBackend {
 		}
 	}
 
+	static getOAuthProvider() {
+		if (this.hasOwnProperty("oAuth")) {
+			return this;
+		}
+		else {
+			let parent = Object.getPrototypeOf(this);
+			return parent.getOAuthProvider?.();
+		}
+	}
+
 	/**
 	 * Helper method for authenticating in OAuth APIs
 	 */
-	async login ({passive = false}) {
+	async login ({passive = false} = {}) {
 		await this.ready;
 
 		if (this.isAuthenticated()) {
 			return this.getUser();
 		}
 
-		let id = this.constructor.name.toLowerCase();
+		let authProvider = this.constructor.getOAuthProvider();
+
+		let id = authProvider.name.toLowerCase();
 
 		this.accessToken = localStorage[this.constructor.tokenKey];
 
@@ -133,7 +143,7 @@ export default class OAuthBackend extends AuthBackend {
 
 			var state = {
 				url: location.href,
-				backend: this.constructor.name
+				backend: authProvider.name
 			};
 
 			this.authPopup = open(`${this.constructor.oAuth}?client_id=${this.clientId}&state=${encodeURIComponent(JSON.stringify(state))}` + this.oAuthParams(),
@@ -146,7 +156,7 @@ export default class OAuthBackend extends AuthBackend {
 			let accessToken = await new Promise((resolve, reject) => {
 				addEventListener("message", evt => {
 					if (evt.source === this.authPopup) {
-						if (evt.data.backend == this.constructor.name) {
+						if (evt.data.backend == authProvider.name) {
 							resolve(evt.data.token);
 						}
 
@@ -194,7 +204,8 @@ export default class OAuthBackend extends AuthBackend {
 	}
 
 	static get tokenKey () {
-		return `mavo:${this.name.toLowerCase()}token`;
+		let name = this.getOAuthProvider()?.name || this.name;
+		return `mavo:${name.toLowerCase()}token`;
 	}
 
 	static phrases = {
