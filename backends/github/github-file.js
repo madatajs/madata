@@ -80,10 +80,10 @@ export default class GithubFile extends Github {
 			}
 		}
 
-		if (this.canPush(file) === false) {
+		if ((await this.canPush(file)) === false) {
 			if (this.options.allowForking) {
 				// Does not have permission to commit, create a fork
-				let forkInfo = await this.fork(file);
+				let forkInfo = await this.fork(file.repoInfo);
 
 				file.forked = true;
 				file.original = Object.assign({}, file);
@@ -205,7 +205,7 @@ export default class GithubFile extends Github {
 	 * @returns {Object} repoInfo object about the fork or null
 	 */
 	async getMyFork(repoInfo = this.file.repoInfo) {
-		let myRepoCount = this.user.public_repos + this.user.total_private_repos;
+		let myRepoCount = this.user.public_repos;
 
 		if (myRepoCount < repoInfo.forks) {
 			// Search which of this user's repos is a fork of the repo in question
@@ -268,7 +268,7 @@ export default class GithubFile extends Github {
 
 		// Does not have permission to commit, create a fork
 		// FIXME what if I already have a repo with that name?
-		let forkInfo = await this.request(`${repoCall}/forks`, {name: file.repo}, "POST");
+		let forkInfo = await this.request(`${repoCall}/forks`, {name: this.file.repo}, "POST");
 
 		// Ensure that fork is created (they take a while) by requesting commits every second up to 5 minutes
 		for (let i = 0; i < 300; i++) {
