@@ -7,7 +7,7 @@ export default class Github extends OAuthBackend {
 		this.updatePermissions({ read: true });
 	}
 
-	oAuthParams = () => "&scope=repo"
+	oAuthParams = () => "&scope=user%20repo"
 
 	async getUser () {
 		if (this.user) {
