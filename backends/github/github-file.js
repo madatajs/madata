@@ -80,7 +80,7 @@ export default class GithubFile extends Github {
 			}
 		}
 
-		if (this.canPush(file) === false) {
+		if ((await this.canPush(file)) === false) {
 			if (this.options.allowForking) {
 				// Does not have permission to commit, create a fork
 				let forkInfo = await this.fork(file);
@@ -249,17 +249,17 @@ export default class GithubFile extends Github {
 
 	/**
 	 * Fork a repo, or return a fork if one already exists
-	 * @param [repoInfo]
+	 * @param [file]
 	 * @param {options} [options]
 	 * @param [options.force=false] {Boolean} Force a new repo to be created. If false, will try to find an existing fork of the repo.
 	 * @returns
 	 */
-	async fork (repoInfo = this.file.repoInfo, {force = false} = {}) {
-		let repoCall = `repos/${repoInfo.full_name}`;
+	async fork (file = this.file, {force = false} = {}) {
+		let repoCall = `repos/${file.repoInfo.full_name}`;
 
 		if (!force) {
 			// Check if we have an existing fork
-			let forkInfo = await this.getMyFork(repoInfo);
+			let forkInfo = await this.getMyFork(file.repoInfo);
 
 			if (forkInfo) {
 				return forkInfo;
