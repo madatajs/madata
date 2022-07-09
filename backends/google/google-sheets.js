@@ -6,7 +6,7 @@ export default class GoogleSheets extends Google {
 
 		Object.assign(this, o);
 
-		this.spreadsheet = this.file.url.pathname?.slice(1)?.split("/")[2];
+		this.spreadsheet = this.file.url.pathname?.slice(1)?.split("/")?.[2];
 		this.apiKey = this.apiKey ?? this.constructor.apiKey;
 	}
 
