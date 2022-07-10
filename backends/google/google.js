@@ -33,6 +33,8 @@ export default class Google extends OAuthBackend {
 	static useCache = false
 
 	static phrases = {
+		access_token_invalid: "Access token is invalid. Please, log in again.",
+		api_key_invalid: key => `The API key “${key}” is not valid. Please provide a valid API key.`,
 		unknown_error: error => `An unknown error occurred. ${error}.`
 	}
 }

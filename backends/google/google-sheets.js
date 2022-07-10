@@ -403,8 +403,6 @@ export default class GoogleSheets extends Google {
 	}
 
 	static phrases = {
-		access_token_invalid: "Access token is invalid. Please, log in again.",
-		api_key_invalid: key => `The API key “${key}” is not valid. Please provide a valid API key.`,
 		no_read_permission: spreadsheet => `You don not have permission to read data from the spreadsheet “${spreadsheet}”.`,
 		no_write_permission: spreadsheet => `You don not have permission to write data to the spreadsheet “${spreadsheet}”.`,
 		no_spreadsheet: spreadsheet => `We could not find the spreadsheet “${spreadsheet}”.`,
