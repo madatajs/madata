@@ -16,8 +16,8 @@ export default class GoogleSheets extends Google {
 				this.sheet = await this.#findSheet();
 			}
 		}
-		catch (err) {
-			switch (err.status) {
+		catch (e) {
+			switch (e.status) {
 				case 400:
 					throw new Error(this.constructor.phrase("api_key_invalid"));
 				case 401:
@@ -28,7 +28,7 @@ export default class GoogleSheets extends Google {
 				case 404:
 					throw new Error(this.constructor.phrase("no_spreadsheet"));
 				default:
-					throw new Error(this.constructor.phrase("unknown_error", err));
+					throw new Error(this.constructor.phrase("unknown_error", e));
 			}
 		}
 
@@ -38,17 +38,17 @@ export default class GoogleSheets extends Google {
 		try {
 			spreadsheet = await this.request(call);
 		}
-		catch (err) {
-			switch (err.status) {
+		catch (e) {
+			switch (e.status) {
 				case 400:
-					const error = (await err.json()).error.message;
+					const error = (await e.json()).error.message;
 					throw new Error(this.constructor.phrase("no_sheet_or_invalid_range", error));
 				case 403:
 					throw new Error(this.constructor.phrase("no_read_permission"));
 				case 404:
 					throw new Error(this.constructor.phrase("no_spreadsheet"));
 				default:
-					throw new Error(this.constructor.phrase("unknown_error", err));
+					throw new Error(this.constructor.phrase("unknown_error", e));
 			}
 		}
 
