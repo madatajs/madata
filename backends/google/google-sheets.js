@@ -348,7 +348,7 @@ export default class GoogleSheets extends Google {
 		// Why? One can pass the spreadsheet URL as an option of the store() method.
 		// It allows reading data from one spreadsheet and storing it in another one.
 		// Should we allow it? Or am I overengineering the problem?
-		if (url.host !== "docs.google.com" || !url.pathname.startsWith("/spreadsheets/")) {
+		if (!GoogleSheets.test(url.toString())) {
 			return null;
 		}
 
