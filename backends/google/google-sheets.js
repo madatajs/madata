@@ -181,6 +181,16 @@ export default class GoogleSheets extends Google {
 		return data;
 	}
 
+	async login (...args) {
+		const user = await super.login(...args);
+
+		if (user) {
+			this.updatePermissions({edit: true, save: true});
+		}
+
+		return user;
+	}
+
 	get #sheetAndRange () {
 		/**
 		 * Since sheet title and cells range are optional, we need to cover all the possible cases:
