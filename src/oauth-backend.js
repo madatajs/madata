@@ -122,11 +122,6 @@ export default class OAuthBackend extends AuthBackend {
 			}
 		}
 
-		if (this.accessToken) {
-			this.dispatchEvent(new CustomEvent("mv-login"));
-			return this.user;
-		}
-
 		if (!passive) {
 			// Show window
 			let popup = {
@@ -169,6 +164,7 @@ export default class OAuthBackend extends AuthBackend {
 		}
 
 		if (this.isAuthenticated()) {
+			this.dispatchEvent(new CustomEvent("mv-login"));
 			this.updatePermissions({login: false, logout: true});
 			return this.getUser();
 		}
