@@ -403,9 +403,9 @@ export default class GoogleSheets extends Google {
 	}
 
 	static phrases = {
-		no_read_permission: spreadsheet => `You don not have permission to read data from the spreadsheet “${spreadsheet}”.`,
-		no_write_permission: spreadsheet => `You don not have permission to write data to the spreadsheet “${spreadsheet}”.`,
-		no_spreadsheet: spreadsheet => `We could not find the spreadsheet “${spreadsheet}”.`,
+		no_read_permission: spreadsheet => `You don not have permission to read data from the spreadsheet: ${spreadsheet}.`,
+		no_write_permission: spreadsheet => `You don not have permission to write data to the spreadsheet: ${spreadsheet}.`,
+		no_spreadsheet: spreadsheet => `We could not find the spreadsheet: ${spreadsheet}.`,
 		no_sheet_to_store_data: (spreadsheet, sheet) => `We could not find the ”${sheet}“ sheet in the spreadsheet “${spreadsheet}” and created it.`,
 		no_sheet_or_invalid_range: (spreadsheet, error) => `There is no sheet with the specified name in the spreadsheet “${spreadsheet}”, and/or the format you used to specify the range is invalid. ${error}.`,
 		invalid_range: error => `The format you used to specify the range for storing data is invalid. ${error}.`,
