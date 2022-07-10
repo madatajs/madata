@@ -224,7 +224,7 @@ export default class GoogleSheets extends Google {
 	static scopes = ["https://www.googleapis.com/auth/spreadsheets"];
 
 	static test (url) {
-		return /^https:\/\/docs.google.com\/spreadsheets\/?.*/.test(url);
+		return url.startsWith("https://docs.google.com/spreadsheets/");
 	}
 
 	static #toISO (serial) {
