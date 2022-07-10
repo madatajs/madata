@@ -6,11 +6,12 @@ export default class GoogleSheets extends Google {
 
 		Object.assign(this, o);
 
-		this.spreadsheet = this.file.url.pathname?.slice(1)?.split("/")?.[2];
 		this.apiKey = this.apiKey ?? this.constructor.apiKey;
 	}
 
-	async get () {
+	async get (url) {
+		this.spreadsheetId = this.spreadsheetId ?? this.#getSpreadsheetId(url);
+
 		try {
 			if (this.#getRangeReference() === "") {
 				this.sheet = await this.#findSheet();
@@ -32,7 +33,7 @@ export default class GoogleSheets extends Google {
 			}
 		}
 
-		const call = `${this.spreadsheet}/?key=${this.apiKey}&ranges=${this.#getRangeReference()}&includeGridData=true`;
+		const call = `${this.spreadsheetId}/?key=${this.apiKey}&ranges=${this.#getRangeReference()}&includeGridData=true`;
 
 		let spreadsheet;
 		try {
@@ -191,6 +192,12 @@ export default class GoogleSheets extends Google {
 		return user;
 	}
 
+	#getSpreadsheetId (url = this.file.url) {
+		url = new URL(url);
+
+		return url.pathname?.slice(1)?.split("/")?.[2];
+	}
+
 	#getRangeReference (sheet = this.sheet, range = this.range) {
 		/**
 		 * Since sheet title and cells range are optional, we need to cover all the possible cases:
@@ -207,8 +214,8 @@ export default class GoogleSheets extends Google {
 	 * Otherwise, a request to a spreadsheet will fail, and we don't want it.
 	 * Let's use all cells of the first visible sheet by default. To do that, we need to provide its title.
 	 */
-	async #findSheet () {
-		const call = `${this.spreadsheet}/?key=${this.apiKey}`;
+	async #findSheet (spreadsheetId = this.spreadsheetId, key = this.apiKey) {
+		const call = `${spreadsheetId}/?key=${key}`;
 		const spreadsheet = await this.request(call);
 		const visibleSheet = spreadsheet.sheets?.find?.(sheet => !sheet.properties?.hidden);
 
