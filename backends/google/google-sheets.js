@@ -22,12 +22,12 @@ export default class GoogleSheets extends Google {
 				case 400:
 					throw new Error(this.constructor.phrase("api_key_invalid"));
 				case 401:
-					this.logout(); // Access token we have is invalid. Discard it.
+					await this.logout(); // Access token we have is invalid. Discard it.
 					throw new Error(this.constructor.phrase("access_token_invalid"));
 				case 403:
-					throw new Error(this.constructor.phrase("no_read_permission"));
+					throw new Error(this.constructor.phrase("no_read_permission", this.source));
 				case 404:
-					throw new Error(this.constructor.phrase("no_spreadsheet"));
+					throw new Error(this.constructor.phrase("no_spreadsheet", this.source));
 				default:
 					throw new Error(this.constructor.phrase("unknown_error", e));
 			}
@@ -43,11 +43,11 @@ export default class GoogleSheets extends Google {
 			switch (e.status) {
 				case 400:
 					const error = (await e.json()).error.message;
-					throw new Error(this.constructor.phrase("no_sheet_or_invalid_range", error));
+					throw new Error(this.constructor.phrase("no_sheet_or_invalid_range", this.source, error));
 				case 403:
-					throw new Error(this.constructor.phrase("no_read_permission"));
+					throw new Error(this.constructor.phrase("no_read_permission", this.source));
 				case 404:
-					throw new Error(this.constructor.phrase("no_spreadsheet"));
+					throw new Error(this.constructor.phrase("no_spreadsheet", this.source));
 				default:
 					throw new Error(this.constructor.phrase("unknown_error", e));
 			}
@@ -177,9 +177,97 @@ export default class GoogleSheets extends Google {
 		// We need to store the loaded data so that we can perform diff later.
 		// Why? Because Google Sheets has a built-in version history and we want to benefit from it.
 		// And if every time we overwrite the full data range, it makes the version history useless.
-		this.loadedData = data;
+		this.loadedData = [...data];
 
 		return data;
+	}
+
+	/**
+	 * Write data to a spreadsheet
+	 * @param {*} data — Data to store
+	 * @param {string} spreadsheet — Spreadsheet URL
+	 * @param {string} sheet — Sheet name
+	 * @param {string} range — Range
+	 */
+	async store (data, {spreadsheet, sheet = this.sheet, range = this.range, ...o} = {}) {
+		let spreadsheetId;
+		if (spreadsheet) {
+			spreadsheetId = this.#getSpreadsheetId(spreadsheet);
+		}
+		spreadsheetId = spreadsheetId ?? this.spreadsheetId;
+
+		if (this.#getRangeReference(sheet, range) === "") {
+			try {
+				sheet = await this.#findSheet(spreadsheetId);
+			}
+			catch (e) {
+				switch (e.status) {
+					case 401:
+						await this.logout(); // Access token we have is invalid. Discard it.
+						throw new Error(this.constructor.phrase("access_token_invalid"));
+					case 403:
+						throw new Error(this.constructor.phrase("no_write_permission", spreadsheet ?? this.source));
+					case 404:
+						throw new Error(this.constructor.phrase("no_spreadsheet", spreadsheet ?? this.source));
+					default:
+						throw new Error(this.constructor.phrase("unknown_error", e));
+				}
+			}
+		}
+
+		const recordCount = data.length;
+
+		// If we write back fewer records than we previously got, we need to remove the old data.
+		// The way we can do it is to provide records filled with empty strings.
+		if (recordCount < this.loadedData.length) {
+			const record = Array(data[0].length).fill(""); // ["", ..., ""] — empty row/column of data
+			const records = Array(this.loadedData.length - recordCount).fill(record); // [ ["", ..., ""], ["", ..., ""], ..., ["", ..., ""] ]
+
+			data = data.concat(records);
+		}
+
+		// Add “empty” rows and columns to data so we could store them in the same range we got the source data from.
+		const emptyRecord = this.columnOffset > 0 ? Array(this.columnOffset + data[0].length).fill(undefined) : []; // [undefined, ..., undefined]
+		const emptyRecords = this.rowOffset > 0 ? Array(this.rowOffset).fill(emptyRecord) : []; // [ [undefined, ..., undefined], [undefined, ..., undefined], ..., [undefined, ..., undefined] ]
+
+		if (this.columnOffset > 0) {
+			// Prepend every row with “empty” columns.
+			data = data.map(row => [...Array(this.columnOffset).fill(undefined), ...row]); // [undefined, ..., undefined, data, data, ..., data]
+		}
+
+		// Prepend data with “empty” rows.
+		data = [...emptyRecords, ...data]; // [ [undefined, ..., undefined, undefined, undefined, ..., undefined], ..., [undefined, ..., undefined, undefined, undefined, ..., undefined], [undefined, ..., undefined, data, data, ..., data], ..., [undefined, ..., undefined, data, data, ..., data] ]
+
+		// Write the new data.
+		const call = `${spreadsheetId}/values/${this.#getRangeReference(sheet, range)}?key=${this.apiKey}&valueInputOption=user_entered&responseValueRenderOption=${this.formattedValues ? "formatted_value" : "unformatted_value"}&includeValuesInResponse=true`;
+		const body = {
+			"range": this.#getRangeReference(sheet, range),
+			"majorDimension": "rows",
+			"values": data
+		};
+
+		let response;
+		try {
+			response = await this.request(call, body, "PUT");
+		}
+		catch (e) {
+			switch (e.status) {
+				case 401:
+					await this.logout(); // Access token we have is invalid. Discard it.
+					throw new Error(this.constructor.phrase("access_token_invalid"));
+				case 403:
+					throw new Error(this.constructor.phrase("no_write_permission", spreadsheet ?? this.source));
+				case 404:
+					throw new Error(this.constructor.phrase("no_spreadsheet", spreadsheet ?? this.source));
+				default:
+					throw new Error(this.constructor.phrase("unknown_error", e));
+			}
+		}
+
+		// Saved successfully
+		this.loadedData = response.updatedData?.values;
+
+		return response;
 	}
 
 	async login (...args) {
@@ -194,6 +282,10 @@ export default class GoogleSheets extends Google {
 
 	#getSpreadsheetId (url = this.file.url) {
 		url = new URL(url);
+
+		if (url.host !== "docs.google.com" || !url.pathname.startsWith("/spreadsheets/")) {
+			return null;
+		}
 
 		return url.pathname?.slice(1)?.split("/")?.[2];
 	}
@@ -248,10 +340,11 @@ export default class GoogleSheets extends Google {
 	static phrases = {
 		access_token_invalid: "Access token is invalid. Please, log in again.",
 		api_key_invalid: key => `The API key “${key}” is not valid. Please provide a valid API key.`,
-		no_read_permission: "You don not have permission to read data from the spreadsheet.",
-		no_spreadsheet: "We could not find the spreadsheet you specified.",
+		no_read_permission: spreadsheet => `You don not have permission to read data from the spreadsheet “${spreadsheet}”.`,
+		no_write_permission: spreadsheet => `You don not have permission to write data to the spreadsheet “${spreadsheet}”.`,
+		no_spreadsheet: spreadsheet => `We could not find the spreadsheet “${spreadsheet}”.`,
 		no_sheet_to_store_data: sheet => `We could not find the ”${sheet}“ sheet in the spreadsheet and created it.`,
-		no_sheet_or_invalid_range: error => `There is no sheet with the specified name in the spreadsheet, and/or the format you used to specify the data range is invalid. ${error}.`,
+		no_sheet_or_invalid_range: (spreadsheet, error) => `There is no sheet with the specified name in the spreadsheet “${spreadsheet}”, and/or the format you used to specify the range is invalid. ${error}.`,
 		unknown_error: error => `An unknown error occurred. ${error}.`
 	};
 }
