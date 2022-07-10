@@ -7,7 +7,7 @@ export default class GoogleCalendar extends Google {
 		const params = this.file.url.searchParams;
 
 		if (params.has("cid")) {
-			this.calendar = decodeURIComponent(escape(window.atob(params.get("cid"))));
+			this.calendar = decodeURIComponent(atob(params.get("cid")));
 		}
 
 		// Order matters: shareable link, public URL, or the user's primary calendar.
