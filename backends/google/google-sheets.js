@@ -220,7 +220,7 @@ export default class GoogleSheets extends Google {
 			}
 		}
 
-		if (this.loadedData) {
+		if (this.loadedData?.length) {
 			const recordCount = data.length;
 
 			// If we write back fewer records than we previously got, we need to remove the old data.
