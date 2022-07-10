@@ -14,7 +14,7 @@ export default class GoogleCalendar extends Google {
 		this.calendar = this.calendar ?? params.get("src") ?? "primary";
 		this.calendar = encodeURIComponent(this.calendar);
 
-		this.apiKey = o.apiKey ?? this.apiKey ?? this.constructor.apiKey;
+		this.apiKey = o.apiKey ?? this.constructor.apiKey;
 	}
 
 	async get (url) {
