@@ -12,7 +12,7 @@ export default class GoogleSheets extends Google {
 
 	async get () {
 		try {
-			if (this.#sheetAndRange === "") {
+			if (this.#getRangeReference() === "") {
 				this.sheet = await this.#findSheet();
 			}
 		}
@@ -32,7 +32,7 @@ export default class GoogleSheets extends Google {
 			}
 		}
 
-		const call = `${this.spreadsheet}/?key=${this.apiKey}&ranges=${this.#sheetAndRange}&includeGridData=true`;
+		const call = `${this.spreadsheet}/?key=${this.apiKey}&ranges=${this.#getRangeReference()}&includeGridData=true`;
 
 		let spreadsheet;
 		try {
@@ -191,7 +191,7 @@ export default class GoogleSheets extends Google {
 		return user;
 	}
 
-	get #sheetAndRange () {
+	#getRangeReference (sheet = this.sheet, range = this.range) {
 		/**
 		 * Since sheet title and cells range are optional, we need to cover all the possible cases:
 		 *
@@ -199,7 +199,7 @@ export default class GoogleSheets extends Google {
 		 * – 'Sheet title'
 		 * – Range
 		 */
-		return `${this.sheet ? `'${this.sheet}'` : ""}${this.range ? (this.sheet ? `!${this.range}` : this.range) : ""}`
+		return `${sheet ? `'${sheet}'` : ""}${range ? (sheet ? `!${range}` : range) : ""}`
 	}
 
 	/**
