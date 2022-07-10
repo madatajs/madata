@@ -61,6 +61,8 @@ export default class GoogleSheets extends Google {
 		if (!rawData) {
 			// No data to work with. It might be the spreadsheet is empty.
 			// No need to proceed.
+			this.loadedData = [];
+
 			return [];
 		}
 
@@ -78,6 +80,8 @@ export default class GoogleSheets extends Google {
 
 		if (startRow >= rawData.length || startColumn === undefined || startColumn === -1) {
 			// No data to work with
+			this.loadedData = [];
+
 			return [];
 		}
 
