@@ -412,7 +412,6 @@ export default class GoogleSheets extends Google {
 		no_sheet_or_invalid_range: (spreadsheet, error) => `There is no sheet with the specified name in the spreadsheet “${spreadsheet}”, and/or the format you used to specify the range is invalid. ${error}.`,
 		invalid_range: error => `The format you used to specify the range for storing data is invalid. ${error}.`,
 		small_range: range => `The “${range}” range is not large enough to store all your data.`,
-		invalid_data_structure: (spreadsheet, data) => `The data you are trying to write to the spreadsheet “${spreadsheet}” has an invalid structure: ${data}.`,
-		unknown_error: error => `An unknown error occurred. ${error}.`
-	};
+		invalid_data_structure: (spreadsheet, data) => `The data you are trying to write to the spreadsheet “${spreadsheet}” has an invalid structure: ${data}.`
+	}
 }
