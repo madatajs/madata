@@ -21,7 +21,7 @@ export default class GoogleSheets extends Google {
 			const error = (await e.json()).error.message;
 			switch (e.status) {
 				case 400:
-					throw new Error(this.constructor.phrase("api_key_invalid"));
+					throw new Error(this.constructor.phrase("api_key_invalid", this.apiKey));
 				case 401:
 					await this.logout(); // Access token we have is invalid. Discard it.
 					throw new Error(this.constructor.phrase("access_token_invalid"));
