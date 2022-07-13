@@ -4,6 +4,8 @@ export default class Google extends OAuthBackend {
 	constructor (url, o) {
 		super(url, o);
 
+		this.apiKey = o.apiKey ?? this.constructor.apiKey;
+
 		this.updatePermissions({ read: true });
 	}
 

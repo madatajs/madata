@@ -13,8 +13,6 @@ export default class GoogleCalendar extends Google {
 		// Order matters: shareable link, public URL, or the user's primary calendar.
 		this.calendar = this.calendar ?? params.get("src") ?? "primary";
 		this.calendar = encodeURIComponent(this.calendar);
-
-		this.apiKey = o.apiKey ?? this.constructor.apiKey;
 	}
 
 	async get (url) {

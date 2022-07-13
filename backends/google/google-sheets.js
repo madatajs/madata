@@ -5,8 +5,6 @@ export default class GoogleSheets extends Google {
 		super.update(url, o);
 
 		Object.assign(this, o);
-
-		this.apiKey = this.apiKey ?? this.constructor.apiKey;
 	}
 
 	async get (url) {
