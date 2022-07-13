@@ -11,20 +11,12 @@ export default class GoogleCalendar extends Google {
 			calendar = await this.request(call);
 		}
 		catch (e) {
-			const error = (await e.json()).error.message;
-			switch (e.status) {
-				case 400:
-					throw new Error(this.constructor.phrase("api_key_invalid", this.apiKey));
-				case 401:
-					await this.logout(); // Access token we have is invalid. Discard it.
-					throw new Error(this.constructor.phrase("access_token_invalid"));
-				case 403:
-					throw new Error(this.constructor.phrase("no_read_permission", this.source));
-				case 404:
-					throw new Error(this.constructor.phrase("no_calendar", this.source));
-				default:
-					throw new Error(error)
+			if (e.status === 401) {
+				await this.logout(); // Access token we have is invalid. Discard it.
 			}
+
+			const error = (await e.json()).error.message;
+			throw new Error(error);
 		}
 
 		return calendar.items;
@@ -60,11 +52,5 @@ export default class GoogleCalendar extends Google {
 		ret.calendarId = encodeURIComponent(calendarId);
 
 		return ret;
-	}
-
-	static phrases = {
-		no_read_permission: calendar => `You don not have permission to read data from the calendar: ${calendar}.`,
-		no_write_permission: calendar => `You don not have permission to write data to the calendar: ${calendar}.`,
-		no_calendar: calendar => `We could not find the calendar: ${calendar}.`
 	}
 }
