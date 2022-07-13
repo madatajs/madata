@@ -54,11 +54,6 @@ export default class GoogleCalendar extends Google {
 		return user;
 	}
 
-	// FIXME: I have a HUGE doubt whether it's a hack or not!
-	static getOAuthProvider () {
-		return { name: "Google Calendar" };
-	}
-
 	static apiDomain = "https://www.googleapis.com/calendar/v3/calendars/";
 	static scopes = ["https://www.googleapis.com/auth/calendar.events"];
 

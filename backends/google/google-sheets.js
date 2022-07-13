@@ -379,11 +379,6 @@ export default class GoogleSheets extends Google {
 		return visibleSheet?.properties?.title;
 	}
 
-	// FIXME: I have a HUGE doubt whether it's a hack or not!
-	static getOAuthProvider () {
-		return { name: "Google Sheets" };
-	}
-
 	static apiDomain = "https://sheets.googleapis.com/v4/spreadsheets/";
 	static scopes = ["https://www.googleapis.com/auth/spreadsheets"];
 
