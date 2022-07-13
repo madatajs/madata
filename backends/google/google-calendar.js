@@ -6,12 +6,14 @@ export default class GoogleCalendar extends Google {
 
 		const params = this.file.url.searchParams;
 
+		// Order matters: shareable link, public URL, or the user's primary calendar.
 		if (params.has("cid")) {
 			this.calendar = decodeURIComponent(atob(params.get("cid")));
 		}
+		else {
+			this.calendar = params.get("src") ?? "primary"
+		}
 
-		// Order matters: shareable link, public URL, or the user's primary calendar.
-		this.calendar = this.calendar ?? params.get("src") ?? "primary";
 		this.calendar = encodeURIComponent(this.calendar);
 	}
 
@@ -56,7 +58,8 @@ export default class GoogleCalendar extends Google {
 	static scopes = ["https://www.googleapis.com/auth/calendar.events"];
 
 	static test (url) {
-		return url.startsWith("https://calendar.google.com/calendar/");
+		url = new URL(url);
+		return url.host === "calendar.google.com";
 	}
 
 	static phrases = {
