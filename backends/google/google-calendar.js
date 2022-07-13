@@ -1,24 +1,10 @@
 import Google from "./google.js";
 
 export default class GoogleCalendar extends Google {
-	update (url, o) {
-		super.update(url, o);
-
-		const params = this.file.url.searchParams;
-
-		// Order matters: shareable link, public URL, or the user's primary calendar.
-		if (params.has("cid")) {
-			this.calendar = decodeURIComponent(atob(params.get("cid")));
-		}
-		else {
-			this.calendar = params.get("src") ?? "primary"
-		}
-
-		this.calendar = encodeURIComponent(this.calendar);
-	}
-
 	async get (url) {
-		let call = `${this.calendar}/events?key=${this.apiKey}`;
+		const file = url? this.constructor.parseURL(url) : this.file;
+
+		let call = `${file.calendarId}/events?key=${this.apiKey}`;
 
 		let calendar;
 		try {
@@ -50,6 +36,30 @@ export default class GoogleCalendar extends Google {
 	static test (url) {
 		url = new URL(url);
 		return url.host === "calendar.google.com";
+	}
+
+	/**
+	 * Parse Calendars URLs.
+	 * @param {string} source Calendar URL.
+	 * @returns Calendar ID.
+	 */
+	static parseURL (source) {
+		const ret = {};
+		const url = new URL(source);
+		const params = url.searchParams;
+
+		let calendarId;
+		// Order matters: shareable link, public URL, or the user's primary calendar.
+		if (params.has("cid")) {
+			calendarId = decodeURIComponent(atob(params.get("cid")));
+		}
+		else {
+			calendarId = params.get("src") ?? "primary";
+		}
+
+		ret.calendarId = encodeURIComponent(calendarId);
+
+		return ret;
 	}
 
 	static phrases = {
