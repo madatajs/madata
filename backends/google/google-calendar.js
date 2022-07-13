@@ -37,7 +37,7 @@ export default class GoogleCalendar extends Google {
 				case 404:
 					throw new Error(this.constructor.phrase("no_calendar", this.source));
 				default:
-					throw new Error(this.constructor.phrase("unknown_error", error));
+					throw new Error(error)
 			}
 		}
 

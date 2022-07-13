@@ -30,7 +30,7 @@ export default class GoogleSheets extends Google {
 				case 404:
 					throw new Error(this.constructor.phrase("no_spreadsheet", this.source));
 				default:
-					throw new Error(this.constructor.phrase("unknown_error", error));
+					throw new Error(error)
 			}
 		}
 
@@ -53,7 +53,7 @@ export default class GoogleSheets extends Google {
 				case 404:
 					throw new Error(this.constructor.phrase("no_spreadsheet", this.source));
 				default:
-					throw new Error(this.constructor.phrase("unknown_error", error));
+					throw new Error(error)
 			}
 		}
 
@@ -215,7 +215,7 @@ export default class GoogleSheets extends Google {
 					case 404:
 						throw new Error(this.constructor.phrase("no_spreadsheet", spreadsheet));
 					default:
-						throw new Error(this.constructor.phrase("unknown_error", error));
+						throw new Error(error)
 				}
 			}
 		}
@@ -315,14 +315,14 @@ export default class GoogleSheets extends Google {
 								throw new Error(this.constructor.phrase("invalid_data_structure", spreadsheet, data));
 							}
 
-							throw new Error(this.constructor.phrase("unknown_error", error));
+							throw new Error(error)
 						}
 					}
 				}
 			}
 			else {
 				const error = (await e.json()).error.message;
-				throw new Error(this.constructor.phrase("unknown_error", error));
+				throw new Error(error)
 			}
 		}
 
