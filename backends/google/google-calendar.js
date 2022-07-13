@@ -44,16 +44,6 @@ export default class GoogleCalendar extends Google {
 		return calendar.items;
 	}
 
-	async login (...args) {
-		const user = await super.login(...args);
-
-		if (user) {
-			this.updatePermissions({edit: true, save: true});
-		}
-
-		return user;
-	}
-
 	static apiDomain = "https://www.googleapis.com/calendar/v3/calendars/";
 	static scopes = ["https://www.googleapis.com/auth/calendar.events"];
 
