@@ -32,131 +32,148 @@ export default class GoogleSheets extends Google {
 		}
 
 		const rangeReference = this.#getRangeReference(file);
-		const call = `${file.id}/?key=${this.apiKey}&ranges=${rangeReference}&includeGridData=true`;
+		let call;
+		if (!this.options.convertDateTime) {
+			call = `${file.id}/values/${rangeReference}/?key=${this.apiKey}&majorDimension=rows&valueRenderOption=unformatted_value`;
+			try {
+				const response = await this.request(call);
+				return response.values;
+			}
+			catch (e) {
+				if (e.status === 401) {
+					await this.logout(); // Access token we have is invalid. Discard it.
+				}
 
-		let spreadsheet;
-		try {
-			spreadsheet = await this.request(call);
+				const error = (await e.json()).error.message;
+				throw new Error(error);
+			}
 		}
-		catch (e) {
-			if (e.status === 401) {
-				await this.logout(); // Access token we have is invalid. Discard it.
+		else {
+			call = `${file.id}/?key=${this.apiKey}&ranges=${rangeReference}&includeGridData=true`;
+			let spreadsheet;
+			try {
+				spreadsheet = await this.request(call);
+			}
+			catch (e) {
+				if (e.status === 401) {
+					await this.logout(); // Access token we have is invalid. Discard it.
+				}
+
+				const error = (await e.json()).error.message;
+				throw new Error(error);
 			}
 
-			const error = (await e.json()).error.message;
-			throw new Error(error);
-		}
-
-		let rawData = spreadsheet.sheets[0].data[0].rowData?.map(r => r.values);
-		if (!rawData) {
-			// No data to work with. It might be the spreadsheet is empty.
-			// No need to proceed.
-			return [];
-		}
-
-		// Search for the beginning of data.
-		let startRow = 0, startColumn;
-		for (const row of rawData) {
-			startColumn = row?.findIndex(cell => cell?.effectiveValue);
-
-			if (startColumn !== undefined && startColumn !== -1) {
-				break;
+			let rawData = spreadsheet.sheets[0].data[0].rowData?.map(r => r.values);
+			if (!rawData) {
+				// No data to work with. It might be the spreadsheet is empty.
+				// No need to proceed.
+				return [];
 			}
 
-			startRow += 1;
-		}
+			// Search for the beginning of data.
+			let startRow = 0, startColumn;
+			for (const row of rawData) {
+				startColumn = row?.findIndex(cell => cell?.effectiveValue);
 
-		if (startRow >= rawData.length || startColumn === undefined || startColumn === -1) {
-			// No data to work with
-			return [];
-		}
-
-		// Search for the end of the first range of data.
-		let endRow,
-		endColumn = Math.max(...rawData.map(row => row? row.length - 1 : 0));
-
-		// Search for the first fully empty row.
-		for (let row = startRow; row < rawData.length; row++) {
-			const r = rawData[row];
-
-			let isEmpty = true;
-			for (let column = startColumn; column <= endColumn; column++) {
-				if (r?.[column]?.effectiveValue) {
-					isEmpty = false;
+				if (startColumn !== undefined && startColumn !== -1) {
 					break;
 				}
+
+				startRow += 1;
 			}
 
-			if (!r || isEmpty) {
-				endRow = row - 1;
-				break;
-			}
-		}
-		endRow = endRow ?? rawData.length - 1;
-
-		// Search for the first fully empty column to adjust endColumn.
-		let column = startColumn + 1;
-		let isEmpty;
-		while (true) {
-			isEmpty = true;
-			for (let row = startRow; row <= endRow; row++) {
-				if (rawData[row]?.[column]?.effectiveValue) {
-					column += 1;
-					isEmpty = false;
-					break;
-				}
+			if (startRow >= rawData.length || startColumn === undefined || startColumn === -1) {
+				// No data to work with
+				return [];
 			}
 
-			if (isEmpty) {
-				endColumn = column - 1;
-				break;
-			}
-		}
+			// Search for the end of the first range of data.
+			let endRow,
+			endColumn = Math.max(...rawData.map(row => row? row.length - 1 : 0));
 
-		let data = [];
-		for (let rowIndex = startRow; rowIndex <= endRow; rowIndex++) {
-			const row = rawData[rowIndex];
-			const ret = [];
+			// Search for the first fully empty row.
+			for (let row = startRow; row < rawData.length; row++) {
+				const r = rawData[row];
 
-			for (let columnIndex = startColumn; columnIndex <= endColumn; columnIndex++) {
-				const cell = row[columnIndex];
-				let value;
-
-				if (!cell?.effectiveValue) {
-					// We have an empty cell
-					ret.push(undefined);
-					continue;
-				}
-
-				value = cell.effectiveValue["stringValue"] ?? cell.effectiveValue["numberValue"] ?? cell.effectiveValue["boolValue"];
-
-				// Do we have date/time/date and time?
-				if (this.options.convertDateTime && cell.effectiveFormat.numberFormat) {
-					const type = cell.effectiveFormat.numberFormat.type;
-
-					if (["DATE", "TIME", "DATE_TIME"].includes(type)) {
-						const { date, time } = GoogleSheets.#toISO(value);
-
-						switch (type) {
-							case "DATE":
-								value = date;
-								break;
-
-							case "TIME":
-								value = time;
-								break;
-
-							case "DATE_TIME":
-								value = `${date}T${time}`;
-								break;
-						}
+				let isEmpty = true;
+				for (let column = startColumn; column <= endColumn; column++) {
+					if (r?.[column]?.effectiveValue) {
+						isEmpty = false;
+						break;
 					}
 				}
 
-				ret.push(value);
+				if (!r || isEmpty) {
+					endRow = row - 1;
+					break;
+				}
+			}
+			endRow = endRow ?? rawData.length - 1;
+
+			// Search for the first fully empty column to adjust endColumn.
+			let column = startColumn + 1;
+			let isEmpty;
+			while (true) {
+				isEmpty = true;
+				for (let row = startRow; row <= endRow; row++) {
+					if (rawData[row]?.[column]?.effectiveValue) {
+						column += 1;
+						isEmpty = false;
+						break;
+					}
+				}
+
+				if (isEmpty) {
+					endColumn = column - 1;
+					break;
+				}
 			}
 
-			data.push(ret);
+			const data = [];
+			for (let rowIndex = startRow; rowIndex <= endRow; rowIndex++) {
+				const row = rawData[rowIndex];
+				const ret = [];
+
+				for (let columnIndex = startColumn; columnIndex <= endColumn; columnIndex++) {
+					const cell = row[columnIndex];
+					let value;
+
+					if (!cell?.effectiveValue) {
+						// We have an empty cell
+						ret.push(undefined);
+						continue;
+					}
+
+					value = cell.effectiveValue["stringValue"] ?? cell.effectiveValue["numberValue"] ?? cell.effectiveValue["boolValue"];
+
+					// Do we have date/time/date and time?
+					if (cell.effectiveFormat.numberFormat) {
+						const type = cell.effectiveFormat.numberFormat.type;
+
+						if (["DATE", "TIME", "DATE_TIME"].includes(type)) {
+							const { date, time } = GoogleSheets.#toISO(value);
+
+							switch (type) {
+								case "DATE":
+									value = date;
+									break;
+
+								case "TIME":
+									value = time;
+									break;
+
+								case "DATE_TIME":
+									value = `${date}T${time}`;
+									break;
+							}
+						}
+					}
+
+					ret.push(value);
+				}
+
+				data.push(ret);
+			}
 		}
 
 		return data;
