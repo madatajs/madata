@@ -14,9 +14,9 @@ There are two backends here, all using authentication via Google:
 ### Constructor options
 
 - `apiKey`
-- `sheet`: A sheet to read/write data from/to. If not provided, the first visible sheet will be used. If there is no sheet with the specified name in the spreadsheet, it will be created while saving data.
+- `sheetTitle`: A sheet to read/write data from/to. If not provided, the first visible sheet will be used.
 - `range`: A range with data in *A1 notation*.
-- `formattedValues`: Whether the values should be returned according to the cell's formatting on the sheet.
+- `allowAddingSheets`: Whether to add a new sheet on save if there is no sheet with the specified title.
 - `convertDateTime`: Whether serial numbers representing date/time in Google Sheets should be converted to ISO date/time.
 
 #### A1 notation for specifying cell ranges

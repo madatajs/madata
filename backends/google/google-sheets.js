@@ -1,66 +1,56 @@
 import Google from "./google.js";
 
 export default class GoogleSheets extends Google {
-	update (url, o) {
-		super.update(url, o);
-
-		Object.assign(this, o);
-	}
-
+	/**
+	 * Read data from the spreadsheet.
+	 * @param {string} url Spreadsheet URL.
+	 * @returns Spreadsheet data.
+	 */
 	async get (url) {
-		this.spreadsheetId = this.spreadsheetId ?? this.#getSpreadsheetId(url);
+		const file = url? this.constructor.parseURL(url) : this.file;
 
-		try {
-			if (this.#getRangeReference() === "") {
-				this.sheet = await this.#findSheet();
+		if (file.sheetId !== undefined && !file.sheetTitle || this.#getRangeReference(file) === "") {
+			// Sheet title has priority over sheet id
+			try {
+				const sheetTitle = await this.#getSheetTitle(file);
+				if (!sheetTitle) {
+					// No (visible) sheet to work with
+					console.warn(this.constructor.phrase("get_no_sheet"));
+					return null;
+				}
+	
+				this.file.sheetTitle = file.sheetTitle = sheetTitle;
 			}
-		}
-		catch (e) {
-			const error = (await e.json()).error.message;
-			switch (e.status) {
-				case 400:
-					throw new Error(this.constructor.phrase("api_key_invalid", this.apiKey));
-				case 401:
+			catch (e) {
+				if (e.status === 401) {
 					await this.logout(); // Access token we have is invalid. Discard it.
-					throw new Error(this.constructor.phrase("access_token_invalid"));
-				case 403:
-					throw new Error(this.constructor.phrase("no_read_permission", this.source));
-				case 404:
-					throw new Error(this.constructor.phrase("no_spreadsheet", this.source));
-				default:
-					throw new Error(error)
+				}
+	
+				const error = (await e.json()).error.message;
+				throw new Error(error);
 			}
 		}
 
-		const call = `${this.spreadsheetId}/?key=${this.apiKey}&ranges=${this.#getRangeReference()}&includeGridData=true`;
+		const rangeReference = this.#getRangeReference(file);
+		const call = `${file.id}/?key=${this.apiKey}&ranges=${rangeReference}&includeGridData=true`;
 
 		let spreadsheet;
 		try {
 			spreadsheet = await this.request(call);
 		}
 		catch (e) {
-			const error = (await e.json()).error.message;
-			switch (e.status) {
-				case 400:
-					throw new Error(this.constructor.phrase("no_sheet_or_invalid_range", this.source, error));
-				case 401:
-					await this.logout(); // Access token we have is invalid. Discard it.
-					throw new Error(this.constructor.phrase("access_token_invalid"));
-				case 403:
-					throw new Error(this.constructor.phrase("no_read_permission", this.source));
-				case 404:
-					throw new Error(this.constructor.phrase("no_spreadsheet", this.source));
-				default:
-					throw new Error(error)
+			if (e.status === 401) {
+				await this.logout(); // Access token we have is invalid. Discard it.
 			}
+
+			const error = (await e.json()).error.message;
+			throw new Error(error);
 		}
 
 		let rawData = spreadsheet.sheets[0].data[0].rowData?.map(r => r.values);
 		if (!rawData) {
 			// No data to work with. It might be the spreadsheet is empty.
 			// No need to proceed.
-			this.loadedData = [];
-
 			return [];
 		}
 
@@ -78,18 +68,12 @@ export default class GoogleSheets extends Google {
 
 		if (startRow >= rawData.length || startColumn === undefined || startColumn === -1) {
 			// No data to work with
-			this.loadedData = [];
-
 			return [];
 		}
 
-		// Save data offset inside raw values to be able to store data back in the same range as the source data.
-		this.rowOffset = startRow;
-		this.columnOffset = startColumn;
-
 		// Search for the end of the first range of data.
 		let endRow,
-		endColumn = Math.max(...rawData.map(row => row.length - 1));
+		endColumn = Math.max(...rawData.map(row => row? row.length - 1 : 0));
 
 		// Search for the first fully empty row.
 		for (let row = startRow; row < rawData.length; row++) {
@@ -144,32 +128,27 @@ export default class GoogleSheets extends Google {
 					continue;
 				}
 
-				if (this.formattedValues) {
-					value = cell.formattedValue;
-				}
-				else {
-					value = cell.effectiveValue["stringValue"] ?? cell.effectiveValue["numberValue"] ?? cell.effectiveValue["boolValue"];
+				value = cell.effectiveValue["stringValue"] ?? cell.effectiveValue["numberValue"] ?? cell.effectiveValue["boolValue"];
 
-					// Do we have date/time/date and time?
-					if (this.convertDateTime && cell.effectiveFormat.numberFormat) {
-						const type = cell.effectiveFormat.numberFormat.type;
+				// Do we have date/time/date and time?
+				if (this.options.convertDateTime && cell.effectiveFormat.numberFormat) {
+					const type = cell.effectiveFormat.numberFormat.type;
 
-						if (["DATE", "TIME", "DATE_TIME"].includes(type)) {
-							const { date, time } = GoogleSheets.#toISO(value);
+					if (["DATE", "TIME", "DATE_TIME"].includes(type)) {
+						const { date, time } = GoogleSheets.#toISO(value);
 
-							switch (type) {
-								case "DATE":
-									value = date;
-									break;
+						switch (type) {
+							case "DATE":
+								value = date;
+								break;
 
-								case "TIME":
-									value = time;
-									break;
+							case "TIME":
+								value = time;
+								break;
 
-								case "DATE_TIME":
-									value = `${date}T${time}`;
-									break;
-							}
+							case "DATE_TIME":
+								value = `${date}T${time}`;
+								break;
 						}
 					}
 				}
@@ -180,73 +159,22 @@ export default class GoogleSheets extends Google {
 			data.push(ret);
 		}
 
-		// We need to store the loaded data so that we can perform diff later.
-		// Why? Because Google Sheets has a built-in version history and we want to benefit from it.
-		// And if every time we overwrite the full data range, it makes the version history useless.
-		this.loadedData = [...data];
-
 		return data;
 	}
 
 	/**
-	 * Write data to a spreadsheet
-	 * @param {*} data — Data to store
-	 * @param {string} spreadsheet — Spreadsheet URL
-	 * @param {string} sheet — Sheet name
-	 * @param {string} range — Range
+	 * Save data to the spreadsheet.
+	 * @param {*} data Data to save.
+	 * @param {Object} file Spreadsheet to work with.
+	 * @param {Object} options Options: sheetTitle, range.
 	 */
-	async store (data, {spreadsheet = this.source, sheet = this.sheet, range = this.range, ...o} = {}) {
-		const spreadsheetId = this.#getSpreadsheetId(spreadsheet) ?? this.spreadsheetId;
+	async store (data, {file = this.file, ...options} = {}) { // Why not put()? To avoid data serialization.
+		file = Object.assign({}, file, {...options});
 
-		if (this.#getRangeReference(sheet, range) === "") {
-			try {
-				sheet = await this.#findSheet(spreadsheetId);
-			}
-			catch (e) {
-				const error = (await e.json()).error.message;
-				switch (e.status) {
-					case 401:
-						await this.logout(); // Access token we have is invalid. Discard it.
-						throw new Error(this.constructor.phrase("access_token_invalid"));
-					case 403:
-						throw new Error(this.constructor.phrase("no_write_permission", spreadsheet));
-					case 404:
-						throw new Error(this.constructor.phrase("no_spreadsheet", spreadsheet));
-					default:
-						throw new Error(error)
-				}
-			}
-		}
-
-		if (this.loadedData?.length) {
-			const recordCount = data.length;
-
-			// If we write back fewer records than we previously got, we need to remove the old data.
-			// The way we can do it is to provide records filled with empty strings.
-			if (recordCount < this.loadedData.length) {
-				const record = Array(data[0].length).fill(""); // ["", ..., ""] — empty row/column of data
-				const records = Array(this.loadedData.length - recordCount).fill(record); // [ ["", ..., ""], ["", ..., ""], ..., ["", ..., ""] ]
-
-				data = data.concat(records);
-			}
-		}
-
-		// Add “empty” rows and columns to data so we could store them in the same range we got the source data from.
-		const emptyRecord = this.columnOffset > 0 ? Array(this.columnOffset + data[0].length).fill(undefined) : []; // [undefined, ..., undefined]
-		const emptyRecords = this.rowOffset > 0 ? Array(this.rowOffset).fill(emptyRecord) : []; // [ [undefined, ..., undefined], [undefined, ..., undefined], ..., [undefined, ..., undefined] ]
-
-		if (this.columnOffset > 0) {
-			// Prepend every row with “empty” columns.
-			data = data.map(row => [...Array(this.columnOffset).fill(undefined), ...row]); // [undefined, ..., undefined, data, data, ..., data]
-		}
-
-		// Prepend data with “empty” rows.
-		data = [...emptyRecords, ...data]; // [ [undefined, ..., undefined, undefined, undefined, ..., undefined], ..., [undefined, ..., undefined, undefined, undefined, ..., undefined], [undefined, ..., undefined, data, data, ..., data], ..., [undefined, ..., undefined, data, data, ..., data] ]
-
-		// Write the new data.
-		const call = `${spreadsheetId}/values/${this.#getRangeReference(sheet, range)}?key=${this.apiKey}&valueInputOption=user_entered&responseValueRenderOption=${this.formattedValues ? "formatted_value" : "unformatted_value"}&includeValuesInResponse=true`;
+		const rangeReference = this.#getRangeReference(file);
+		const call = `${file.id}/values/${rangeReference}?key=${this.apiKey}&valueInputOption=user_entered&responseValueRenderOption=unformatted_value&includeValuesInResponse=true`;
 		const body = {
-			"range": this.#getRangeReference(sheet, range),
+			"range": rangeReference,
 			"majorDimension": "rows",
 			"values": data
 		};
@@ -256,31 +184,26 @@ export default class GoogleSheets extends Google {
 			response = await this.request(call, body, "PUT");
 		}
 		catch (e) {
-			switch (e.status) {
-				case 401:
-					await this.logout(); // Access token we have is invalid. Discard it.
-					throw new Error(this.constructor.phrase("access_token_invalid"));
-				case 403:
-					throw new Error(this.constructor.phrase("no_write_permission", spreadsheet));
-				case 404:
-					throw new Error(this.constructor.phrase("no_spreadsheet", spreadsheet));
-			}
-
 			if (e.status === 400) {
-				if (sheet) {
-					// It might be there is no sheet with the specified name.
+				if (file.sheetTitle) {
+					// It might be there is no sheet with the specified title.
 					// Let's check it.
-					const spreadsheetData = await this.request(spreadsheetId);
-					const sheetData = spreadsheetData.sheets?.find?.(sheet => sheet.properties?.title === sheet);
+					let spreadsheet = this.spreadsheet;
+					if (!spreadsheet) {
+						spreadsheet = await this.request(file.id);
+						this.spreadsheet = spreadsheet;
+					}
 
-					if (!sheetData) {
+					const sheet = spreadsheet.sheets?.find?.(sheet => sheet.properties?.title === file.sheetTitle);
+
+					if (!sheet && this.options.allowAddingSheets) {
 						// There is no. Let's try to create one.
 						const req = {
 							requests: [
 								{
 									addSheet: {
 										properties: {
-											title: sheet
+											title: file.sheetTitle
 										}
 									}
 								}
@@ -288,44 +211,37 @@ export default class GoogleSheets extends Google {
 						};
 
 						try {
-							await this.request(`${spreadsheetId}:batchUpdate`, req, "POST");
+							await this.request(`${file.id}:batchUpdate`, req, "POST");
 
 							// Warn about the newly created sheet.
-							console.warn(this.constructor.phrase("no_sheet_to_store_data", spreadsheet, sheet));
+							console.warn(this.constructor.phrase("store_sheet_added", file.sheetTitle));
 
 							// Let's try to write data one more time.
 							response = await this.request(call, body, "PUT");
 						}
 						catch (e) {
+							if (e.status === 401) {
+								await this.logout(); // Access token we have is invalid. Discard it.
+							}
+
 							const error = (await e.json()).error.message;
-
-							if (error.startsWith("Unable to parse range")) {
-								throw new Error(this.constructor.phrase("invalid_range", e));
-							}
-							else if (error.startsWith("Requested writing within range")) {
-								throw new Error(this.constructor.phrase("small_range", range));
-							}
-							else if (error.includes("protected cell or object")) {
-								// The sheet and/or range is protected
-								throw new Error(e);
-							}
-							else if (error.startsWith("Invalid values")) {
-								throw new Error(this.constructor.phrase("invalid_data_structure", spreadsheet, data));
-							}
-
-							throw new Error(error)
+							throw new Error(error);
 						}
+					}
+					else {
+						throw new Error(this.constructor.phrase("store_no_sheet", file.sheetTitle));
 					}
 				}
 			}
 			else {
+				if (e.status === 401) {
+					await this.logout(); // Access token we have is invalid. Discard it.
+				}
+
 				const error = (await e.json()).error.message;
-				throw new Error(error)
+				throw new Error(error);
 			}
 		}
-
-		// Saved successfully
-		this.loadedData = response.updatedData?.values;
 
 		return response;
 	}
@@ -340,33 +256,41 @@ export default class GoogleSheets extends Google {
 		return user;
 	}
 
-	#getSpreadsheetId (url = this.file.url) {
-		url = new URL(url);
-		return url.pathname?.slice(1)?.split("/")?.[2];
-	}
-
-	#getRangeReference (sheet = this.sheet, range = this.range) {
-		/**
-		 * Since sheet title and cells range are optional, we need to cover all the possible cases:
-		 *
-		 * - 'Sheet title'!Range
-		 * – 'Sheet title'
-		 * – Range
-		 */
-		return `${sheet ? `'${sheet}'` : ""}${range ? (sheet ? `!${range}` : range) : ""}`
+	/**
+	 * Get the range reference.
+	 * @param {string} sheetTitle Sheet title.
+	 * @param {string} range Range in the A1 notation.
+	 * @returns The range reference in one of the supported formats: 'Sheet title'!Range, 'Sheet title', or Range.
+	 */
+	#getRangeReference ({sheetTitle = this.file.sheetTitle, range = this.file.range} = file) {
+		return `${sheetTitle ? `'${sheetTitle}'` : ""}${range ? (sheetTitle ? `!${range}` : range) : ""}`
 	}
 
 	/**
-	 * If neither sheet title nor range is provided, we should use some default range to get/read data from/to.
-	 * Otherwise, a request to a spreadsheet will fail, and we don't want it.
-	 * Let's use all cells of the first visible sheet by default. To do that, we need to provide its title.
+	 * Get title of the sheet in the spreadsheet.
+	 * @param {Object} file Spreadsheet to work with.
+	 * @returns Sheet title or title of the first visible sheet, or null if there are no (visible) sheets to work with.
 	 */
-	async #findSheet (spreadsheetId = this.spreadsheetId, key = this.apiKey) {
-		const call = `${spreadsheetId}/?key=${key}`;
-		const spreadsheet = await this.request(call);
-		const visibleSheet = spreadsheet.sheets?.find?.(sheet => !sheet.properties?.hidden);
+	async #getSheetTitle (file = this.file) {
+		const call = `${file.id}/?key=${this.apiKey}`;
 
-		return visibleSheet?.properties?.title;
+		const spreadsheet = await this.request(call);
+		// Store the spreadsheet for future use (to avoid extra network requests).
+		if (!this.spreadsheet) {
+			this.spreadsheet = spreadsheet;
+		}
+
+		let sheet;
+		if (file.sheetId) {
+			// Get sheet title by its id.
+			sheet = spreadsheet.sheets?.find?.(sheet => sheet.properties?.sheetId === file.sheetId);
+		}
+		else {
+			// Get the first visible sheet (if any).
+			sheet = spreadsheet.sheets?.find?.(sheet => !sheet.properties?.hidden);
+		}
+
+		return sheet?.properties?.title;
 	}
 
 	static apiDomain = "https://sheets.googleapis.com/v4/spreadsheets/";
@@ -374,6 +298,29 @@ export default class GoogleSheets extends Google {
 
 	static test (url) {
 		return url.startsWith("https://docs.google.com/spreadsheets/");
+	}
+
+	/**
+	 * Parse spreadsheets URLs.
+	 * @param {string} source Spreadsheet URL.
+	 * @returns Spreadsheet ID, sheet ID, sheet title, range.
+	 */
+	static parseURL (source) {
+		const ret = {
+			sheetId: undefined,
+			sheetTitle: undefined,
+			range: undefined
+		};
+		const url = new URL(source);
+		const path = url.pathname.slice(1).split("/");
+		const hash = url.hash;
+
+		ret.id = path[2];
+		if (hash && hash.startsWith("#gid=")) {
+			ret.sheetId = +hash.slice(5);
+		}
+
+		return ret;
 	}
 
 	static #toISO (serial) {
@@ -388,13 +335,8 @@ export default class GoogleSheets extends Google {
 	}
 
 	static phrases = {
-		no_read_permission: spreadsheet => `You don not have permission to read data from the spreadsheet: ${spreadsheet}.`,
-		no_write_permission: spreadsheet => `You don not have permission to write data to the spreadsheet: ${spreadsheet}.`,
-		no_spreadsheet: spreadsheet => `We could not find the spreadsheet: ${spreadsheet}.`,
-		no_sheet_to_store_data: (spreadsheet, sheet) => `We could not find the ”${sheet}“ sheet in the spreadsheet “${spreadsheet}” and created it.`,
-		no_sheet_or_invalid_range: (spreadsheet, error) => `There is no sheet with the specified name in the spreadsheet “${spreadsheet}”, and/or the format you used to specify the range is invalid. ${error}.`,
-		invalid_range: error => `The format you used to specify the range for storing data is invalid. ${error}.`,
-		small_range: range => `The “${range}” range is not large enough to store all your data.`,
-		invalid_data_structure: (spreadsheet, data) => `The data you are trying to write to the spreadsheet “${spreadsheet}” has an invalid structure: ${data}.`
+		get_no_sheet: "We could not find the sheet to get data from. Try providing the sheetTitle option with the sheet title.",
+		store_no_sheet: sheet => `We could not find the ${sheet} sheet in the spreadsheet. Try enabling the allowAddingSheets option to create it.`,
+		store_sheet_added: sheet => `We could not find the ${sheet} sheet in the spreadsheet and created it.`
 	}
 }
