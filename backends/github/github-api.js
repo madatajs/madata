@@ -27,7 +27,7 @@ export default class GithubAPI extends Github {
 				"Accept": "application/vnd.github.squirrel-girl-preview"
 			}
 		};
-		let response = await this.request(call.apiCall, {ref:this.branch}, "GET", req);
+		let response = await this.request(call.apiCall, {}, "GET", req);
 
 		// Raw API call
 		let json = await response.json();
@@ -43,7 +43,7 @@ export default class GithubAPI extends Github {
 				next = response.headers.get("Link")?.match(/<(.+?)>; rel="next"/)?.[1];
 
 				if (next) {
-					response = await this.request(next, {ref:this.branch}, "GET", req);
+					response = await this.request(next, {}, "GET", req);
 
 					if (response.ok) {
 						let pageJSON = await response.json();
