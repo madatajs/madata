@@ -53,7 +53,7 @@ export default class Backend extends EventTarget {
 		}
 	}
 
-	async get (url = new URL(this.url)) {
+	async get (url = new URL(this.file.url)) {
 		if (url.protocol != "data:" && this.constructor.useCache !== false) {
 			url.searchParams.set("timestamp", Date.now()); // ensure fresh copy
 		}

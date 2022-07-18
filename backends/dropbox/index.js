@@ -13,10 +13,10 @@ export default class Dropbox extends OAuthBackend {
 	update (url, o) {
 		super.update(url, o);
 
-		this.file.url = Dropbox.#fixShareURL(this.url);
+		this.file.url = Dropbox.#fixShareURL(url);
 	}
 
-	async upload (file, path) {
+	async upload (file, {path}) {
 		path = this.path.replace(/[^/]+$/, "") + path;
 
 		await this.put(file, path);
@@ -33,7 +33,7 @@ export default class Dropbox extends OAuthBackend {
 	 * @param {Object} file - An object with name & data keys
 	 * @return {Promise} A promise that resolves when the file is saved.
 	 */
-	put (serialized, path = this.path, o = {}) {
+	put (serialized, {path = this.path, ...o} = {}) {
 		return this.request("https://content.dropboxapi.com/2/files/upload", serialized, "POST", {
 			headers: {
 				"Dropbox-API-Arg": JSON.stringify({
