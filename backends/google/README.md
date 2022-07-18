@@ -17,7 +17,7 @@ There are two backends here, all using authentication via Google:
 - `sheetTitle`: A sheet to read/write data from/to. If not provided, the first visible sheet will be used.
 - `range`: A range with data in *A1 notation*.
 - `allowAddingSheets`: Whether to add a new sheet on save if there is no sheet with the specified title.
-- `convertDateTime`: Whether serial numbers representing date/time in Google Sheets should be converted to ISO date/time.
+- `serializeDates`: Whether dates, times, and durations should be represented as formatted strings (in their given number format which depends on the spreadsheet locale) instead of “serial number” format.
 
 #### A1 notation for specifying cell ranges
 
