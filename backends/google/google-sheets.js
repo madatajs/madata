@@ -80,10 +80,19 @@ export default class GoogleSheets extends Google {
 				if (file.sheetTitle) {
 					// It might be there is no sheet with the specified title.
 					// Let's check it.
-					let spreadsheet = this.spreadsheet;
-					if (!spreadsheet) {
-						spreadsheet = await this.request(file.id);
-						this.spreadsheet = spreadsheet;
+					let spreadsheet;
+					if (!this.spreadsheet) {
+						try {
+							this.spreadsheet = spreadsheet = await this.request(file.id);
+						}
+						catch (e) {
+							if (e.status === 401) {
+								await this.logout(); // Access token we have is invalid. Discard it.
+							}
+
+							const error = (await e.json()).error.message;
+							throw new Error(error);
+						}
 					}
 
 					const sheet = spreadsheet.sheets?.find?.(sheet => sheet.properties?.title === file.sheetTitle);
@@ -166,10 +175,18 @@ export default class GoogleSheets extends Google {
 	async #getSheetTitle (file = this.file) {
 		const call = `${file.id}/?key=${this.apiKey}`;
 
-		const spreadsheet = await this.request(call);
-		// Store the spreadsheet for future use (to avoid extra network requests).
-		if (!this.spreadsheet) {
-			this.spreadsheet = spreadsheet;
+		let spreadsheet;
+		try {
+			// Store the spreadsheet for future use (to avoid extra network requests).
+			this.spreadsheet = spreadsheet = await this.request(call);
+		}
+		catch (e) {
+			if (e.status === 401) {
+				await this.logout(); // Access token we have is invalid. Discard it.
+			}
+
+			const error = (await e.json()).error.message;
+			throw new Error(error);
 		}
 
 		let sheet;
