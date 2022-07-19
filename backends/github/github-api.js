@@ -88,16 +88,6 @@ export default class GithubAPI extends Github {
 		else {
 			// Raw API call
 			ret.apiCall = ret.url.pathname.slice(1) + ret.url.search;
-			let path = ret.url.pathname.slice(1).split("/");
-			let firstSegment = path.shift();
-
-			if (firstSegment !== "repos") {
-				return ret;
-			}
-
-			ret.username = path.shift();
-			ret.repo = path.shift();
-			ret.resources = path.shift();
 		}
 
 		return ret;
