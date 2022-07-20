@@ -9,11 +9,11 @@ export default class GithubAPI extends Github {
 	}
 
 	async get (url) {
-		let call = url? GithubAPI.parseURL(url) : this.info;
+		let call = url? GithubAPI.parseURL(url) : this.file;
 
 		if (call.query) {
 			// GraphQL
-			let response = await this.request(this.url, { query: call.query }, "POST");
+			let response = await this.request(call.url, { query: call.query }, "POST");
 			if (response.errors?.length) {
 				throw new Error(response.errors.map(x => x.message).join("\n"));
 			}
@@ -27,7 +27,7 @@ export default class GithubAPI extends Github {
 				"Accept": "application/vnd.github.squirrel-girl-preview"
 			}
 		};
-		let response = await this.request(call.apiCall, {ref:this.branch}, "GET", req);
+		let response = await this.request(call.apiCall, {}, "GET", req);
 
 		// Raw API call
 		let json = await response.json();
@@ -43,7 +43,7 @@ export default class GithubAPI extends Github {
 				next = response.headers.get("Link")?.match(/<(.+?)>; rel="next"/)?.[1];
 
 				if (next) {
-					response = await this.request(next, {ref:this.branch}, "GET", req);
+					response = await this.request(next, {}, "GET", req);
 
 					if (response.ok) {
 						let pageJSON = await response.json();
@@ -80,10 +80,14 @@ export default class GithubAPI extends Github {
 			url: new URL(source, location)
 		};
 
-		if (url.hash && url.pathname == "/graphql") {
+		if (ret.url.hash && ret.url.pathname == "/graphql") {
 			// https://api.github.com/graphql#query{...}
 			ret.query = source.match(/#([\S\s]+)/)?.[1]; // url.hash drops line breaks
-			url.hash = "";
+			ret.url.hash = "";
+		}
+		else {
+			// Raw API call
+			ret.apiCall = ret.url.pathname.slice(1) + ret.url.search;
 		}
 
 		return ret;
