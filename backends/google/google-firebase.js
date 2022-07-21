@@ -2,7 +2,7 @@ import Google from "./google.js";
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.9.0/firebase-app.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider, useDeviceLanguage } from "https://www.gstatic.com/firebasejs/9.9.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.9.0/firebase-firestore-lite.js";
+import { getFirestore, doc, collection, getDoc, getDocs, setDoc, addDoc } from "https://www.gstatic.com/firebasejs/9.9.0/firebase-firestore-lite.js";
 
 export default class GoogleFirebase extends Google {
 	ready = new Promise((resolve, reject) => {
@@ -29,19 +29,36 @@ export default class GoogleFirebase extends Google {
 		file = this.#applyDefaults(file);
 
 		const firestore = getFirestore();
-		const docRef = doc(firestore, file.path);
-		
-		try {
-			const document = await getDoc(docRef);
-			if (document.exists()) {
-				return document.data();
+
+		if (this.#isCollection(file)) {
+			const collectionRef = collection(firestore, file.path);
+
+			try {
+				const documents = [];
+				const collection = await getDocs(collectionRef);
+				collection.forEach(doc => documents.push({id: doc.id, data: doc.data()}));
+
+				return documents;
 			}
-			else {
-				throw new Error(this.constructor.phrase("document_does_not_exist"));
+			catch (e) {
+				throw new Error(e.message);
 			}
 		}
-		catch (e) {
-			throw new Error(e.message);
+		else {
+			const docRef = doc(firestore, file.path);
+			
+			try {
+				const document = await getDoc(docRef);
+				if (document.exists()) {
+					return document.data();
+				}
+				else {
+					throw new Error(this.constructor.phrase("document_does_not_exist"));
+				}
+			}
+			catch (e) {
+				throw new Error(e.message);
+			}
 		}
 	}
 
@@ -51,14 +68,55 @@ export default class GoogleFirebase extends Google {
 		}
 
 		const firestore = getFirestore();
-		const docRef = doc(firestore, file.path);
 
-		try {
-			return await setDoc(docRef, data);
+		if (this.#isCollection(file)) {
+			const documents = Array.isArray(data)? data : [data];
+
+			const collectionRef = collection(firestore, file.path);
+			const ids = [];
+			for (const document of documents) {
+				let { id, data } = document;
+				if (id === undefined) {
+					data ??= {...document};
+
+					try {
+						// Generate document ID automatically.
+						const docRef = await addDoc(collectionRef, data);
+						ids.push(docRef.id);
+					}
+					catch (e) {}
+				}
+				else {
+					if (data === undefined) {
+						data = {...document};
+						delete data.id;
+					}
+
+					try {
+						const docRef = doc(firestore, file.path + "/" + id);
+						await setDoc(docRef, data);
+						ids.push(id);
+					}
+					catch (e) {}
+				}
+			}
+
+			// Return IDs of all successfully stored documents.
+			return {ids};
 		}
-		catch (e) {
-			throw new Error(e.message);
+		else {
+			try {
+				const docRef = doc(firestore, file.path);
+				await setDoc(docRef, data);
+
+				// Return document ID.
+				return {id: file.path.split("/").pop()};
+			}
+			catch (e) {
+				throw new Error(e.message);
+			}
 		}
+		
 	}
 
 	async login () {
@@ -112,6 +170,13 @@ export default class GoogleFirebase extends Google {
 		}
 
 		return file;
+	}
+
+	#isCollection (file = this.file) {
+		const path = file.path.split("/");
+
+		// The collection path has an odd number of segments
+		return path.length % 2 === 1;
 	}
 
 	static defaults = {
