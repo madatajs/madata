@@ -31,7 +31,7 @@ export default class Backend extends EventTarget {
 	}
 
 	async stringify (data) {
-		return this.options.stringify? this.options.stringify(data) : JSON.stringify(data);
+		return this.options.stringify? this.options.stringify(data) : JSON.stringify(data, null, "\t");
 	}
 
 	updatePermissions(o) {
