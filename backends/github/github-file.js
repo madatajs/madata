@@ -138,6 +138,14 @@ export default class GithubFile extends Github {
 		if (user) {
 			this.updatePermissions({edit: true, save: true});
 
+			if (!this.file.owner) {
+				Object.defineProperty(this.file, "owner", {
+					get: () => this.user.username,
+					configurable: true,
+					enumerable: true,
+				});
+			}
+
 			if (this.file.repo) {
 				// TODO move to load()?
 				this.file.repoInfo = await this.getRepoInfo();
@@ -344,16 +352,23 @@ export default class GithubFile extends Github {
 	 * Parse Github URLs, return username, repo, branch, path
 	 */
 	 static parseURL (source) {
+		const ret = {
+			owner: undefined,
+			repo: undefined,
+			branch: undefined,
+			path: undefined,
+		};
+
+		if (!source) {
+			return ret;
+		}
+
 		const url = new URL(source);
 
 		let path = url.pathname.slice(1).split("/");
 
-		const ret = {
-			owner: path.shift(),
-			repo: path.shift(),
-			branch: undefined,
-			path: undefined,
-		};
+		ret.owner = path.shift();
+		ret.repo = path.shift();
 
 		if (ret.repo) { // If we don't have a repo, we won't have a branch or a file path either
 			let hasBranch = url.host === "raw.githubusercontent.com" || path[0] === "blob";
