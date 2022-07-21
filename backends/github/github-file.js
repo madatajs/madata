@@ -3,11 +3,17 @@ import hooks from "../../src/hooks.js";
 import {readFile, delay} from "../../src/util.js";
 
 export default class GithubFile extends Github {
-	async get (url, {path} = {}) {
-		let file = url? this.constructor.parseURL(url) : this.file;
+	async get (url) {
+		// URL could be absolute or relative
+		let file;
 
-		if (path) {
-			file = Object.assign({}, file, {path});
+		if (url) {
+			// Resolve against original URL
+			url = new URL(url, this.source || "https://github.com");
+			file = this.constructor.parseURL(url);
+		}
+		else {
+			file = this.file;
 		}
 
 		if (this.isAuthenticated()) {
