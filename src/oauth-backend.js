@@ -82,7 +82,7 @@ export default class OAuthBackend extends AuthBackend {
 				return response[req.responseType]();
 			}
 		}
-		else if (response.status === 404) {
+		else if (response.status === 404 && req.method === "GET") {
 			return null;
 		}
 		else {
