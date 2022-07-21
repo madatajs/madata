@@ -4,13 +4,17 @@ import {readFile, delay} from "../../src/util.js";
 
 export default class GithubFile extends Github {
 	async get (url) {
-		// URL could be absolute or relative
+		// URL could be absolute or a path
 		let file;
 
 		if (url) {
-			// Resolve against original URL
-			url = new URL(url, this.source || "https://github.com");
-			file = this.constructor.parseURL(url);
+			if (url.startsWith("https://")) {
+				file = this.constructor.parseURL(url);
+			}
+			else {
+				// Relative path
+				file = Object.assign({}, this.file, {path: url});
+			}
 		}
 		else {
 			file = this.file;
@@ -34,7 +38,7 @@ export default class GithubFile extends Github {
 				}
 			}
 
-			if (file.repo && response.content) {
+			if (file.repo && response?.content) {
 				// Fetching file contents
 				return fromBase64(response.content);
 			}
@@ -76,18 +80,14 @@ export default class GithubFile extends Github {
 	 * @param {String} path - Optional file path
 	 * @return {Promise} A promise that resolves when the file is saved.
 	 */
-	 async put (serialized, {file = this.file, path, isEncoded, ...o} = {}) {
-		if (path) {
-			file = Object.assign({}, file, {path});
+	 async put (serialized, {file, isEncoded} = {}) {
+		if (file.repoInfo === undefined) {
+			file.repoInfo = await this.getRepoInfo(file);
 		}
 
-		if (!file.repoInfo) {
-			file.repoInfo = await this.getRepoInfo(file);
-
-			if (!file.repoInfo) {
-				// Create repo if it doesn’t exist
-				file.repoInfo = await this.createRepo(this.file.repo)
-			}
+		if (file.repoInfo === null) {
+			// Create repo if it doesn’t exist
+			file.repoInfo = await this.createRepo(this.file.repo)
 		}
 
 		if ((await this.canPush(file)) === false) {
@@ -151,6 +151,10 @@ export default class GithubFile extends Github {
 			if (!this.file.owner) {
 				Object.defineProperty(this.file, "owner", {
 					get: () => this.user.username,
+					set: (value) => {
+						delete this.file.owner;
+						this.file.owner = value;
+					},
 					configurable: true,
 					enumerable: true,
 				});
@@ -179,7 +183,7 @@ export default class GithubFile extends Github {
 	}
 
 	async canPush (file = this.file) {
-		if (!file.repoInfo) {
+		if (file.repoInfo === undefined) {
 			file.repoInfo = await this.getRepoInfo(file);
 		}
 
