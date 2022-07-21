@@ -74,6 +74,14 @@ export default class GithubFile extends Github {
 		}
 	}
 
+	static sameRepo (file1, file2) {
+		if (file1 === file2) {
+			return true;
+		}
+
+		return file1.owner === file2.owner && file1.repo === file2.repo;
+	}
+
 	/**
 	 * Saves a file to the backend.
 	 * @param {String} serialized - Serialized data
@@ -87,7 +95,12 @@ export default class GithubFile extends Github {
 
 		if (file.repoInfo === null) {
 			// Create repo if it doesn’t exist
-			file.repoInfo = await this.createRepo(this.file.repo)
+			file.repoInfo = await this.createRepo(this.file.repo);
+		}
+
+		// Update this.file.repoInfo too
+		if (!this.file.repoInfo && GithubFile.sameRepo(file, this.file)) {
+			this.file.repoInfo = file.repoInfo;
 		}
 
 		if ((await this.canPush(file)) === false) {
@@ -112,27 +125,27 @@ export default class GithubFile extends Github {
 		let fileCall = `repos/${file.owner}/${file.repo}/contents/${file.path}`;
 		let commitPrefix = this.options.commitPrefix || "";
 
-		try {
-			fileInfo = await this.request(fileCall, {
-				ref: this.file.branch
-			});
+		// Read file, so we can get a SHA
+		fileInfo = await this.request(fileCall, {
+			ref: this.file.branch
+		});
 
+		if (fileInfo !== null) {
+			// Write file
 			fileInfo = await this.request(fileCall, {
 				message: commitPrefix + this.constructor.phrase("updated_file", fileInfo.name || file.path),
 				content: serialized,
-				branch: this.file.branch,
+				branch: file.branch,
 				sha: fileInfo.sha
 			}, "PUT");
 		}
-		catch (err) {
-			if (err.status == 404) {
-				// File does not exist, create it
-				fileInfo = await this.request(fileCall, {
-					message: commitPrefix + this.constructor.phrase("created_file", file.path),
-					content: serialized,
-					branch: this.file.branch
-				}, "PUT");
-			}
+		else {
+			// File doesn't exist yet, create it
+			fileInfo = await this.request(fileCall, {
+				message: commitPrefix + this.constructor.phrase("created_file", file.path),
+				content: serialized,
+				branch: file.branch
+			}, "PUT");
 		}
 
 		const env = {context: this, fileInfo};
