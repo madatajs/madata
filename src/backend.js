@@ -70,9 +70,9 @@ export default class Backend extends EventTarget {
 		return null;
 	}
 
-	async load () {
+	async load (...args) {
 		await this.ready;
-		let response = await this.get();
+		let response = await this.get(...args);
 
 		if (typeof response != "string") {
 			// Backend did the parsing, we're done here
