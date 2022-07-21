@@ -108,9 +108,7 @@ export default class GoogleFirebase extends Google {
 
 	#applyDefaults (file = this.file) {
 		for (const part in GoogleFirebase.defaults) {
-			if (file[part] === undefined) {
-				file[part] = GoogleFirebase.defaults[part];
-			}
+			file[part] = this.options[part] ?? GoogleFirebase.defaults[part];
 		}
 
 		return file;
