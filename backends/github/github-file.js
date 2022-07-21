@@ -318,24 +318,50 @@ export default class GithubFile extends Github {
 		return forkInfo;
 	}
 
-	async getPagesInfo (repoInfo = this.file.repoInfo) {
-		let repo = repoInfo.full_name;
-		return repoInfo.pagesInfo = repoInfo.pagesInfo || this.request(`repos/${repo}/pages`, {}, "GET", {
+	async publish (file = this.file, {https_enforced = true} = {}) {
+		let source = {
+			branch: file.branch || "main",
+		}
+
+		let pagesInfo = await this.request(`repos/${file.owner}/${file.repo}/pages`, {source}, "POST", {
 			headers: {
-				"Accept": "application/vnd.github.mister-fantastic-preview+json"
+				"Accept": "application/vnd.github+json",
 			}
 		});
+
+		if (https_enforced) {
+			await this.request(`repos/${file.owner}/${file.repo}/pages`, {https_enforced: true}, "PUT", {
+				headers: {
+					"Accept": "application/vnd.github.v3+json",
+				}
+			});
+		}
+
+		return pagesInfo;
 	}
 
-	async getRepoURL (repoInfo = this.file.repoInfo, {
-		sha = this.file.branch || "latest",
+	async getPagesInfo (file = this.file) {
+		let repoInfo = await this.getRepoInfo(file);
+
+		if (repoInfo) {
+			let repo = repoInfo.full_name;
+			return repoInfo.pagesInfo = repoInfo.pagesInfo || this.request(`repos/${repo}/pages`, {}, "GET", {
+				headers: {
+					"Accept": "application/vnd.github+json",
+				}
+			});
+		}
+	}
+
+	async getRepoURL (file = this.file, {
+		sha = file.branch || "latest",
 	} = {}) {
 		if (this.options.repoURL) {
 			return this.options.repoURL;
 		}
 
 		try {
-			let pagesInfo = await this.getPagesInfo(repoInfo);
+			let pagesInfo = await this.getPagesInfo(file);
 
 			if (pagesInfo) {
 				return pagesInfo.html_url;
