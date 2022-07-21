@@ -4,7 +4,21 @@ import {readFile, delay} from "../../src/util.js";
 
 export default class GithubFile extends Github {
 	async get (url) {
-		let file = url? this.constructor.parseURL(url) : this.file;
+		// URL could be absolute or a path
+		let file;
+
+		if (url) {
+			if (url.startsWith("https://")) {
+				file = this.constructor.parseURL(url);
+			}
+			else {
+				// Relative path
+				file = Object.assign({}, this.file, {path: url});
+			}
+		}
+		else {
+			file = this.file;
+		}
 
 		if (this.isAuthenticated()) {
 			let call = `repos/${file.owner}/${file.repo}/contents/${file.path}`;
@@ -24,7 +38,7 @@ export default class GithubFile extends Github {
 				}
 			}
 
-			if (file.repo && response.content) {
+			if (file.repo && response?.content) {
 				// Fetching file contents
 				return fromBase64(response.content);
 			}
@@ -60,24 +74,33 @@ export default class GithubFile extends Github {
 		}
 	}
 
+	static sameRepo (file1, file2) {
+		if (file1 === file2) {
+			return true;
+		}
+
+		return file1.owner === file2.owner && file1.repo === file2.repo;
+	}
+
 	/**
 	 * Saves a file to the backend.
 	 * @param {String} serialized - Serialized data
 	 * @param {String} path - Optional file path
 	 * @return {Promise} A promise that resolves when the file is saved.
 	 */
-	 async put (serialized, {file = this.file, path, isEncoded, ...o} = {}) {
-		if (path) {
-			file = Object.assign({}, file, {path});
+	 async put (serialized, {file, isEncoded} = {}) {
+		if (file.repoInfo === undefined) {
+			file.repoInfo = await this.getRepoInfo(file);
 		}
 
-		if (!file.repoInfo) {
-			file.repoInfo = await this.getRepoInfo(file);
+		if (file.repoInfo === null) {
+			// Create repo if it doesn’t exist
+			file.repoInfo = await this.createRepo(this.file.repo);
+		}
 
-			if (!file.repoInfo) {
-				// Create repo if it doesn’t exist
-				file.repoInfo = await this.createRepo(this.file.repo)
-			}
+		// Update this.file.repoInfo too
+		if (!this.file.repoInfo && GithubFile.sameRepo(file, this.file)) {
+			this.file.repoInfo = file.repoInfo;
 		}
 
 		if ((await this.canPush(file)) === false) {
@@ -102,27 +125,27 @@ export default class GithubFile extends Github {
 		let fileCall = `repos/${file.owner}/${file.repo}/contents/${file.path}`;
 		let commitPrefix = this.options.commitPrefix || "";
 
-		try {
-			fileInfo = await this.request(fileCall, {
-				ref: this.file.branch
-			});
+		// Read file, so we can get a SHA
+		fileInfo = await this.request(fileCall, {
+			ref: this.file.branch
+		});
 
+		if (fileInfo !== null) {
+			// Write file
 			fileInfo = await this.request(fileCall, {
 				message: commitPrefix + this.constructor.phrase("updated_file", fileInfo.name || file.path),
 				content: serialized,
-				branch: this.file.branch,
+				branch: file.branch,
 				sha: fileInfo.sha
 			}, "PUT");
 		}
-		catch (err) {
-			if (err.status == 404) {
-				// File does not exist, create it
-				fileInfo = await this.request(fileCall, {
-					message: commitPrefix + this.constructor.phrase("created_file", file.path),
-					content: serialized,
-					branch: this.file.branch
-				}, "PUT");
-			}
+		else {
+			// File doesn't exist yet, create it
+			fileInfo = await this.request(fileCall, {
+				message: commitPrefix + this.constructor.phrase("created_file", file.path),
+				content: serialized,
+				branch: file.branch
+			}, "PUT");
 		}
 
 		const env = {context: this, fileInfo};
@@ -137,6 +160,18 @@ export default class GithubFile extends Github {
 
 		if (user) {
 			this.updatePermissions({edit: true, save: true});
+
+			if (!this.file.owner) {
+				Object.defineProperty(this.file, "owner", {
+					get: () => this.user.username,
+					set: (value) => {
+						delete this.file.owner;
+						this.file.owner = value;
+					},
+					configurable: true,
+					enumerable: true,
+				});
+			}
 
 			if (this.file.repo) {
 				// TODO move to load()?
@@ -161,7 +196,7 @@ export default class GithubFile extends Github {
 	}
 
 	async canPush (file = this.file) {
-		if (!file.repoInfo) {
+		if (file.repoInfo === undefined) {
 			file.repoInfo = await this.getRepoInfo(file);
 		}
 
@@ -283,24 +318,50 @@ export default class GithubFile extends Github {
 		return forkInfo;
 	}
 
-	async getPagesInfo (repoInfo = this.file.repoInfo) {
-		let repo = repoInfo.full_name;
-		return repoInfo.pagesInfo = repoInfo.pagesInfo || this.request(`repos/${repo}/pages`, {}, "GET", {
+	async publish (file = this.file, {https_enforced = true} = {}) {
+		let source = {
+			branch: file.branch || "main",
+		}
+
+		let pagesInfo = await this.request(`repos/${file.owner}/${file.repo}/pages`, {source}, "POST", {
 			headers: {
-				"Accept": "application/vnd.github.mister-fantastic-preview+json"
+				"Accept": "application/vnd.github+json",
 			}
 		});
+
+		if (https_enforced) {
+			await this.request(`repos/${file.owner}/${file.repo}/pages`, {https_enforced: true}, "PUT", {
+				headers: {
+					"Accept": "application/vnd.github.v3+json",
+				}
+			});
+		}
+
+		return pagesInfo;
 	}
 
-	async getRepoURL (repoInfo = this.file.repoInfo, {
-		sha = this.file.branch || "latest",
+	async getPagesInfo (file = this.file) {
+		let repoInfo = await this.getRepoInfo(file);
+
+		if (repoInfo) {
+			let repo = repoInfo.full_name;
+			return repoInfo.pagesInfo = repoInfo.pagesInfo || this.request(`repos/${repo}/pages`, {}, "GET", {
+				headers: {
+					"Accept": "application/vnd.github+json",
+				}
+			});
+		}
+	}
+
+	async getRepoURL (file = this.file, {
+		sha = file.branch || "latest",
 	} = {}) {
 		if (this.options.repoURL) {
 			return this.options.repoURL;
 		}
 
 		try {
-			let pagesInfo = await this.getPagesInfo(repoInfo);
+			let pagesInfo = await this.getPagesInfo(file);
 
 			if (pagesInfo) {
 				return pagesInfo.html_url;
@@ -344,16 +405,23 @@ export default class GithubFile extends Github {
 	 * Parse Github URLs, return username, repo, branch, path
 	 */
 	 static parseURL (source) {
+		const ret = {
+			owner: undefined,
+			repo: undefined,
+			branch: undefined,
+			path: undefined,
+		};
+
+		if (!source) {
+			return ret;
+		}
+
 		const url = new URL(source);
 
 		let path = url.pathname.slice(1).split("/");
 
-		const ret = {
-			owner: path.shift(),
-			repo: path.shift(),
-			branch: undefined,
-			path: undefined,
-		};
+		ret.owner = path.shift();
+		ret.repo = path.shift();
 
 		if (ret.repo) { // If we don't have a repo, we won't have a branch or a file path either
 			let hasBranch = url.host === "raw.githubusercontent.com" || path[0] === "blob";

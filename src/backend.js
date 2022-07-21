@@ -31,7 +31,7 @@ export default class Backend extends EventTarget {
 	}
 
 	async stringify (data) {
-		return this.options.stringify? this.options.stringify(data) : JSON.stringify(data);
+		return this.options.stringify? this.options.stringify(data) : JSON.stringify(data, null, "\t");
 	}
 
 	updatePermissions(o) {
@@ -70,9 +70,9 @@ export default class Backend extends EventTarget {
 		return null;
 	}
 
-	async load () {
+	async load (...args) {
 		await this.ready;
-		let response = await this.get();
+		let response = await this.get(...args);
 
 		if (typeof response != "string") {
 			// Backend did the parsing, we're done here
@@ -86,20 +86,32 @@ export default class Backend extends EventTarget {
 		return json;
 	}
 
-	async store (data, {url, path, ...o} = {}) {
+	async store (data, o = {}) {
 		await this.ready;
 
-		let serialized = typeof data === "string"? data : await this.stringify(data);
-		let file;
+		if (typeof o === "string") {
+			o = {url: o};
+		}
+
+		let {file, url, ...options} = o;
 
 		if (url) {
-			file = this.constructor.parseURL(url);
+			if (/^\w+:/.test(url)) {
+				// Absolute URL
+				file = this.constructor.parseURL(url);
+			}
+			else {
+				// Relative path
+				file = Object.assign({}, this.file, {path: url});
+			}
 		}
-		else {
+		else if (!file) {
 			file = this.file;
 		}
 
-		let fileInfo = await this.put(serialized, {file, ...o});
+		let serialized = typeof data === "string"? data : await this.stringify(data);
+
+		let fileInfo = await this.put(serialized, {file, ...options});
 
 		// TODO add data and serialized onto fileInfo so we can just return a single value?
 
