@@ -1,9 +1,10 @@
 # Google backends
 
-There are two backends here, all using authentication via Google:
+There are three backends here, all using authentication via Google:
 
 - Google Sheets
 - Google Calendar
+- Google Firebase
 
 ## Google Sheets
 
@@ -40,3 +41,14 @@ This is a string like `A1:B2` that refers to a group of cells in the sheet (the 
 - `https://calendar.google.com/calendar/u/0?cid=cDlkOWxkOXZ2aHNrOXE5M2hhcDQxN2sxZHNAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ`
 - `https://calendar.google.com/calendar/embed?src=p9d9ld9vvhsk9q93hap417k1ds@group.calendar.google.com`
 - `https://calendar.google.com/calendar/embed?src=fr.french%23holiday%40group.v.calendar.google.com`
+
+## Google Firebase
+
+### URLs
+
+- Database URL like `https://mavo-demos.firebaseio.com`
+
+### Constructor options
+
+- `apiKey`
+- `path`
