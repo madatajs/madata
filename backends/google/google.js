@@ -23,11 +23,7 @@ export default class Google extends OAuthBackend {
 		};
 	}
 
-	get #allScopes () {
-		return [...(this.constructor.scopes ?? []), "https://www.googleapis.com/auth/userinfo.profile"];
-	}
-
-	oAuthParams = () => `&redirect_uri=${encodeURIComponent("https://auth.mavo.io")}&response_type=code&scope=${encodeURIComponent(this.#allScopes.join(" "))}`
+	oAuthParams = () => `&redirect_uri=${encodeURIComponent("https://auth.mavo.io")}&response_type=code&scope=${encodeURIComponent(this.constructor.scopes.join(" "))}`
 
 	static oAuth = "https://accounts.google.com/o/oauth2/auth"
 	static clientId = "380712995757-4e9augrln1ck0soj8qgou0b4tnr30o42.apps.googleusercontent.com"

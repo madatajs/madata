@@ -23,7 +23,7 @@ export default class GoogleCalendar extends Google {
 	}
 
 	static apiDomain = "https://www.googleapis.com/calendar/v3/calendars/";
-	static scopes = ["https://www.googleapis.com/auth/calendar.events"];
+	static scopes = ["https://www.googleapis.com/auth/calendar.events", "https://www.googleapis.com/auth/userinfo.profile"];
 
 	static test (url) {
 		url = new URL(url);

@@ -203,7 +203,7 @@ export default class GoogleSheets extends Google {
 	}
 
 	static apiDomain = "https://sheets.googleapis.com/v4/spreadsheets/";
-	static scopes = ["https://www.googleapis.com/auth/spreadsheets"];
+	static scopes = ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/userinfo.profile"];
 
 	static test (url) {
 		return url.startsWith("https://docs.google.com/spreadsheets/");
