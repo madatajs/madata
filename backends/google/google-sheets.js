@@ -56,7 +56,7 @@ export default class GoogleSheets extends Google {
 	 * @param {Object} file Spreadsheet to work with.
 	 * @param {Object} options Options: sheetTitle, range.
 	 */
-	async store (data, {file = this.file, ...options} = {}) { // Why not put()? To avoid data serialization.
+	async put (data, {file = this.file, ...options} = {}) {
 		file = Object.assign({}, file, {...options});
 
 		const rangeReference = GoogleSheets.#getRangeReference(file);
@@ -156,6 +156,9 @@ export default class GoogleSheets extends Google {
 
 		return user;
 	}
+
+	stringify = data => data
+	parse = data => data
 
 	/**
 	 * Get the range reference.

@@ -64,7 +64,7 @@ export default class GoogleFirebase extends Google {
 		}
 	}
 
-	async store (data, {file = this.file, path, ...options} = {}) {
+	async put (data, {file = this.file, path, ...options} = {}) {
 		if (path) {
 			file = Object.assign({}, file, {path});
 		}
@@ -189,6 +189,9 @@ export default class GoogleFirebase extends Google {
 
 		return file;
 	}
+
+	stringify = data => data
+	parse = data => data
 
 	static #isCollection (file) {
 		const path = file.path.split("/");
