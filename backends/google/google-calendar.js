@@ -36,9 +36,10 @@ export default class GoogleCalendar extends Google {
 	 * @returns Calendar ID.
 	 */
 	static parseURL (source) {
-		const ret = {};
-		const url = new URL(source);
-		const params = url.searchParams;
+		const ret = {
+			url: new URL(source)
+		};
+		const params = ret.url.searchParams;
 
 		let calendarId;
 		// Order matters: shareable link, public URL, or the user's primary calendar.

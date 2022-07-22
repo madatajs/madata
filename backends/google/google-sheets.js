@@ -216,13 +216,13 @@ export default class GoogleSheets extends Google {
 	 */
 	static parseURL (source) {
 		const ret = {
+			url: new URL(source),
 			sheetId: undefined,
 			sheetTitle: undefined,
 			range: undefined
 		};
-		const url = new URL(source);
-		const path = url.pathname.slice(1).split("/");
-		const hash = url.hash;
+		const path = ret.url.pathname.slice(1).split("/");
+		const hash = ret.url.hash;
 
 		ret.id = path[2];
 		if (hash && hash.startsWith("#gid=")) {
