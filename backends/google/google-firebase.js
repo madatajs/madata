@@ -123,12 +123,18 @@ export default class GoogleFirebase extends Google {
 
 	async upload (file, path) {
 		const dataURL = await readFile(file);
-		const storage = getStorage();
-		const storageRef = ref(storage, path);
 
-		await uploadString(storageRef, dataURL, "data_url");
+		try {
+			const storage = getStorage();
+			const storageRef = ref(storage, path);
 
-		return await getDownloadURL(storageRef);
+			await uploadString(storageRef, dataURL, "data_url");
+
+			return await getDownloadURL(storageRef);
+		}
+		catch (e) {
+			throw new Error(e.message);
+		}
 	}
 
 	async login () {
