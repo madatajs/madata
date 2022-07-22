@@ -9,7 +9,7 @@ export default class GoogleSheets extends Google {
 	async get (url) {
 		const file = url? this.constructor.parseURL(url) : this.file;
 
-		if (file.sheetId !== undefined && !file.sheetTitle || this.#getRangeReference(file) === "") {
+		if (file.sheetId !== undefined && !file.sheetTitle || GoogleSheets.#getRangeReference(file) === "") {
 			// Sheet title has priority over sheet id
 			try {
 				const sheetTitle = await this.#getSheetTitle(file);
@@ -31,7 +31,7 @@ export default class GoogleSheets extends Google {
 			}
 		}
 
-		const rangeReference = this.#getRangeReference(file);
+		const rangeReference = GoogleSheets.#getRangeReference(file);
 		let call = `${file.id}/values/${rangeReference}/?key=${this.apiKey}&majorDimension=rows&valueRenderOption=unformatted_value`;
 		if (this.options.serializeDates) {
 			call += "&dateTimeRenderOption=formatted_string";
@@ -59,7 +59,7 @@ export default class GoogleSheets extends Google {
 	async store (data, {file = this.file, ...options} = {}) { // Why not put()? To avoid data serialization.
 		file = Object.assign({}, file, {...options});
 
-		const rangeReference = this.#getRangeReference(file);
+		const rangeReference = GoogleSheets.#getRangeReference(file);
 		let call = `${file.id}/values/${rangeReference}?key=${this.apiKey}&valueInputOption=user_entered&responseValueRenderOption=unformatted_value&includeValuesInResponse=true`;
 		if (this.options.serializeDates) {
 			call += "&responseDateTimeRenderOption=formatted_string";
@@ -163,7 +163,7 @@ export default class GoogleSheets extends Google {
 	 * @param {string} range Range in the A1 notation.
 	 * @returns The range reference in one of the supported formats: 'Sheet title'!Range, 'Sheet title', or Range.
 	 */
-	#getRangeReference ({sheetTitle = this.file.sheetTitle, range = this.file.range} = file) {
+	static #getRangeReference ({sheetTitle, range} = file) {
 		return `${sheetTitle ? `'${sheetTitle}'` : ""}${range ? (sheetTitle ? `!${range}` : range) : ""}`
 	}
 

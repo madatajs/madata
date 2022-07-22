@@ -32,7 +32,7 @@ export default class GoogleFirebase extends Google {
 
 		const firestore = getFirestore();
 
-		if (this.#isCollection(file)) {
+		if (GoogleFirebase.#isCollection(file)) {
 			const collectionRef = collection(firestore, file.path);
 
 			try {
@@ -71,7 +71,7 @@ export default class GoogleFirebase extends Google {
 
 		const firestore = getFirestore();
 
-		if (this.#isCollection(file)) {
+		if (GoogleFirebase.#isCollection(file)) {
 			const documents = Array.isArray(data)? data : [data];
 
 			const collectionRef = collection(firestore, file.path);
@@ -184,7 +184,7 @@ export default class GoogleFirebase extends Google {
 		return file;
 	}
 
-	#isCollection (file = this.file) {
+	static #isCollection (file) {
 		const path = file.path.split("/");
 
 		// The collection path has an odd number of segments
