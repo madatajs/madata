@@ -106,10 +106,6 @@ export default class OAuthBackend extends AuthBackend {
 	async login ({passive = false} = {}) {
 		await this.ready;
 
-		if (this.isAuthenticated()) {
-			return this.getUser();
-		}
-
 		let authProvider = this.constructor.getOAuthProvider();
 
 		let id = authProvider.name.toLowerCase();
@@ -127,11 +123,6 @@ export default class OAuthBackend extends AuthBackend {
 					delete this.accessToken;
 				}
 			}
-		}
-
-		if (this.accessToken) {
-			this.dispatchEvent(new CustomEvent("mv-login"));
-			return this.user;
 		}
 
 		if (!passive) {
@@ -176,6 +167,7 @@ export default class OAuthBackend extends AuthBackend {
 		}
 
 		if (this.isAuthenticated()) {
+			this.dispatchEvent(new CustomEvent("mv-login"));
 			this.updatePermissions({login: false, logout: true});
 			return this.getUser();
 		}
