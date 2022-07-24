@@ -3,23 +3,7 @@ import hooks from "../../src/hooks.js";
 import {readFile, delay} from "../../src/util.js";
 
 export default class GithubFile extends Github {
-	async get (url) {
-		// URL could be absolute or a path
-		let file;
-
-		if (url) {
-			if (url.startsWith("https://")) {
-				file = this.constructor.parseURL(url);
-			}
-			else {
-				// Relative path
-				file = Object.assign({}, this.file, {path: url});
-			}
-		}
-		else {
-			file = this.file;
-		}
-
+	async get (file) {
 		if (this.isAuthenticated()) {
 			let call = `repos/${file.owner}/${file.repo}/contents/${file.path}`;
 
@@ -95,7 +79,7 @@ export default class GithubFile extends Github {
 
 		if (file.repoInfo === null) {
 			// Create repo if it doesn’t exist
-			file.repoInfo = await this.createRepo(this.file.repo);
+			file.repoInfo = await this.createRepo(file.repo);
 		}
 
 		// Update this.file.repoInfo too
@@ -212,7 +196,7 @@ export default class GithubFile extends Github {
 
 	async createRepo (name, options = {}) {
 		// TODO what if the repo is in an organization?
-		return this.request("user/repos", {name, ...options}, "POST");
+		return this.request("user/repos", {name, private: this.options.private === true, ...options}, "POST");
 	}
 
 	async getRepoInfo(file = this.file) {

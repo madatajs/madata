@@ -70,9 +70,26 @@ export default class Backend extends EventTarget {
 		return null;
 	}
 
-	async load (...args) {
+	async load (url, ...args) {
 		await this.ready;
-		let response = await this.get(...args);
+
+		let file;
+
+		if (url) {
+			if (/^\w+:/.test(url)) {
+				// Absolute URL
+				file = this.constructor.parseURL(url);
+			}
+			else {
+				// Relative path
+				file = Object.assign({}, this.file, {path: url});
+			}
+		}
+		else {
+			file = this.file;
+		}
+
+		let response = await this.get(file, ...args);
 
 		if (typeof response != "string") {
 			// Backend did the parsing, we're done here
