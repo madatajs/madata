@@ -23,6 +23,11 @@ There are four backends here, all using authentication via Google:
 
 - `https://drive.google.com/file/d/1aV-SUER-bXvph4PH28ppAu6lxoIlnA4F/view?usp=sharing`
 
+### Constructor options
+
+- `apiKey`
+- `allowCopying`: Whether to copy on save if logged in user has no permission to modify content.
+
 ## Google Firebase
 
 ### URLs
