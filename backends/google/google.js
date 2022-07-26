@@ -29,4 +29,8 @@ export default class Google extends OAuthBackend {
 	static clientId = "380712995757-4e9augrln1ck0soj8qgou0b4tnr30o42.apps.googleusercontent.com"
 	static apiKey = "AIzaSyCiAkSCE96adO_mFItVdS9fi7CXfTiwhe4"
 	static useCache = false
+
+	static phrases = {
+		access_token_invalid: "Access token is invalid. Please, log in again."
+	}
 }
