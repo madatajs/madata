@@ -25,7 +25,7 @@ export default class GoogleDrive extends Google {
 			file.info = await this.getFileInfo(file);
 		}
 		
-		if (!file.info.ownedByMe && file.info.capabilities.canCopy && !file.info.copyRequiresWriterPermission) {
+		if (!file.info.ownedByMe && file.info.capabilities.canCopy) {
 			if (this.options.allowCopying) {
 				const fileInfo = await this.copyFile(file);
 
@@ -72,7 +72,7 @@ export default class GoogleDrive extends Google {
 	}
 
 	static defaults = {
-		fields: "name, id, webViewLink, capabilities, copyRequiresWriterPermission, ownedByMe"
+		fields: "name, id, webViewLink, capabilities, ownedByMe"
 	}
 
 	static phrases = {
