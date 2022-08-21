@@ -106,6 +106,10 @@ export default class OAuthBackend extends AuthBackend {
 	async login ({passive = false} = {}) {
 		await this.ready;
 
+		if (this.isAuthenticated()) {
+			return this.getUser();
+		}
+
 		let authProvider = this.constructor.getOAuthProvider();
 
 		let id = authProvider.name.toLowerCase();
