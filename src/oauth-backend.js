@@ -171,9 +171,10 @@ export default class OAuthBackend extends AuthBackend {
 		}
 
 		if (this.isAuthenticated()) {
+			let user = await this.getUser();
 			this.dispatchEvent(new CustomEvent("mv-login"));
 			this.updatePermissions({login: false, logout: true});
-			return this.getUser();
+			return user;
 		}
 	}
 
