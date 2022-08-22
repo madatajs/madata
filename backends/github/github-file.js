@@ -72,7 +72,15 @@ export default class GithubFile extends Github {
 	 * @param {String} path - Optional file path
 	 * @return {Promise} A promise that resolves when the file is saved.
 	 */
-	 async put (serialized, {file, isEncoded} = {}) {
+	async put (serialized, {file, isEncoded} = {}) {
+		return this.#write("put", file, serialized, {isEncoded});
+	}
+
+	async delete (file = this.file) {
+		return this.#write("delete", file);
+	}
+
+	async #write (type, file, ...args) {
 		if (file.repoInfo === undefined) {
 			file.repoInfo = await this.getRepoInfo(file);
 		}
@@ -103,36 +111,52 @@ export default class GithubFile extends Github {
 			}
 		}
 
-		serialized = isEncoded? serialized : toBase64(serialized);
-
 		let fileInfo;
 		let fileCall = `repos/${file.owner}/${file.repo}/contents/${file.path}`;
 		let commitPrefix = this.options.commitPrefix || "";
 
 		// Read file, so we can get a SHA
 		fileInfo = await this.request(fileCall, {
-			ref: this.file.branch
+			ref: file.branch
 		});
 
-		if (fileInfo !== null) {
-			// Write file
-			fileInfo = await this.request(fileCall, {
-				message: commitPrefix + this.constructor.phrase("updated_file", fileInfo.name || file.path),
-				content: serialized,
-				branch: file.branch,
-				sha: fileInfo.sha
-			}, "PUT");
+		if (type === "put") {
+			let [serialized, {isEncoded} = {}] = args;
+
+			serialized = isEncoded? serialized : toBase64(serialized);
+
+			if (fileInfo !== null) {
+				// Write file
+				fileInfo = await this.request(fileCall, {
+					message: commitPrefix + this.constructor.phrase("updated_file", file.path),
+					content: serialized,
+					branch: file.branch,
+					sha: fileInfo.sha
+				}, "PUT");
+			}
+			else {
+				// File doesn't exist yet, create it
+				fileInfo = await this.request(fileCall, {
+					message: commitPrefix + this.constructor.phrase("created_file", file.path),
+					content: serialized,
+					branch: file.branch
+				}, "PUT");
+			}
 		}
-		else {
-			// File doesn't exist yet, create it
-			fileInfo = await this.request(fileCall, {
-				message: commitPrefix + this.constructor.phrase("created_file", file.path),
-				content: serialized,
-				branch: file.branch
-			}, "PUT");
+		else if (type === "delete") {
+
+			if (fileInfo !== null) {
+				console.log(fileCall, fileInfo, fileInfo.sha);
+				// Delete file
+				fileInfo = await this.request(fileCall, {
+					message: commitPrefix + this.constructor.phrase("deleted_file", file.path),
+					branch: file.branch,
+					sha: fileInfo.sha
+				}, "DELETE");
+			}
 		}
 
-		const env = {context: this, fileInfo};
+		const env = {context: this, fileInfo, type};
 
 		hooks.run("gh-after-commit", env);
 
@@ -149,6 +173,7 @@ export default class GithubFile extends Github {
 				Object.defineProperty(this.file, "owner", {
 					get: () => this.user.username,
 					set: (value) => {
+						console.log(`setting owner from ${this.user.username} to ${value}`);
 						delete this.file.owner;
 						this.file.owner = value;
 					},
@@ -207,7 +232,12 @@ export default class GithubFile extends Github {
 			repoInfo = this.file.repoInfo;
 		}
 		else {
-			repoInfo = await this.request(`repos/${file.owner}/${file.repo}`);
+			if (file.owner && file.repo) {
+				repoInfo = await this.request(`repos/${file.owner}/${file.repo}`);
+			}
+			else {
+				throw new Error("Cannot get repo info, owner and/or repo name missing.", file);
+			}
 		}
 
 		if (file.branch === undefined) {
@@ -377,6 +407,7 @@ export default class GithubFile extends Github {
 	static phrases = {
 		"updated_file": (name = "file") => "Updated " + name,
 		"created_file": (name = "file") => "Created " + name,
+		"deleted_file": (name = "file") => "Deleted " + name,
 		"no_push_permission": (repo) => `You do not have permission to write to repository ${repo}`,
 	}
 
