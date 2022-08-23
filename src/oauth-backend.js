@@ -106,7 +106,7 @@ export default class OAuthBackend extends AuthBackend {
 	async login ({passive = false} = {}) {
 		await this.ready;
 
-		if (this.user) {
+		if (this.isAuthenticated()) {
 			return this.getUser();
 		}
 
