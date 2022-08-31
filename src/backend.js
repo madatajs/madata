@@ -155,9 +155,6 @@ export default class Backend extends EventTarget {
 		return this.delete(file);
 	}
 
-	// To be be overriden by subclasses
-	ready = Promise.resolve()
-
 	toString () {
 		return `${this.constructor.name} (${this.source})`;
 	}
