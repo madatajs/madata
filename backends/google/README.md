@@ -21,12 +21,18 @@ There are four backends here, all using authentication via Google:
 
 ### URLs
 
-- `https://drive.google.com/file/d/1aV-SUER-bXvph4PH28ppAu6lxoIlnA4F/view?usp=sharing`
+- File URL like `https://drive.google.com/file/d/1aV-SUER-bXvph4PH28ppAu6lxoIlnA4F/view?usp=sharing`
+- “My Drive“ folder URL like `https://drive.google.com/drive/u/0/my-drive`
+- Folder URL like `https://drive.google.com/drive/u/0/folders/1VFdkWL6X0bV17x2xere8sUPoYMFByCz_`
 
 ### Constructor options
 
 - `apiKey`
-- `allowCopying`: Whether to copy on save if logged in user has no permission to modify content.
+- `filename`: The name of the file to be created (if not the file URL, but URL of any folder, including the “My Drive” folder, is provided).
+- `folder`: This option takes into account in two cases:
+  - The user has no writing permissions and the new file with data might be created in the specified folder
+  - While creating the backend, the user provided the URL of a folder, not a file, so the new file with data will be placed in the specified folder.
+- `allowCreatingFiles`: Whether to create a file with data in the specified folder (if the `folder` parameter is provided) or in the user's “My Drive” folder on save, if they have no permission to modify the content of the source file.
 
 ## Google Firebase
 
