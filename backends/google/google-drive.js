@@ -80,7 +80,8 @@ export default class GoogleDrive extends Google {
 					throw new Error(this.constructor.phrase("access_token_invalid"));
 				}
 
-				throw new Error(e.message);
+				const error = (await e.json()).error.message;
+				throw new Error(error);
 			}
 		}
 
@@ -112,7 +113,8 @@ export default class GoogleDrive extends Google {
 							throw new Error(this.constructor.phrase("access_token_invalid"));
 						}
 
-						throw new Error(e.message);
+						const error = (await e.json()).error.message;
+						throw new Error(error);
 					}
 				}
 				else {
@@ -120,7 +122,8 @@ export default class GoogleDrive extends Google {
 				}
 			}
 
-			throw new Error(e.message);
+			const error = (await e.json()).error.message;
+			throw new Error(error);
 		}
 	}
 
