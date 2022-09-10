@@ -135,8 +135,25 @@ export default class Backend extends EventTarget {
 		return {data, serialized, fileInfo};
 	}
 
-	// To be be overriden by subclasses
-	ready = Promise.resolve()
+	async remove (file = this.file) {
+		await this.ready;
+
+		if (typeof file === "string") {
+			if (/^\w+:/.test(file)) {
+				// Absolute URL
+				file = this.constructor.parseURL(file);
+			}
+			else {
+				// Relative path
+				file = Object.assign({}, this.file, {path: file});
+			}
+		}
+		else if (!file) {
+			file = this.file;
+		}
+
+		return this.delete(file);
+	}
 
 	toString () {
 		return `${this.constructor.name} (${this.source})`;

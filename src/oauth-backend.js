@@ -104,7 +104,13 @@ export default class OAuthBackend extends AuthBackend {
 	 * Helper method for authenticating in OAuth APIs
 	 */
 	async login ({passive = false} = {}) {
-		await this.ready;
+		if (this.ready) {
+			await this.ready;
+		}
+
+		if (this.isAuthenticated()) {
+			return this.getUser();
+		}
 
 		let authProvider = this.constructor.getOAuthProvider();
 
@@ -167,9 +173,10 @@ export default class OAuthBackend extends AuthBackend {
 		}
 
 		if (this.isAuthenticated()) {
+			let user = await this.getUser();
 			this.dispatchEvent(new CustomEvent("mv-login"));
 			this.updatePermissions({login: false, logout: true});
-			return this.getUser();
+			return user;
 		}
 	}
 
