@@ -124,6 +124,25 @@ export default class GoogleDrive extends Google {
 		}
 	}
 
+	async delete (file) {
+		if (!file.id) {
+			return;
+		}
+
+		try {
+			return await this.request(`drive/v3/files/${file.id}?key=${this.apiKey}`, {trashed: true}, "PATCH");
+		}
+		catch (e) {
+			if (e.status === 401) {
+				await this.logout(); // Access token we have is invalid. Discard it.
+				throw new Error(this.constructor.phrase("access_token_invalid"));
+			}
+
+			const error = (await e.json()).error.message;
+			throw new Error(error);
+		}
+	}
+
 	async login (...args) {
 		const user = await super.login(...args);
 
