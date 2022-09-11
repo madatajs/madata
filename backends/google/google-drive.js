@@ -96,8 +96,7 @@ export default class GoogleDrive extends Google {
 			else if (e.status === 403) {
 				// No write permissions
 				if (this.options.allowCreatingFiles) {
-					// Create file in the user's “My Drive” folder.
-					// Do we need to support other paths?
+					// Create file in the specified folder or in the user's “My Drive” folder.
 					try {
 						fileInfo = await this.#createFile(file);
 
