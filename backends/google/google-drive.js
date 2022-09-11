@@ -5,21 +5,14 @@ export default class GoogleDrive extends Google {
 		super.update(url, o);
 
 		if (o.folder) {
-			const url = new URL(o.folder);
-			const path = url.pathname.slice(1).split("/");
+			const folderId = GoogleDrive.#getFolderId(o.folder);
 
-			if (path[0] !== "drive") {
-				// Ignore URLs which are not URLs of folders on Google Drive.
-				return;
-			}
-
-			if (path[3] !== "folders") {
-				// Ignore the user's “My Drive” folder, which has no id.
+			if (!folderId) {
 				delete this.file.folder;
 				return;
 			}
 
-			this.file.folderId = path[4];
+			this.file.folderId = folderId;
 		}
 
 		if (o.fields) {
@@ -126,6 +119,40 @@ export default class GoogleDrive extends Google {
 		}
 	}
 
+	async upload (file, {filename = file.name, folder} = {}) {
+		const metadata = {
+			name: filename
+		}
+
+		if (folder) {
+			const folderId = GoogleDrive.#getFolderId(folder);
+
+			if (folderId) {
+				metadata.parents = [folderId];
+			}
+		}
+
+		const res = await this.request("upload/drive/v3/files?&fields=webViewLink&uploadType=resumable", metadata, "POST", {responseType: "response"});
+		const call = res.headers.get("Location");
+
+		try {
+			const fileInfo = await this.request(call, file, "PATCH");
+			return fileInfo.webViewLink;
+		}
+		catch (e) {
+			if (e.status === 401) {
+				await this.logout(); // Access token we have is invalid. Discard it.
+				throw new Error(this.constructor.phrase("access_token_invalid"));
+			}
+			else if (e.status === 403) {
+				throw new Error(this.constructor.phrase("no_upload_permission"));
+			}
+
+			const error = (await e.json()).error.message;
+			throw new Error(error);
+		}
+	}
+
 	async delete (file) {
 		if (!file.id) {
 			return;
@@ -178,6 +205,19 @@ export default class GoogleDrive extends Google {
 		return await this.request(call);
 	}
 
+	static #getFolderId (url) {
+		url = new URL(url);
+		const path = url.pathname.slice(1).split("/");
+
+		if (path[0] && path[3] && (path[0] !== "drive" || path[3] !== "folders")) {
+			// Ignore URLs which are not URLs of folders on Google Drive.
+			// Ignore the user's “My Drive” folder, which has no id.
+			return;
+		}
+
+		return path[4];
+	}
+
 	static apiDomain = "https://www.googleapis.com/";
 	static scopes = ["https://www.googleapis.com/auth/drive", "https://www.googleapis.com/auth/userinfo.profile"];
 
@@ -193,6 +233,7 @@ export default class GoogleDrive extends Google {
 
 	static phrases = {
 		"no_write_permission": (file) => `You do not have permission to write to file ${file}. Try enabling the allowCreatingFiles option to create a copy of it in your “My Drive” folder.`,
+		"no_upload_permission": "You do not have permission to upload files."
 	}
 
 	/**
