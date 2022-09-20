@@ -23,7 +23,7 @@ There are four backends here, all using authentication via Google:
 
 - File URL like `https://drive.google.com/file/d/1aV-SUER-bXvph4PH28ppAu6lxoIlnA4F/view?usp=sharing`
 - “My Drive“ folder URL like `https://drive.google.com/drive/u/0/my-drive`
-- Folder URL like `https://drive.google.com/drive/u/0/folders/1VFdkWL6X0bV17x2xere8sUPoYMFByCz_`
+- Folder URL like `https://drive.google.com/drive/u/0/folders/1VFdkWL6X0bV17x2xere8sUPoYMFByCz_` or `https://drive.google.com/drive/folders/1ALDwEixG2VJ-UKRJZH0CQH4bEkJ1PfoX`
 
 ### Constructor options
 

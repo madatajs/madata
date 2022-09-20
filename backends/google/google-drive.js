@@ -209,13 +209,18 @@ export default class GoogleDrive extends Google {
 		url = new URL(url);
 		const path = url.pathname.slice(1).split("/");
 
-		if (path[0] && path[3] && (path[0] !== "drive" || path[3] !== "folders")) {
+		if (path[0] && path[1] && (path[0] !== "drive" || path[1] === "my-drive")) {
 			// Ignore URLs which are not URLs of folders on Google Drive.
 			// Ignore the user's “My Drive” folder, which has no id.
 			return;
 		}
 
-		return path[4];
+		if (path[1] === "folders") {
+			return path[2];
+		}
+		else if (path[3] === "folders") {
+			return path[4];
+		}
 	}
 
 	static apiDomain = "https://www.googleapis.com/";
@@ -255,9 +260,11 @@ export default class GoogleDrive extends Google {
 		if (type === "file") {
 			ret.id = path[2];
 		}
-		else if (type === "drive" && path[3] === "folders") {
-			ret.folder = source;
-			ret.folderId = path[4];
+		else if (type === "drive") {
+			if (path[1] === "folders" || path[3] === "folders") {
+				ret.folder = source;
+				ret.folderId = path[1] === "folders"? path[2] : path[4];
+			}
 		}
 
 		// Apply defaults.
