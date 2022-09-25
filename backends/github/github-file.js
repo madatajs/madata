@@ -32,7 +32,7 @@ export default class GithubFile extends Github {
 		}
 		else {
 			// Unauthenticated, use simple GET request to avoid rate limit
-			url = new URL(`https://raw.githubusercontent.com/${file.owner}/${file.repo}/${file.branch || "main"}/${file.path}`);
+			let url = new URL(`https://raw.githubusercontent.com/${file.owner}/${file.repo}/${file.branch || "main"}/${file.path}`);
 			url.searchParams.set("timestamp", Date.now()); // ensure fresh copy
 
 			let response = await fetch(url.href);
@@ -205,12 +205,16 @@ export default class GithubFile extends Github {
 	}
 
 	async canPush (file = this.file) {
+		if (typeof file === "string") {
+			file = this.constructor.parseURL(file);
+		}
+
 		if (file.repoInfo === undefined) {
 			file.repoInfo = await this.getRepoInfo(file);
 		}
 
 		if (file.repoInfo) {
-			return file.repoInfo.permissions.push;
+			return file.repoInfo.permissions?.push;
 		}
 
 		// Repo does not exist yet so we can't check permissions
@@ -240,7 +244,7 @@ export default class GithubFile extends Github {
 			}
 		}
 
-		if (file.branch === undefined) {
+		if (repoInfo && file.branch === undefined) {
 			file.branch = repoInfo.default_branch;
 		}
 
@@ -419,7 +423,7 @@ export default class GithubFile extends Github {
 	/**
 	 * Parse Github URLs, return username, repo, branch, path
 	 */
-	 static parseURL (source) {
+	static parseURL (source) {
 		const ret = {
 			owner: undefined,
 			repo: undefined,
