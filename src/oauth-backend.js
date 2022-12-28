@@ -52,7 +52,7 @@ export default class OAuthBackend extends AuthBackend {
 		}
 
 		if (type(req.body) === "object") {
-			if (req.method == "GET") {
+			if (req.method === "GET" || req.method === "HEAD") {
 				for (let p in req.body) {
 					let action = req.body[p] === undefined? "delete" : "set";
 					call.searchParams[action](p, req.body[p]);
