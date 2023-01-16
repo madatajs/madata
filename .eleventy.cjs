@@ -10,7 +10,7 @@ module.exports = config => {
 					return data.id;
 				}
 
-				return "Mavue: Easier Vue.js apps, inspired by Mavo";
+				return "Madata: Make any cloud service with an API your backend!";
 			}
 		}
 	};

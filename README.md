@@ -2,7 +2,7 @@
 
 # Madata
 
-Make any cloud service with an API your free remote database.
+Make any cloud service with an API your backend!
 A spinoff from [Mavo](https://mavo.io).
 
 </header>
