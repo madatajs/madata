@@ -1,0 +1,20 @@
+{# <nav>
+	<a href="#installation">Installation</a>
+	<a href="https://github.com/mavoweb/madata/tree/main/{{ id }}">GitHub</a>
+</nav> #}
+
+{{ content | safe }}
+
+{% if id %}
+
+<section>
+
+<h2 id="installation">Installation</h2>
+
+<p>Just include the this JS file and you're good:
+
+<pre class="language-html"><code>&lt;script src="https://madata.mavo.io/{{ id }}/{{ id }}.js" type="module">&lt;/script></code></pre>
+
+</section>
+
+{% endif %}
