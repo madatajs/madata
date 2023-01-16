@@ -139,7 +139,7 @@ You could also programmatically fetch <code>/services</code> to programmatically
 <p>The default auth provider is <code>https://auth.madata.dev</code> but you can customize it like so:</p>
 <pre><code class="language-js">Backend.authProvider = &quot;https://auth.example.com&quot;;
 </code></pre>
-<h3>API</h3>
+<h4>API</h4>
 <p><code>backend.login()</code> will display authentication UI to the user. <code>backend.login({passive: true})</code>
 will log the user in if they have already logged in previously,
 but will not do anything if they have not.
@@ -172,9 +172,25 @@ backend.addEventListener(&quot;mv-logout&quot;, evt =&gt; {
 <pre><code class="language-js">loginButton.addEventListener(&quot;click&quot;, evt =&gt; backend.login());
 logoutButton.addEventListener(&quot;click&quot;, evt =&gt; backend.logout());
 </code></pre>
+<h3>Storage</h3>
 <p>Save:</p>
 <pre><code class="language-js">let fileInfo = await backend.store(json);
 </code></pre>
+<h3>Uploads</h3>
+<p>For backends that support uploads, this is how simple it could be to create an image uploader:</p>
+<pre><code class="language-html">&lt;input type=file id=uploader&gt;
+</code></pre>
+<pre><code class="language-js">uploadForm.addEventListener(&quot;submit&quot;, evt =&gt; {
+	evt.preventDefault();
+
+	let file = uploader.files[0];
+
+	if (file &amp;&amp; file.type.startsWith(&quot;image/&quot;)) {
+		backend.upload(file, `images/${file.name}`);
+	}
+});
+</code></pre>
+<p>You can check if <code>backend.upload</code> is defined to see if the backend supports image uploads.</p>
 </main>
 
 <script src="./global.js" type="module"></script>

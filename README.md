@@ -79,7 +79,7 @@ The default auth provider is `https://auth.madata.dev` but you can customize it 
 Backend.authProvider = "https://auth.example.com";
 ```
 
-### API
+#### API
 
 `backend.login()` will display authentication UI to the user. `backend.login({passive: true})`
 will log the user in if they have already logged in previously,
@@ -121,11 +121,34 @@ loginButton.addEventListener("click", evt => backend.login());
 logoutButton.addEventListener("click", evt => backend.logout());
 ```
 
+### Storage
+
 Save:
 
 ```js
 let fileInfo = await backend.store(json);
 ```
 
+### Uploads
+
+For backends that support uploads, this is how simple it could be to create an image uploader:
+
+```html
+<input type=file id=uploader>
+```
+
+```js
+uploadForm.addEventListener("submit", evt => {
+	evt.preventDefault();
+
+	let file = uploader.files[0];
+
+	if (file && file.type.startsWith("image/")) {
+		backend.upload(file, `images/${file.name}`);
+	}
+});
+```
+
+You can check if `backend.upload` is defined to see if the backend supports image uploads.
 
 </main>
