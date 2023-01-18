@@ -16,6 +16,16 @@
 </head>
 <body>
 
+{# <header>
+	<a href="{{ page | relative }}/index.html">
+		<img src="{{ page | relative }}/logo.svg" alt="logo" />
+	</a>
+
+	<h1>Madata</h1>
+	<p>Make any cloud service with an API your backend!
+	A spinoff from <a href="https://mavo.io">Mavo</a>
+</header> #}
+
 {{ content | safe }}
 
 <script src="{{ page | relative }}/global.js" type="module"></script>

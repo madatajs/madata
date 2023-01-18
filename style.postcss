@@ -30,9 +30,16 @@ body > * {
 	padding: 1em clamp(1em, 50vw - var(--page-width) / 2, 50vw);
 
 	&:is(header) {
+		display: grid;
+		grid-template-columns: 1fr auto;
+		grid-auto-flow: dense;
 		order: 0;
 		background: var(--accent-color);
 		color: white;
+
+		& > * {
+			grid-column: 1;
+		}
 
 		& h1 {
 			margin: 0;
@@ -42,6 +49,13 @@ body > * {
 				margin: 0;
 				font-weight: bold;
 			}
+		}
+
+		& img {
+			width: auto;
+			height: 100%;
+			grid-column: 2;
+			grid-row-end: span 99;
 		}
 
 		& a {
@@ -223,4 +237,8 @@ table {
 			}
 		}
 	}
+}
+
+.gh-only {
+	display: none;
 }

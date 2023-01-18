@@ -1,5 +1,7 @@
 <header>
 
+<img src="logo.svg" width="100" alt="Logo showing a cloud presented as a tree" />
+
 # Madata
 
 Make any cloud service with an API your backend!
@@ -22,7 +24,6 @@ Reading public data:
 import Backend from "https://projects.verou.me/madata/src/index.js";
 
 let backend = Backend.create("https://github.com/leaverou/repo/data.json");
-
 let json = await backend.load();
 
 // Do something with said json

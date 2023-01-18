@@ -14,7 +14,10 @@
 </head>
 <body>
 
+
+
 <header>
+<img src="logo.svg" width="100" alt="Logo showing a cloud presented as a tree" />
 <h1>Madata</h1>
 <p>Make any cloud service with an API your backend!
 A spinoff from <a href="https://mavo.io">Mavo</a>.</p>
@@ -29,7 +32,6 @@ Then <code>Backend.create(url)</code> automatically gets you an instance of the 
 <pre><code class="language-js">import Backend from &quot;https://projects.verou.me/madata/src/index.js&quot;;
 
 let backend = Backend.create(&quot;https://github.com/leaverou/repo/data.json&quot;);
-
 let json = await backend.load();
 
 // Do something with said json
