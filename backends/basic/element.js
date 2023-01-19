@@ -1,5 +1,5 @@
-import Backend from "../src/backend.js";
-import {$} from "../src/util.js";
+import Backend from "../../src/backend.js";
+import {$} from "../../src/util.js";
 
 /**
  * Save in an HTML element
