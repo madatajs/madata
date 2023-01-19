@@ -21,7 +21,7 @@ Then `Backend.create(url)` automatically gets you an instance of the correspondi
 Reading public data:
 
 ```js
-import Backend from "https://projects.verou.me/madata/src/index.js";
+import Backend from "https://madata.dev/src/index.js";
 
 let backend = Backend.create("https://github.com/leaverou/repo/data.json");
 let json = await backend.load();

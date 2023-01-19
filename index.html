@@ -29,7 +29,7 @@ You don’t need to worry about differences between the different APIs, and swap
 Each supported backend documents what kinds of URLs it supports.
 Then <code>Backend.create(url)</code> automatically gets you an instance of the corresponding backend.</p>
 <p>Reading public data:</p>
-<pre><code class="language-js">import Backend from &quot;https://projects.verou.me/madata/src/index.js&quot;;
+<pre><code class="language-js">import Backend from &quot;https://madata.dev/src/index.js&quot;;
 
 let backend = Backend.create(&quot;https://github.com/leaverou/repo/data.json&quot;);
 let json = await backend.load();
