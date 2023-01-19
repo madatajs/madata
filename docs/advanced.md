@@ -5,6 +5,7 @@
 ## Adding support for another service
 
 You need to create a new `Backend` subclass.
+For `Backend.create()` to take your class into account, you need to call `Backend.register(MyBackend)`.
 You can look at the existing backends for what this should look like.
 
 ## Creating your own auth provider
@@ -24,5 +25,9 @@ We strongly recommend leaving the confirmation step in place (*“Are you sure y
 Since all Madata apps using the same auth provider
 
 </div>
+
+## Creating plugins
+
+TBD
 
 </main>

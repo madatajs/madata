@@ -52,8 +52,9 @@ body > * {
 		}
 
 		& img {
+			position: relative;
 			width: auto;
-			height: 111%;
+			height: 112%;
 			grid-column: 2;
 			grid-row-end: span 99;
 		}
@@ -216,6 +217,10 @@ table {
 	border-spacing: 0;
 	border-collapse: collapse;
 
+	&:has(thead:only-child) {
+		width: auto;
+	}
+
 	& th,
 	& td {
 		text-align: left;
@@ -223,9 +228,13 @@ table {
 		border: 1px solid hsl(var(--gray) 0% / .1);
 	}
 
-	& thead {
+	& thead:not(:only-child) {
 		background: hsl(var(--accent-color-hs) 92%);
 		color: hsl(var(--accent-color-hs) 20%);
+	}
+
+	& thead:only-child {
+		background: hsl(var(--gray) 96%);
 	}
 
 	& tbody,
@@ -237,6 +246,10 @@ table {
 			}
 		}
 	}
+}
+
+main > h1 {
+	color: var(--accent-color);
 }
 
 .gh-only {

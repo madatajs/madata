@@ -8,7 +8,6 @@
 	<link rel="icon" href="{{ page | relative }}/logo.svg">
 	<link rel="stylesheet" href="{{ page | relative }}/style.css" />
 
-	<script src="../v-app/v-app.js" type="module"></script>
 	{% if id and id != "v-app" %}
 	<script src="{{ id }}.js" type="module"></script>
 	{% endif %}
@@ -16,17 +15,27 @@
 </head>
 <body>
 
-{# <header>
-	<a href="{{ page | relative }}/index.html">
-		<img src="{{ page | relative }}/logo.svg" alt="logo" />
-	</a>
+{% if page.url and page.url !== "/" %}
+<header>
+	<img src="{{ page | relative }}/logo.svg" alt="logo" />
+	<a href="/" class="home">Home</a>
 
 	<h1>Madata</h1>
 	<p>Make any cloud service with an API your backend!
 	A spinoff from <a href="https://mavo.io">Mavo</a>
-</header> #}
+</header>
+{% endif %}
+<nav>
+	<a href="/docs/">Docs</a>
+	<a href="/backends/">Backends</a>
+	<a href="https://github.com/madatajs/madata">GitHub</a>
+</nav>
+
+{% if page.url and page.url !== "/" %}<main>{% endif %}
 
 {{ content | safe }}
+
+{% if page.url and page.url !== "/" %}</main>{% endif %}
 
 <script src="{{ page | relative }}/global.js" type="module"></script>
 

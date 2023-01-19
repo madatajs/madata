@@ -8,11 +8,17 @@
 	<link rel="icon" href="./logo.svg">
 	<link rel="stylesheet" href="./style.css" />
 
-	<script src="../v-app/v-app.js" type="module"></script>
 	
 	
 </head>
 <body>
+
+
+<nav>
+	<a href="/docs/">Docs</a>
+	<a href="/backends/">Backends</a>
+	<a href="https://github.com/madatajs/madata">GitHub</a>
+</nav>
 
 
 
@@ -24,17 +30,20 @@ A spinoff from <a href="https://mavo.io">Mavo</a>.</p>
 </header>
 <main>
 <h2>Getting Started</h2>
-<p>Madata provides a unified API for authentication, reading, uploads, and storage, regardless of the storage service used.
+<p>Madata provides a unified API for authentication, reading &amp; storing data, as well as file uploads (where supported), regardless of the storage service used.
 You don’t need to worry about differences between the different APIs, and swapping one storage service for another is as easy as changing a URL!
 Each supported backend documents what kinds of URLs it supports.
 Then <code>Backend.create(url)</code> automatically gets you an instance of the corresponding backend.</p>
-<p>Reading public data:</p>
 <pre><code class="language-js">import Backend from &quot;https://madata.dev/src/index.js&quot;;
 
 let backend = Backend.create(&quot;https://github.com/leaverou/repo/data.json&quot;);
 let json = await backend.load();
 
-// Do something with said json
+json.happy = true;
+
+await backend.store();
+
+console.log(&quot;Stored some data!&quot;);
 </code></pre>
 <h2>Supported backends</h2>
 <table>
@@ -194,6 +203,8 @@ logoutButton.addEventListener(&quot;click&quot;, evt =&gt; backend.logout());
 </code></pre>
 <p>You can check if <code>backend.upload</code> is defined to see if the backend supports image uploads.</p>
 </main>
+
+
 
 <script src="./global.js" type="module"></script>
 
