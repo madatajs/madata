@@ -1,9 +1,11 @@
+/**
+ * Save in an HTML element
+ * @class Element
+ */
+
 import Backend from "../../src/backend.js";
 import {$} from "../../src/util.js";
 
-/**
- * Save in an HTML element
- */
 export default class Element extends Backend {
 	constructor (url, o) {
 		super(url, o);

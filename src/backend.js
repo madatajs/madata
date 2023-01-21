@@ -1,7 +1,13 @@
+/**
+ * Base class for all backends
+ * @claas Backend
+ * @extends EventTarget
+ */
 import hooks from './hooks.js';
 
 /**
- * Base class for all backends
+ * @param {string} url - URL string describing the data location
+ * @param {object} o - Options
  */
 export default class Backend extends EventTarget {
 	constructor (url, o = {}) {
@@ -13,6 +19,11 @@ export default class Backend extends EventTarget {
 		this.update(url, o);
 	}
 
+	/**
+	 * Update an existing backend instance with new parameters
+	 * @param {string} url - Same as constructor
+	 * @param {object} o - Same as constructor
+	 */
 	update (url, o = {}) {
 		this.source = url;
 		this.file = this.constructor.parseURL(url);
@@ -53,6 +64,12 @@ export default class Backend extends EventTarget {
 		}
 	}
 
+	/**
+	 * Low-level method to fetch data from the backend. Subclasses should override this method.
+	 * Clients should not call this method directly, but use `load()` instead.
+	 * @param {*} url - URL to fetch, if different from that provided in the constructor
+	 * @returns {string} - Data from the backend as a string, `null` if not found
+	 */
 	async get (url = new URL(this.file.url)) {
 		if (url.protocol != "data:" && this.constructor.useCache !== false) {
 			url.searchParams.set("timestamp", Date.now()); // ensure fresh copy
@@ -70,6 +87,13 @@ export default class Backend extends EventTarget {
 		return null;
 	}
 
+	/**
+	 * Higher-level method for reading data from the backend.
+	 * Subclasses should usually NOT override this method.
+	 * @param {string} url - URL to fetch, if different from that provided in the constructor
+	 * @param  {...any} args
+	 * @returns {object} - Data from the backend as a JSON object, `null` if not found
+	 */
 	async load (url, ...args) {
 		await this.ready;
 
@@ -103,6 +127,12 @@ export default class Backend extends EventTarget {
 		return json;
 	}
 
+	/**
+	 * Higher-level method for writing data to the backend.
+	 * Subclasses should usually NOT override this method.
+	 * @param {object} data - Data to write to the backend
+	 * @param {object} [o] - Options object
+	 */
 	async store (data, o = {}) {
 		await this.ready;
 

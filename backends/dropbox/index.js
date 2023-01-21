@@ -1,7 +1,10 @@
+/**
+ * @class Dropbox
+ * @extends OAuthBackend
+ */
 import OAuthBackend from "../../src/oauth-backend.js";
 import hooks from "../../src/hooks.js";
 import {readFile} from "../../src/util.js";
-
 
 export default class Dropbox extends OAuthBackend {
 	constructor (url, o) {

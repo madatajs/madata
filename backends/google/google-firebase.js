@@ -1,3 +1,8 @@
+/**
+ * Google Firebase backend.
+ * @class GoogleFirebase
+ * @extends Google
+ */
 import Google from "./google.js";
 import { readFile } from "../../src/util.js";
 
@@ -48,7 +53,7 @@ export default class GoogleFirebase extends Google {
 		}
 		else {
 			const docRef = doc(firestore, file.path);
-			
+
 			try {
 				const document = await getDoc(docRef);
 				if (document.exists()) {
@@ -118,7 +123,7 @@ export default class GoogleFirebase extends Google {
 				throw new Error(e.message);
 			}
 		}
-		
+
 	}
 
 	async upload (file, path) {

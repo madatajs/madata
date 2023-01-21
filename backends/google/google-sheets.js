@@ -1,3 +1,8 @@
+/**
+ * Google Sheets backend.
+ * @class GoogleSheets
+ * @extends Google
+ */
 import Google from "./google.js";
 
 export default class GoogleSheets extends Google {
@@ -18,14 +23,14 @@ export default class GoogleSheets extends Google {
 					console.warn(this.constructor.phrase("get_no_sheet"));
 					return null;
 				}
-	
+
 				this.file.sheetTitle = file.sheetTitle = sheetTitle;
 			}
 			catch (e) {
 				if (e.status === 401) {
 					await this.logout(); // Access token we have is invalid. Discard it.
 				}
-	
+
 				const error = (await e.json()).error.message;
 				throw new Error(error);
 			}
@@ -162,6 +167,8 @@ export default class GoogleSheets extends Google {
 
 	/**
 	 * Get the range reference.
+	 * @static
+	 * @private
 	 * @param {string} sheetTitle Sheet title.
 	 * @param {string} range Range in the A1 notation.
 	 * @returns The range reference in one of the supported formats: 'Sheet title'!Range, 'Sheet title', or Range.
@@ -172,6 +179,7 @@ export default class GoogleSheets extends Google {
 
 	/**
 	 * Get title of the sheet in the spreadsheet.
+	 * @private
 	 * @param {Object} file Spreadsheet to work with.
 	 * @returns Sheet title or title of the first visible sheet, or null if there are no (visible) sheets to work with.
 	 */

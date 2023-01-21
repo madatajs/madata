@@ -1,3 +1,8 @@
+/**
+ * Github Gist backend
+ * @class GithubGist
+ * @extends Github
+ */
 import Github from "./github.js";
 import hooks from "../../src/hooks.js";
 

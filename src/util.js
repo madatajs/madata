@@ -1,4 +1,9 @@
 /**
+ * @module util
+ */
+
+/**
+ * @memberof module:util
  * Determine the internal JavaScript [[Class]] of an object.
  * @param {*} o - Value to check
  * @returns {string}

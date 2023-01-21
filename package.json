@@ -10,7 +10,8 @@
     "build": "npm run build:html && npm run build:css",
     "watch:css": "npx postcss \"**/*.postcss\" --base . --dir . --ext .css --config postcss.config.cjs --watch",
     "watch:html": "npx @11ty/eleventy --config=.eleventy.cjs --watch",
-    "watch": "npm run watch:html &! npm run watch:css"
+    "watch": "npm run watch:html &! npm run watch:css",
+    "docs": "npx documentation build src/** -f html --github -o api"
   },
   "repository": {
     "type": "git",
@@ -27,6 +28,7 @@
   },
   "homepage": "https://github.com/madatajs/madata#readme",
   "devDependencies": {
+    "documentation": "^14.0.1",
     "postcss": "^8.3.9",
     "postcss-cli": "^9.0.1",
     "postcss-nesting": "^8.0.1"

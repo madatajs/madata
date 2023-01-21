@@ -1,8 +1,9 @@
-import Backend from "../../src/backend.js";
-
 /**
  * Store data in localStorage
+ * @class Local
  */
+import Backend from "../../src/backend.js";
+
 export default class Local extends Backend {
 	constructor (url, o) {
 		super(url, o);

@@ -1,4 +1,5 @@
 /**
+ * @module index-fn
  * Export all backends without side effects
  */
 export {default as Element} from "./basic/element.js";

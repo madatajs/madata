@@ -1,5 +1,7 @@
+/** @module hooks */
 /**
  * A class for adding deep extensibility to any piece of JS code
+ * @class Hooks
  */
 export class Hooks {
 	add (name, callback, first) {

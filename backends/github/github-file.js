@@ -1,8 +1,17 @@
+/**
+ * @class GithubFile
+ * @extends Github
+ */
 import Github from "./github.js";
 import hooks from "../../src/hooks.js";
 import {readFile, delay} from "../../src/util.js";
 
 export default class GithubFile extends Github {
+	/**
+	 * Low-level method to fetch a file from GitHub
+	 * @param {Object} file
+	 * @returns {string} File contents as a string, or `null` if not found
+	 */
 	async get (file) {
 		if (this.isAuthenticated()) {
 			let call = `repos/${file.owner}/${file.repo}/contents/${file.path}`;

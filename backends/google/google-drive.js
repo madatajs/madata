@@ -1,3 +1,7 @@
+/**
+ * @class GoogleDrive
+ * @extends Google
+ */
 import Google from "./google.js";
 
 export default class GoogleDrive extends Google {
@@ -187,7 +191,7 @@ export default class GoogleDrive extends Google {
 			mimeType: "application/json",
 			name: file.filename
 		};
-		
+
 		if (file.folderId) {
 			metadata.parents = [file.folderId];
 		}

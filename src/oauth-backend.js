@@ -1,16 +1,26 @@
+/**
+ * OAuth 2.0 backends
+ * @class OAuthBackend
+ * @extends AuthBackend
+ */
 import hooks from './hooks.js';
 import AuthBackend from "./auth-backend.js";
 import {type} from "./util.js";
 
 /**
- * OAuth 2.0 backends
+ * @param {string} url - URL string describing the data location
+ * @param {object} o - Options
  */
-
 export default class OAuthBackend extends AuthBackend {
 	constructor (url, o = {}) {
 		super(url, o);
 	}
 
+	/**
+	 * Update an existing backend instance with new parameters
+	 * @param {string} url - Same as constructor
+	 * @param {object} o - Same as constructor
+	 */
 	update(url, o) {
 		super.update(url, o);
 
