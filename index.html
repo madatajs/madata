@@ -126,48 +126,7 @@ console.log(&quot;Stored some data!&quot;);
 </tbody>
 </table>
 <h3>Authentication</h3>
-<h4>Decentralized OAuth Authentication Providers</h4>
-<p>Backends that support authentication fall in two main categories:
-(a) <a href="https://en.wikipedia.org/wiki/OAuth">OAuth</a> backends
-(b) backends doing their own authentication.</p>
-<p>For (a), Madata introduces the concept of a <em>decentralized auth(entication) provider</em>,
-so you can experiment with different backends without having to register an OAuth application with each of those services.
-Instead, the auth provider has registered an OAuth app for all the backends it supports,
-facilitates the OAuth handshake for you, and communicates the access token back to Madata so it can store it in the user's browser.</p>
-<p>The whole purpose of the auth provider is to handle acquiring the initial access token for a user's first login.
-After that, the access token is cached in the browser’s <code>localStorage</code> until it expires, usually not for months or even years,
-and the user doesn’t need to make any further requests to the auth provider.
-For this reason, the bandwidth and CPU requirements for hosting an auth provider are very low,
-even if it serves thousands of users.</p>
-<p>You can choose an existing open authentication server, or <a href="/docs/advanced/">self-host your own</a>.</p>
-<p>Here are some open authentication servers you can use:</p>
-<ul>
-<li><a href="https://auth.madata.dev"><code>https://auth.madata.dev</code></a></li>
-<li><a href="https://auth.mavo.io"><code>https://auth.mavo.io</code></a></li>
-</ul>
-<p>Each auth server supports certain backends and may not support the full range of backends Madata supports.
-Visiting the server's homepage should tell you which backends it supports.
-You could also programmatically fetch <code>/services</code> to programmatically read which services are supported.</p>
-<p>The default auth provider is <code>https://auth.madata.dev</code> but you can customize it like so:</p>
-<pre><code class="language-js">Backend.authProvider = &quot;https://auth.example.com&quot;;
-</code></pre>
-<h4>API</h4>
-<p><code>backend.login()</code> will display authentication UI to the user. <code>backend.login({passive: true})</code>
-will log the user in if they have already logged in previously,
-but will not do anything if they have not.
-<code>backend.logout()</code> will log the current user out.</p>
-<p><code>backend.user</code> contains various user information.
-The following are normalized:</p>
-<ul>
-<li><code>backend.user.username</code></li>
-<li><code>backend.user.name</code></li>
-<li><code>backend.user.avatar</code></li>
-<li><code>backend.user.url</code> (profile URL in remote service)</li>
-</ul>
-<p>But <code>backend.user</code> will also contain a variety of other information, depending on what is returned from the API.
-Please note that some of these may not be available, e.g. if a service does not use avatars, <code>backend.user.avatar</code> will be <code>undefined</code>.</p>
-<p>If user already has an access token, they will be logged in upon <code>Backend.create()</code>, as it calls <code>backend.login({passive: true})</code>.</p>
-<p>So to show auth status to the user:</p>
+<p>Show auth status to the user:</p>
 <pre><code class="language-js">backend.addEventListener(&quot;mv-login&quot;, evt =&gt; {
 	header.classList.add(&quot;logged-in&quot;);
 
@@ -184,6 +143,7 @@ backend.addEventListener(&quot;mv-logout&quot;, evt =&gt; {
 <pre><code class="language-js">loginButton.addEventListener(&quot;click&quot;, evt =&gt; backend.login());
 logoutButton.addEventListener(&quot;click&quot;, evt =&gt; backend.logout());
 </code></pre>
+<p>Read more about <a href="/docs/authentication/">authentication</a></p>
 <h3>Storage</h3>
 <p>Save:</p>
 <pre><code class="language-js">let fileInfo = await backend.store(json);
