@@ -4,6 +4,7 @@
  * @extends EventTarget
  */
 import hooks from './hooks.js';
+import {toArray} from './util.js';
 
 /**
  * @param {string} url - URL string describing the data location
@@ -198,7 +199,12 @@ export default class Backend extends EventTarget {
 		return {url};
 	}
 
-	// Return the appropriate backend(s) for this url
+	/**
+	 * Return the appropriate backend(s) for this url
+	 * @param {string} url - URL describing the storage location
+	 * @param {object} [o] - Options object to be passed to the backend
+	 * @param {Backend | Array<Backend>} [o.existing] - Existing backend object(s) to re-use if possible
+	 */
 	static create (url, o = {}) {
 		let Class;
 
@@ -213,9 +219,13 @@ export default class Backend extends EventTarget {
 		}
 
 		// Can we re-use the existing object perhaps?
-		if (Class && o.existing?.constructor === Class && o.existing.constructor.prototype.hasOwnProperty("update")) {
-			o.existing.update(url, o);
-			return existing;
+		if (o.existing) {
+			let existing = toArray(o.existing)
+			               .find(backend => backend.constructor === Class && backend.constructor.prototype.hasOwnProperty("update"));
+			if (existing) {
+				existing.update(url, o);
+				return existing;
+			}
 		}
 
 		return Class? new Class(url, o) : null;

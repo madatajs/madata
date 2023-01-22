@@ -44,3 +44,13 @@ export function $(selector, context = document) {
 export function delay(ms) {
 	return new Promise(resolve => setTimeout(resolve, ms));
 }
+
+/**
+ * Wrap a value in an array, if it's not always an array
+ * Useful for allowing function signatures to accept both single values and arrays
+ * @param {*} value
+ * @returns {Array}
+ */
+export function toArray(value) {
+	return Array.isArray(value)? value : [value];
+}
