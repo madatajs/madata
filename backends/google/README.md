@@ -35,9 +35,9 @@ Note that you can't work with Google Docs using this backend. Use the Google She
 
 ### Constructor options
 
-- `filename`: The name of the file to be created (if the URL is the URL of a folder, including the “My Drive” folder).
 - `folder`: If the logged-in user has no permission to write data to the source file, Madata will try to create a copy of the file in the specified folder.
 - `allowCreatingFiles`: Whether to create a file on save if logged-in user has no permission to write to the source file or the file doesn't exist. By default, Madata will try to create a file in the user's “My Drive” folder. Use the `folder` option to change the file location.
+- `filename`: The name of the file to be created on save.
 
 ## Google Firebase
 
