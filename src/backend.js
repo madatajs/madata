@@ -207,21 +207,9 @@ export default class Backend extends EventTarget {
 		}
 
 		if (url && !Class) {
-			for (let backend of Backend.types) {
-				if (backend.test(url, o)) {
-					Class = backend;
-
-					// TODO check if backend is a descendant class of this
-					// This allows calling create on child classes to narrow the scope of the search
-
-					break;
-				}
-			}
-
-			if (!Class) {
-				// No backend found, fall back to basic read-only URL loading
-				Class = Backend.Remote
-			}
+			// Find a suitable backend
+			// If none found, fall back to basic read-only URL loading
+			Class = Backend.find(url) ?? Backend.Remote;
 		}
 
 		// Can we re-use the existing object perhaps?
@@ -231,6 +219,21 @@ export default class Backend extends EventTarget {
 		}
 
 		return Class? new Class(url, o) : null;
+	}
+
+	static find (url) {
+		if (url) {
+			for (let backend of Backend.types) {
+				// Check first if backend is a descendant class of this
+				// This allows calling create on child classes to narrow the scope of the search
+				// And then if the URL is one of the URLs handlded by it
+				if (backend.prototype instanceof this && backend.test(url, o)) {
+					return backend;
+				}
+			}
+		}
+
+		return null;
 	}
 
 	static types = []
