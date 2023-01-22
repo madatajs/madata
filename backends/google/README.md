@@ -9,59 +9,66 @@ There are four backends here, all using authentication via Google:
 
 ## Google Calendar
 
-### URLs
+| ✅ Auth | ❌ Writes | ❌ Uploads |
+|---------|-----------|-----------|
 
-- `https://calendar.google.com/calendar/`
-- `https://calendar.google.com/calendar/embed?src=your_email`
-- `https://calendar.google.com/calendar/u/0?cid=cDlkOWxkOXZ2aHNrOXE5M2hhcDQxN2sxZHNAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ`
-- `https://calendar.google.com/calendar/embed?src=p9d9ld9vvhsk9q93hap417k1ds@group.calendar.google.com`
-- `https://calendar.google.com/calendar/embed?src=fr.french%23holiday%40group.v.calendar.google.com`
+Read events from public and private Google calendars.
+
+### URL format
+
+- The user's primary calendar URLs like `https://calendar.google.com/calendar/` or `https://calendar.google.com/calendar/embed?src=user_email`
+- Public calendar URLs like `https://calendar.google.com/calendar/embed?src=p9d9ld9vvhsk9q93hap417k1ds@group.calendar.google.com` or `https://calendar.google.com/calendar/embed?src=fr.french%23holiday%40group.v.calendar.google.com`
+- URLs from a browser address bar like `https://calendar.google.com/calendar/u/0?cid=cDlkOWxkOXZ2aHNrOXE5M2hhcDQxN2sxZHNAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ`
 
 ## Google Drive
 
-### URLs
+| ✅ Auth | ✅ Writes | ✅ Uploads |
+|---------|-----------|-----------|
 
-- File URL like `https://drive.google.com/file/d/1aV-SUER-bXvph4PH28ppAu6lxoIlnA4F/view?usp=sharing`
+### URL format
+
+- Regular file URLs like `https://drive.google.com/file/d/1aV-SUER-bXvph4PH28ppAu6lxoIlnA4F/view?usp=sharing`
 - “My Drive“ folder URL like `https://drive.google.com/drive/u/0/my-drive`
-- Folder URL like `https://drive.google.com/drive/u/0/folders/1VFdkWL6X0bV17x2xere8sUPoYMFByCz_` or `https://drive.google.com/drive/folders/1ALDwEixG2VJ-UKRJZH0CQH4bEkJ1PfoX`
+- Any other folder URLs like `https://drive.google.com/drive/u/0/folders/1VFdkWL6X0bV17x2xere8sUPoYMFByCz_` or `https://drive.google.com/drive/folders/1ALDwEixG2VJ-UKRJZH0CQH4bEkJ1PfoX`
+
+Note that you can't work with Google Docs using this backend. Use the Google Sheets backend instead.
 
 ### Constructor options
 
-- `apiKey`
-- `filename`: The name of the file to be created (if not the file URL, but URL of any folder, including the “My Drive” folder, is provided).
-- `folder`: This option takes into account in two cases:
-  - The user has no writing permissions and the new file with data might be created in the specified folder
-  - While creating the backend, the user provided the URL of a folder, not a file, so the new file with data will be placed in the specified folder.
-- `allowCreatingFiles`: Whether to create a file with data in the specified folder (if the `folder` parameter is provided) or in the user's “My Drive” folder on save, if they have no permission to modify the content of the source file.
+- `filename`: The name of the file to be created (if the URL is the URL of a folder, including the “My Drive” folder).
+- `folder`: If the logged-in user has no permission to write data to the source file, Madata will try to create a copy of the file in the specified folder.
+- `allowCreatingFiles`: Whether to create a file on save if logged-in user has no permission to write to the source file or the file doesn't exist. By default, Madata will try to create a file in the user's “My Drive” folder. Use the `folder` option to change the file location.
 
 ## Google Firebase
 
-### URLs
+| ✅ Auth | ✅ Writes | ✅ Uploads |
+|---------|-----------|-----------|
 
-- Database URL like `https://mavo-demos.firebaseio.com`
+Write & read data and upload files using all the Google Firebase powers.
 
-### Constructor options
+**URL format** Database URL like `https://project_id.firebaseio.com`
 
-- `apiKey`
-- `path`
+**Constructor option** `path`: Path to the file like `collection/document/collection/.../filename`
 
 ## Google Sheets
 
-### URLs
+| ✅ Auth | ✅ Writes | ❌ Uploads |
+|---------|-----------|-----------|
 
-- Spreadsheet URL like `https://docs.google.com/spreadsheets/d/14bzCuziKutrA3iESarKoj2o56dhraR8pzuFAuwTIo-g/edit?usp=sharing`
+Write & read data from public and private Google spreadsheets.
+
+**URL format** Spreadsheet URL like `https://docs.google.com/spreadsheets/d/14bzCuziKutrA3iESarKoj2o56dhraR8pzuFAuwTIo-g/edit?usp=sharing`
 
 ### Constructor options
 
-- `apiKey`
-- `sheetTitle`: A sheet to read/write data from/to. If not provided, the first visible sheet will be used.
-- `range`: A range with data in *A1 notation*.
+- `sheetTitle`: A sheet to read/write data from/to. If not provided, Madata will try to use the first visible sheet.
+- `range`: A range with data in *A1 notation*. If not provided, Madata will try to use all data on the sheet.
 - `allowAddingSheets`: Whether to add a new sheet on save if there is no sheet with the specified title.
-- `serializeDates`: Whether dates, times, and durations should be represented as formatted strings (in their given number format which depends on the spreadsheet locale) instead of “serial number” format.
+- `serializeDates`: Whether dates, times, and durations should be represented as strings in their given number format (which depends on the spreadsheet locale). For example, instead of default `44963` might be returned `2/6/2023 12:15:00`. Defaults to `false`.
 
-#### A1 notation for specifying cell ranges
+### A1 notation for specifying cell ranges
 
-This is a string like `A1:B2` that refers to a group of cells in the sheet (the first visible sheet) and is typically used in formulas. For example, valid ranges are:
+This is a string like `A1:B2` that refers to a group of cells in the sheet and is typically used in formulas. For example, valid ranges are:
 
 - `A1:B2` refers to the first two cells in the top two rows of the sheet.
 - `A:C` refers to all the cells in the first three columns of the sheet.
@@ -69,4 +76,4 @@ This is a string like `A1:B2` that refers to a group of cells in the sheet (the 
 - `A5:A` refers to all the cells of the first column of the sheet, from row 5 onward.
 - `C2:2` refers to all the cells of the second row of the sheet, from column C onward.
 
-**Note:** Named ranges are also supported.
+Note that *named ranges* are also supported.
