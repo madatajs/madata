@@ -215,7 +215,7 @@ export default class Backend extends EventTarget {
 		if (url && !Class) {
 			// Find a suitable backend
 			// If none found, fall back to basic read-only URL loading
-			Class = Backend.find(url) ?? Backend.Remote;
+			Class = Backend.find(url, o) ?? Backend.Remote;
 		}
 
 		// Can we re-use the existing object perhaps?
@@ -231,7 +231,7 @@ export default class Backend extends EventTarget {
 		return Class? new Class(url, o) : null;
 	}
 
-	static find (url) {
+	static find (url, o) {
 		if (url) {
 			for (let backend of Backend.types) {
 				// Check first if backend is a descendant class of this
