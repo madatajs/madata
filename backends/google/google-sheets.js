@@ -11,9 +11,7 @@ export default class GoogleSheets extends Google {
 	 * @param {string} url Spreadsheet URL.
 	 * @returns Spreadsheet data.
 	 */
-	async get (url) {
-		const file = url? this.constructor.parseURL(url) : this.file;
-
+	async get (file) {
 		if (file.sheetId !== undefined && !file.sheetTitle || GoogleSheets.#getRangeReference(file) === "") {
 			// Sheet title has priority over sheet id
 			try {

@@ -31,8 +31,7 @@ export default class GoogleFirebase extends Google {
 		}
 	})
 
-	async get (url) {
-		let file = url? this.constructor.parseURL(url) : this.file;
+	async get (file) {
 		file = this.#applyDefaults(file);
 
 		const firestore = getFirestore();
