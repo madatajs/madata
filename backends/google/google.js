@@ -28,11 +28,11 @@ export default class Google extends OAuthBackend {
 		};
 	}
 
-	oAuthParams = () => `&redirect_uri=${encodeURIComponent("https://auth.mavo.io")}&response_type=code&scope=${encodeURIComponent(this.constructor.scopes.join(" "))}`
+	oAuthParams = () => `&redirect_uri=${encodeURIComponent("https://auth.madata.dev")}&response_type=code&scope=${encodeURIComponent(this.constructor.scopes.join(" "))}`
 
 	static oAuth = "https://accounts.google.com/o/oauth2/auth"
 	static clientId = "375702642766-9n3p8i52lnkus451fojeqoreg8akss59.apps.googleusercontent.com"
-	static apiKey = "AIzaSyD1sviH5er4QthKa8z7v9ATwofO0NmHgvo"
+	static apiKey = "AIzaSyBWd4LzYlUZ_IAv096ojIsx6nOGmYy3VB0"
 	static useCache = false
 
 	static phrases = {
