@@ -28,7 +28,9 @@ export default class Google extends OAuthBackend {
 		};
 	}
 
-	oAuthParams = () => `&redirect_uri=${encodeURIComponent("https://auth.madata.dev")}&response_type=code&scope=${encodeURIComponent(this.constructor.scopes.join(" "))}`
+	oAuthParams () {
+		return `&redirect_uri=${encodeURIComponent(this.authProvider)}&response_type=code&scope=${encodeURIComponent(this.constructor.scopes.join(" "))}`;
+	}
 
 	static oAuth = "https://accounts.google.com/o/oauth2/auth"
 	static clientId = "375702642766-9n3p8i52lnkus451fojeqoreg8akss59.apps.googleusercontent.com"

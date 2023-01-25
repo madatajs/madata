@@ -126,7 +126,7 @@ export default class OAuthBackend extends AuthBackend {
 
 		let id = authProvider.name.toLowerCase();
 
-		this.accessToken = localStorage[this.constructor.tokenKey];
+		this.accessToken = localStorage[this.tokenKey];
 
 		if (this.accessToken) {
 			try {
@@ -135,7 +135,7 @@ export default class OAuthBackend extends AuthBackend {
 			catch (e) {
 				if (e.status == 401) {
 					// Unauthorized. Access token we have is invalid, discard it
-					localStorage.removeItem(this.constructor.tokenKey);
+					localStorage.removeItem(this.tokenKey);
 					delete this.accessToken;
 				}
 			}
@@ -177,7 +177,7 @@ export default class OAuthBackend extends AuthBackend {
 				});
 			});
 
-			this.accessToken = localStorage[this.constructor.tokenKey] = accessToken;
+			this.accessToken = localStorage[this.tokenKey] = accessToken;
 
 			hooks.run("oauth-login-success", this);
 		}
@@ -197,7 +197,7 @@ export default class OAuthBackend extends AuthBackend {
 		if (this.isAuthenticated()) {
 			var id = this.constructor.name.toLowerCase();
 
-			localStorage.removeItem(this.constructor.tokenKey);
+			localStorage.removeItem(this.tokenKey);
 			delete this.accessToken;
 
 			// TODO does this really represent all backends? Should it be a setting?
@@ -215,9 +215,17 @@ export default class OAuthBackend extends AuthBackend {
 		}
 	}
 
-	static get tokenKey () {
+	get tokenKey () {
 		let name = this.getOAuthProvider()?.name || this.name;
-		return `mavo:${name.toLowerCase()}token`;
+		let id = name.toLowerCase();
+		let authProvider = new URL(this.authProvider).hostname;
+
+		if (hostname === "auth.mavo.io") {
+			// Backwards compatibility
+			return `mavo:${id}token`;
+		}
+
+		return `madatatoken:${authProvider}/${id}`;
 	}
 
 	static phrases = {

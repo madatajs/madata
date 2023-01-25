@@ -25,12 +25,23 @@ Here are some open authentication servers you can use:
 
 Each auth server supports certain backends and may not support the full range of backends Madata supports.
 Visiting the server's homepage should tell you which backends it supports.
-You could also programmatically fetch `{{ auth_server_url }}/services` to programmatically read which services are supported.
+You could also programmatically fetch `{{ auth_server_url }}/services.json` to programmatically read which services are supported.
+
+## Choosing an auth provider
 
 The default auth provider is `https://auth.madata.dev` but you can customize it like so:
 
 ```js
 Backend.authProvider = "https://auth.example.com";
+```
+
+This sets the default auth provider to `"https://auth.example.com"`.
+You would need to do this before creating any `Backend` objects.
+
+You can also set the auth provider on a one-off basis, by using the `authProvider` constructor option:
+
+```js
+let backend = Backend.create(url, { authProvider: "https://auth.example.com"});
 ```
 
 ## API
@@ -85,3 +96,27 @@ To have buttons for login/logout:
 loginButton.addEventListener("click", evt => backend.login());
 logoutButton.addEventListener("click", evt => backend.logout());
 ```
+
+<h2 id="custom-auth-provider">Advanced: Creating your own auth provider</h2>
+
+1. First, fork one of the template repos.
+We provide template repos for
+a) Serverless (Netlify, but can easily be adjusted for other providers): [madatajs/auth-serverless](https://github.com/madatajs/auth-serverless)
+b) PHP: [madatajs/auth-php](https://github.com/madatajs/auth-php)
+1. **Make your fork private.** This is essential, since you will be storing secret API keys in it!
+2. Register OAuth applications for each service you wish to support.
+Edit `services.json` with the public API keys and `.secret.json` with the secret API keys of these services.
+
+<div class=warning>
+
+We strongly recommend leaving the confirmation step in place (*“Are you sure you want to log in to [URL]?”*).
+Since all Madata apps using the same auth provider
+
+</div>
+
+<div class=warning>
+
+Please note you need to run your auth provider on the root of a domain or subdomain.
+E.g. `https://example.com/foo` is not a valid auth provider URL, but `https://foo.example.com` is.
+
+</div>
