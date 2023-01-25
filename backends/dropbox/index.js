@@ -51,7 +51,9 @@ export default class Dropbox extends OAuthBackend {
 		});
 	}
 
-	oAuthParams = () => `&redirect_uri=${encodeURIComponent("https://auth.mavo.io")}&response_type=code`
+	oAuthParams () {
+		return `&redirect_uri=${encodeURIComponent(this.authProvider)}&response_type=code`;
+	}
 
 	async getUser () {
 		if (this.user) {

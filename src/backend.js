@@ -28,6 +28,7 @@ export default class Backend extends EventTarget {
 	update (url, o = {}) {
 		this.source = url;
 		this.file = this.constructor.parseURL(url);
+		this.authProvider = o.authProvider ?? Backend.authProvider;
 		this.options = o;
 
 		// Options object has higher priority than url
@@ -276,4 +277,9 @@ export default class Backend extends EventTarget {
 		// We're on the root class and still can't find it
 		return id + " " + args.join(" ");
 	}
+
+	/**
+	 * Default Auth Provider
+	 */
+	static authProvider = "https://auth.madata.dev"
 };
