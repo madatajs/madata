@@ -126,17 +126,15 @@ export default class GoogleFirebase extends Google {
 	}
 
 	async delete (file) {
-		const fromStorage = file.url.host.startsWith("firebasestorage") || file.url.protocol === "gs:";
-
-		if (fromStorage) {
+		if (file.inStorage) {
 			// Delete from Storage
 			const storage = getStorage(this.app);
 			try {
-				const fileRef = ref(storage, file.url.href);
+				const fileRef = ref(storage, file.path);
 				await deleteObject(fileRef);
 
 				// Return URL of successfully deleted file.
-				return file.url.href;
+				return file.path;
 			}
 			catch (e) {
 				throw new Error(e.message);
@@ -259,18 +257,24 @@ export default class GoogleFirebase extends Google {
 	}
 
 	/**
-	 * Parse database URL.
-	 * @param {string} source Database URL.
-	 * @returns Project ID, auth domain, storage bucket.
+	 * Parse URL.
+	 * @param {string} source Database URL | URL of a file in Firebase Storage.
+	 * @returns Project ID, auth domain, storage bucket | A flag whether a file is in Firebase Storage, file URL.
 	 */
 	static parseURL (source) {
 		const ret = {
 			url: new URL(source)
 		};
 
-		ret.projectId = ret.url.host.replace(".firebaseio.com", "");
-		ret.authDomain = ret.projectId + ".firebaseapp.com";
-		ret.storageBucket = ret.projectId + ".appspot.com";
+		if (ret.url.host === "firebasestorage.googleapis.com" || ret.url.protocol === "gs:") {
+			ret.inStorage = true;
+			ret.path = source;
+		}
+		else {
+			ret.projectId = ret.url.host.replace(".firebaseio.com", "");
+			ret.authDomain = ret.projectId + ".firebaseapp.com";
+			ret.storageBucket = ret.projectId + ".appspot.com";
+		}
 
 		return ret;
 	}
