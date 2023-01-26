@@ -28,7 +28,6 @@ export default class Backend extends EventTarget {
 	update (url, o = {}) {
 		this.source = url;
 		this.file = this.constructor.parseURL(url);
-		this.authProvider = o.authProvider ?? Backend.authProvider;
 		this.options = o;
 
 		// Options object has higher priority than url
@@ -279,7 +278,20 @@ export default class Backend extends EventTarget {
 	}
 
 	/**
-	 * Default Auth Provider
+	 * Auth Provider to use
 	 */
 	static authProvider = "https://auth.madata.dev"
+
+	/**
+	 * services.json from the auth provider will be cached here.
+	 * You could also set this manually to avoid the network request.
+	 * @member {Promise<Object>}
+	 */
+	static get authProviderServices () {
+		// If the getter is running, we don't have this, fetch from the auth provider
+		// FIXME what if the request fails or it's not valid JSON?
+		// FIXME if authProvider changes, this doesn't get updated
+		delete this.authProviderServices;
+		return this.authProviderServices = fetch(new URL("/services.json", this.authProvider)).then(r => r.json());
+	}
 };

@@ -14,6 +14,18 @@ import {type} from "./util.js";
 export default class OAuthBackend extends AuthBackend {
 	constructor (url, o = {}) {
 		super(url, o);
+
+		// Subclasses that also have async dependencies must do
+		// this.ready = Promise.all([super.ready, ...])
+		// instead of just overwriting this.ready
+		this.ready = Promise.resolve(this.constructor.authProviderServices).then(services => {
+			let meta = services[this.constructor.getOAuthBackend().name];
+			this.clientId = meta.client_id;
+
+			if (meta.api_key && !("apiKey" in this.options)) {
+				this.apiKey = meta.api_key;
+			}
+		});
 	}
 
 	/**
@@ -24,8 +36,9 @@ export default class OAuthBackend extends AuthBackend {
 	update(url, o) {
 		super.update(url, o);
 
-		if (this.constructor.clientId ?? o.clientId) {
-			this.clientId = o.clientId ?? this.constructor.clientId;
+		if (o.apiKey) {
+			// Some backends (e.g. Firebase) require a separate API key per project
+			this.apiKey = o.apiKey;
 		}
 	}
 
@@ -100,18 +113,20 @@ export default class OAuthBackend extends AuthBackend {
 		}
 	}
 
-	static getOAuthProvider() {
+	static getOAuthBackend() {
 		if (this.hasOwnProperty("oAuth")) {
 			return this;
 		}
 		else {
 			let parent = Object.getPrototypeOf(this);
-			return parent.getOAuthProvider?.();
+			return parent.getOAuthBackend?.();
 		}
 	}
 
 	/**
 	 * Helper method for authenticating in OAuth APIs
+	 * @param [options] {object}
+	 * @param [options.passive] {boolean} - Do not trigger any login UI, just return the current user if already logged in
 	 */
 	async login ({passive = false} = {}) {
 		if (this.ready) {
@@ -122,11 +137,9 @@ export default class OAuthBackend extends AuthBackend {
 			return this.getUser();
 		}
 
-		let authProvider = this.constructor.getOAuthProvider();
+		let oAuthBackend = this.constructor.getOAuthBackend();
 
-		let id = authProvider.name.toLowerCase();
-
-		this.accessToken = localStorage[this.tokenKey];
+		this.accessToken = localStorage[this.constructor.tokenKey];
 
 		if (this.accessToken) {
 			try {
@@ -135,7 +148,7 @@ export default class OAuthBackend extends AuthBackend {
 			catch (e) {
 				if (e.status == 401) {
 					// Unauthorized. Access token we have is invalid, discard it
-					localStorage.removeItem(this.tokenKey);
+					localStorage.removeItem(this.constructor.tokenKey);
 					delete this.accessToken;
 				}
 			}
@@ -153,7 +166,7 @@ export default class OAuthBackend extends AuthBackend {
 
 			var state = {
 				url: location.href,
-				backend: authProvider.name
+				backend: oAuthBackend.name
 			};
 
 			this.authPopup = open(`${this.constructor.oAuth}?client_id=${this.clientId}&state=${encodeURIComponent(JSON.stringify(state))}` + this.oAuthParams(),
@@ -166,7 +179,7 @@ export default class OAuthBackend extends AuthBackend {
 			let accessToken = await new Promise((resolve, reject) => {
 				addEventListener("message", evt => {
 					if (evt.source === this.authPopup) {
-						if (evt.data.backend == authProvider.name) {
+						if (evt.data.backend == oAuthBackend.name) {
 							resolve(evt.data.token);
 						}
 
@@ -177,7 +190,7 @@ export default class OAuthBackend extends AuthBackend {
 				});
 			});
 
-			this.accessToken = localStorage[this.tokenKey] = accessToken;
+			this.accessToken = localStorage[this.constructor.tokenKey] = accessToken;
 
 			hooks.run("oauth-login-success", this);
 		}
@@ -195,9 +208,7 @@ export default class OAuthBackend extends AuthBackend {
 	 */
 	async logout () {
 		if (this.isAuthenticated()) {
-			var id = this.constructor.name.toLowerCase();
-
-			localStorage.removeItem(this.tokenKey);
+			localStorage.removeItem(this.constructor.tokenKey);
 			delete this.accessToken;
 
 			// TODO does this really represent all backends? Should it be a setting?
@@ -215,8 +226,8 @@ export default class OAuthBackend extends AuthBackend {
 		}
 	}
 
-	get tokenKey () {
-		let name = this.constructor.getOAuthProvider()?.name || this.name;
+	static get tokenKey () {
+		let name = this.getOAuthBackend()?.name || this.name;
 		let id = name.toLowerCase();
 		let authProvider = new URL(this.authProvider).hostname;
 
@@ -225,7 +236,7 @@ export default class OAuthBackend extends AuthBackend {
 			return `mavo:${id}token`;
 		}
 
-		return `madatatoken:${authProvider}/${id}`;
+		return `madata:token:${authProvider}/${id}`;
 	}
 
 	static phrases = {
