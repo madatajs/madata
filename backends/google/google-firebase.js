@@ -8,8 +8,8 @@ import { readFile, toArray } from "../../src/util.js";
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider, useDeviceLanguage } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-import { getFirestore, doc, collection, getDoc, getDocs, setDoc, addDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore-lite.js";
-import { getStorage, ref, uploadString, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-storage.js";
+import { getFirestore, doc, collection, getDoc, getDocs, setDoc, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore-lite.js";
+import { getStorage, ref, uploadString, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-storage.js";
 
 export default class GoogleFirebase extends Google {
 	ready = new Promise((resolve, reject) => {
@@ -125,6 +125,46 @@ export default class GoogleFirebase extends Google {
 
 	}
 
+	async delete (file) {
+		const fromStorage = file.url.host.startsWith("firebasestorage");
+
+		if (fromStorage) {
+			// Delete from Storage
+			const storage = getStorage(this.app);
+			try {
+				const fileRef = ref(storage, file.url.href);
+				await deleteObject(fileRef);
+
+				// Return URL of successfully deleted file.
+				return file.url.href;
+			}
+			catch (e) {
+				throw new Error(e.message);
+			}
+		}
+		else {
+			// Delete from Firestore
+			if (GoogleFirebase.#isCollection(file)) {
+				// Collection deletion is not recommended since it has negative security and performance implications.
+				// See https://firebase.google.com/docs/firestore/manage-data/delete-data#collections
+				console.warn(this.constructor.phrase("delete_collection_warning"));
+				return null;
+			}
+
+			const firestore = getFirestore(this.app);
+			try {
+				const docRef = doc(firestore, file.path);
+				await deleteDoc(docRef);
+
+				// Return the ID of the successfully deleted document.
+				return file.path.split("/").pop();
+			}
+			catch (e) {
+				throw new Error(e.message);
+			}
+		}
+	}
+
 	async upload (file, path) {
 		const dataURL = await readFile(file);
 
@@ -233,5 +273,9 @@ export default class GoogleFirebase extends Google {
 		ret.storageBucket = ret.projectId + ".appspot.com";
 
 		return ret;
+	}
+
+	static phrases = {
+		delete_collection_warning: "Deleting collections from a Web client is not recommended. See https://firebase.google.com/docs/firestore/manage-data/delete-data#collections for details."
 	}
 }
