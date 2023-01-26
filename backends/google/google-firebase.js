@@ -126,7 +126,7 @@ export default class GoogleFirebase extends Google {
 	}
 
 	async delete (file) {
-		const fromStorage = file.url.host.startsWith("firebasestorage");
+		const fromStorage = file.url.host.startsWith("firebasestorage") || file.url.protocol === "gs:";
 
 		if (fromStorage) {
 			// Delete from Storage
