@@ -186,8 +186,9 @@ export default class GoogleFirebase extends Google {
 				...user
 			};
 		}
-
-		return null;
+		else {
+			return super.getUser();
+		}
 	}
 
 	#applyDefaults (file = this.file) {
