@@ -4,7 +4,7 @@
  * @extends Google
  */
 import Google from "./google.js";
-import { readFile } from "../../src/util.js";
+import { readFile, toArray } from "../../src/util.js";
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider, useDeviceLanguage } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
@@ -76,7 +76,7 @@ export default class GoogleFirebase extends Google {
 		const firestore = getFirestore(this.app);
 
 		if (GoogleFirebase.#isCollection(file)) {
-			const documents = Array.isArray(data)? data : [data];
+			const documents = toArray(data);
 
 			const collectionRef = collection(firestore, file.path);
 			const ids = [];
