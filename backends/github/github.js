@@ -31,5 +31,4 @@ export default class Github extends OAuthBackend {
 
 	static apiDomain = "https://api.github.com/"
 	static oAuth = "https://github.com/login/oauth/authorize"
-	static clientId = "7e08e016048000bc594e"
 }

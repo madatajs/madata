@@ -192,7 +192,7 @@ export default class GoogleFirebase extends Google {
 
 				const res = await signInWithPopup(auth, provider);
 				const credential = GoogleAuthProvider.credentialFromResult(res);
-				this.accessToken = localStorage[this.tokenKey] = credential.accessToken;
+				this.accessToken = localStorage[this.constructor.tokenKey] = credential.accessToken;
 				this.user = res.user;
 			}
 			catch (e) {

@@ -38,12 +38,6 @@ Backend.authProvider = "https://auth.example.com";
 This sets the default auth provider to `"https://auth.example.com"`.
 You would need to do this before creating any `Backend` objects.
 
-You can also set the auth provider on a one-off basis, by using the `authProvider` constructor option:
-
-```js
-let backend = Backend.create(url, { authProvider: "https://auth.example.com"});
-```
-
 ## API
 
 `backend.login()` will display authentication UI to the user.

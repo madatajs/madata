@@ -52,7 +52,7 @@ export default class Dropbox extends OAuthBackend {
 	}
 
 	oAuthParams () {
-		return `&redirect_uri=${encodeURIComponent(this.authProvider)}&response_type=code`;
+		return `&redirect_uri=${encodeURIComponent(this.constructor.authProvider)}&response_type=code`;
 	}
 
 	async getUser () {
@@ -89,7 +89,6 @@ export default class Dropbox extends OAuthBackend {
 
 	static apiDomain = "https://api.dropboxapi.com/2/"
 	static oAuth = "https://www.dropbox.com/oauth2/authorize"
-	static clientId = "9rv97nkxvvdq1a3"
 
 	static test (url) {
 		url = new URL(url, location);

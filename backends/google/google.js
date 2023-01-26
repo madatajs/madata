@@ -9,8 +9,6 @@ export default class Google extends OAuthBackend {
 	constructor (url, o) {
 		super(url, o);
 
-		this.apiKey = o.apiKey ?? this.constructor.apiKey;
-
 		this.updatePermissions({ read: true });
 	}
 
@@ -29,12 +27,10 @@ export default class Google extends OAuthBackend {
 	}
 
 	oAuthParams () {
-		return `&redirect_uri=${encodeURIComponent(this.authProvider)}&response_type=code&scope=${encodeURIComponent(this.constructor.scopes.join(" "))}`;
+		return `&redirect_uri=${encodeURIComponent(this.constructor.authProvider)}&response_type=code&scope=${encodeURIComponent(this.constructor.scopes.join(" "))}`;
 	}
 
 	static oAuth = "https://accounts.google.com/o/oauth2/auth"
-	static clientId = "375702642766-9n3p8i52lnkus451fojeqoreg8akss59.apps.googleusercontent.com"
-	static apiKey = "AIzaSyBWd4LzYlUZ_IAv096ojIsx6nOGmYy3VB0"
 	static useCache = false
 
 	static phrases = {
