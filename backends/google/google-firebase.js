@@ -141,31 +141,34 @@ export default class GoogleFirebase extends Google {
 		}
 	}
 
-	async login () {
+	async login ({ passive } = {}) {
 		await this.ready;
 
 		const auth = getAuth(this.app);
-		const provider = new GoogleAuthProvider();
 
-		// Apply the default browser preference.
-		useDeviceLanguage(auth);
+		if (!passive) {
+			try {
+				const provider = new GoogleAuthProvider();
 
-		try {
-			const res = await signInWithPopup(auth, provider);
-			const credential = GoogleAuthProvider.credentialFromResult(res);
-			this.accessToken = localStorage[this.tokenKey] = credential.accessToken;
-			this.user = res.user;
+				// Apply the default browser preference.
+				useDeviceLanguage(auth);
 
-			const user = await super.login({passive: true});
-			if (user) {
-				this.updatePermissions({edit: true, save: true});
+				const res = await signInWithPopup(auth, provider);
+				const credential = GoogleAuthProvider.credentialFromResult(res);
+				this.accessToken = localStorage[this.tokenKey] = credential.accessToken;
+				this.user = res.user;
 			}
+			catch (e) {
+				throw new Error(e.message);
+			}
+		}
 
-			return user;
+		const user = await super.login({ passive: true });
+		if (user) {
+			this.updatePermissions({ edit: true, save: true });
 		}
-		catch (e) {
-			throw new Error(e.message);
-		}
+
+		return user;
 	}
 
 	async getUser () {
