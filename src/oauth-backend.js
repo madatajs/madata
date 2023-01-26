@@ -22,7 +22,7 @@ export default class OAuthBackend extends AuthBackend {
 			let meta = services[this.constructor.getOAuthBackend().name];
 			this.clientId = meta.client_id;
 
-			if (meta.api_key) {
+			if (meta.api_key && !("apiKey" in this.options)) {
 				this.apiKey = meta.api_key;
 			}
 		});
@@ -35,6 +35,11 @@ export default class OAuthBackend extends AuthBackend {
 	 */
 	update(url, o) {
 		super.update(url, o);
+
+		if (o.apiKey) {
+			// Some backends (e.g. Firebase) require a separate API key per project
+			this.apiKey = o.apiKey;
+		}
 	}
 
 	isAuthenticated () {
