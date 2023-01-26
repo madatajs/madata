@@ -34,7 +34,7 @@ export default class GoogleFirebase extends Google {
 	async get (file) {
 		file = this.#applyDefaults(file);
 
-		const firestore = getFirestore();
+		const firestore = getFirestore(this.app);
 
 		if (GoogleFirebase.#isCollection(file)) {
 			const collectionRef = collection(firestore, file.path);
@@ -73,7 +73,7 @@ export default class GoogleFirebase extends Google {
 			file = Object.assign({}, file, {path});
 		}
 
-		const firestore = getFirestore();
+		const firestore = getFirestore(this.app);
 
 		if (GoogleFirebase.#isCollection(file)) {
 			const documents = Array.isArray(data)? data : [data];
@@ -129,7 +129,7 @@ export default class GoogleFirebase extends Google {
 		const dataURL = await readFile(file);
 
 		try {
-			const storage = getStorage();
+			const storage = getStorage(this.app);
 			const storageRef = ref(storage, path);
 
 			await uploadString(storageRef, dataURL, "data_url");
@@ -144,10 +144,9 @@ export default class GoogleFirebase extends Google {
 	async login ({ passive } = {}) {
 		await this.ready;
 
-		const auth = getAuth(this.app);
-
 		if (!passive) {
 			try {
+				const auth = getAuth(this.app);
 				const provider = new GoogleAuthProvider();
 
 				// Apply the default browser preference.
@@ -176,7 +175,7 @@ export default class GoogleFirebase extends Google {
 			return this.user;
 		}
 
-		const auth = getAuth();
+		const auth = getAuth(this.app);
 		const user = auth.currentUser;
 
 		if (user) {
