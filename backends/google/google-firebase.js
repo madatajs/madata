@@ -6,10 +6,10 @@
 import Google from "./google.js";
 import { readFile } from "../../src/util.js";
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.9.0/firebase-app.js";
-import { getAuth, signInWithPopup, GoogleAuthProvider, useDeviceLanguage } from "https://www.gstatic.com/firebasejs/9.9.0/firebase-auth.js";
-import { getFirestore, doc, collection, getDoc, getDocs, setDoc, addDoc } from "https://www.gstatic.com/firebasejs/9.9.0/firebase-firestore-lite.js";
-import { getStorage, ref, uploadString, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.9.0/firebase-storage.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
+import { getAuth, signInWithPopup, GoogleAuthProvider, useDeviceLanguage } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+import { getFirestore, doc, collection, getDoc, getDocs, setDoc, addDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore-lite.js";
+import { getStorage, ref, uploadString, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-storage.js";
 
 export default class GoogleFirebase extends Google {
 	ready = new Promise((resolve, reject) => {
@@ -153,6 +153,7 @@ export default class GoogleFirebase extends Google {
 		try {
 			const res = await signInWithPopup(auth, provider);
 			this.accessToken = localStorage[this.tokenKey] = res.user.accessToken;
+			this.user = res.user;
 
 			const user = await super.login({passive: true});
 			if (user) {
