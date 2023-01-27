@@ -68,10 +68,11 @@ export default class Backend extends EventTarget {
 	/**
 	 * Low-level method to fetch data from the backend. Subclasses should override this method.
 	 * Clients should not call this method directly, but use `load()` instead.
-	 * @param {*} url - URL to fetch, if different from that provided in the constructor
+	 * @param {Object} file - file to fetch, if different from that provided in the constructor
 	 * @returns {string} - Data from the backend as a string, `null` if not found
 	 */
-	async get (url = new URL(this.file.url)) {
+	async get (file = this.file) {
+		let url = new URL(file.url);
 		if (url.protocol != "data:" && this.constructor.useCache !== false) {
 			url.searchParams.set("timestamp", Date.now()); // ensure fresh copy
 		}
