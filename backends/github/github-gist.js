@@ -13,7 +13,7 @@ export default class GithubGist extends Github {
 		if (this.isAuthenticated()) {
 			// Authenticated API call
 			if (file.gistId) {
-				let data = await this.request(`gists/${info.gistId}`, {}, "GET");
+				let data = await this.request(`gists/${file.gistId}`, {}, "GET");
 				let files = data.files;
 
 				if (file.path && (file.path in files)) {
