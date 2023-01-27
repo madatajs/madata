@@ -288,10 +288,12 @@ export default class Backend extends EventTarget {
 	 * @member {Promise<Object>}
 	 */
 	static get authProviderServices () {
-		// If the getter is running, we don't have this, fetch from the auth provider
+		// If the getter is running, we don't have this info, fetch from the auth provider
 		// FIXME what if the request fails or it's not valid JSON?
 		// FIXME if authProvider changes, this doesn't get updated
-		delete this.authProviderServices;
-		return this.authProviderServices = fetch(new URL("/services.json", this.authProvider)).then(r => r.json());
+		// We use `Backend` instead of `this` because `this` will point to the current class,
+		// and we want to overwrite this on the parent class
+		delete Backend.authProviderServices;
+		return Backend.authProviderServices = fetch(new URL("/services.json", this.authProvider)).then(r => r.json());
 	}
 };
