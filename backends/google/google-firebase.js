@@ -12,24 +12,27 @@ import { getFirestore, doc, collection, getDoc, getDocs, setDoc, addDoc, deleteD
 import { getStorage, ref, uploadString, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-storage.js";
 
 export default class GoogleFirebase extends Google {
-	ready = new Promise((resolve, reject) => {
-		const firebaseConfig = {
-			apiKey: this.apiKey,
-			authDomain: this.file.authDomain,
-			databaseURL: this.source,
-			projectId: this.file.projectId,
-			storageBucket: this.file.storageBucket
-		};
+	ready = Promise.all([
+		super.ready,
+		new Promise((resolve, reject) => {
+			const firebaseConfig = {
+				apiKey: this.apiKey,
+				authDomain: this.file.authDomain,
+				databaseURL: this.source,
+				projectId: this.file.projectId,
+				storageBucket: this.file.storageBucket
+			};
 
-		this.app = initializeApp(firebaseConfig);
-
-		if (this.app) {
-			resolve(this.app);
-		}
-		else {
-			reject(this.constructor.phrase("could_not_initialize_app"));
-		}
-	})
+			this.app = initializeApp(firebaseConfig);
+		
+			if (this.app) {
+				resolve(this.app);
+			}
+			else {
+				reject(this.constructor.phrase("could_not_initialize_app"));
+			}
+		})
+	]);
 
 	async get (file) {
 		file = this.#applyDefaults(file);
