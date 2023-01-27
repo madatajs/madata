@@ -47,7 +47,9 @@ export default class OAuthBackend extends AuthBackend {
 	}
 
 	// Any extra params to be passed to the oAuth URL.
-	oAuthParams = () => ""
+	oAuthParams () {
+		return "";
+	}
 
 	/**
 	 * Helper for making OAuth requests with JSON-based APIs.
