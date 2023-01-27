@@ -75,7 +75,7 @@ export default class GithubGist extends Github {
 		file.gistId = gistInfo.id;
 		file.owner = gistInfo.owner.login;
 
-		if (this.info.gistId !== gistId) {
+		if (file.gistId !== gistId) {
 			// New gist created (or forked)
 			let env = {context: this, file};
 			hooks.run("gh-new-gist", env);
