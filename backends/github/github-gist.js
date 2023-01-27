@@ -32,8 +32,11 @@ export default class GithubGist extends Github {
 		}
 		else {
 			// Unauthenticated, use simple GET request to avoid rate limit
-			let path = file.path === this.defaults.path? "" : file.path + "/";
-			url = new URL(`https://gist.githubusercontent.com/${file.owner}/${file.gistId}/raw/${path}`);
+			let path = "";
+			if (file.path) {
+				path = file.path === GithubGist.defaults.path ? "" : file.path + "/";
+			}
+			let url = new URL(`https://gist.githubusercontent.com/${file.owner}/${file.gistId}/raw/${path}`);
 			url.searchParams.set("timestamp", Date.now()); // ensure fresh copy
 
 			let response = await fetch(url);
