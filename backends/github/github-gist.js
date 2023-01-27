@@ -7,13 +7,11 @@ import Github from "./github.js";
 import hooks from "../../src/hooks.js";
 
 export default class GithubGist extends Github {
-	async get (url) {
-		var file = url? this.constructor.parseURL(url) : this.file;
-
+	async get (file) {
 		if (this.isAuthenticated()) {
 			// Authenticated API call
 			if (file.gistId) {
-				let data = await this.request(`gists/${info.gistId}`, {}, "GET");
+				let data = await this.request(`gists/${file.gistId}`, {}, "GET");
 				let files = data.files;
 
 				if (file.path && (file.path in files)) {
@@ -32,8 +30,11 @@ export default class GithubGist extends Github {
 		}
 		else {
 			// Unauthenticated, use simple GET request to avoid rate limit
-			let path = file.path === this.defaults.path? "" : file.path + "/";
-			url = new URL(`https://gist.githubusercontent.com/${file.owner}/${file.gistId}/raw/${path}`);
+			let path = "";
+			if (file.path) {
+				path = file.path === GithubGist.defaults.path ? "" : file.path + "/";
+			}
+			let url = new URL(`https://gist.githubusercontent.com/${file.owner}/${file.gistId}/raw/${path}`);
 			url.searchParams.set("timestamp", Date.now()); // ensure fresh copy
 
 			let response = await fetch(url);
@@ -74,7 +75,7 @@ export default class GithubGist extends Github {
 		file.gistId = gistInfo.id;
 		file.owner = gistInfo.owner.login;
 
-		if (this.info.gistId !== gistId) {
+		if (file.gistId !== gistId) {
 			// New gist created (or forked)
 			let env = {context: this, file};
 			hooks.run("gh-new-gist", env);
