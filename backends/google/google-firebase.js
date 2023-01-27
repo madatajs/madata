@@ -251,7 +251,7 @@ export default class GoogleFirebase extends Google {
 	}
 
 	static defaults = {
-		path: "mv-data/data"
+		path: "madata/data"
 	}
 
 	static test (url) {
