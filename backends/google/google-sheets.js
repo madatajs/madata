@@ -42,8 +42,35 @@ export default class GoogleSheets extends Google {
 
 		try {
 			const response = await this.request(call);
-			return response.values;
-		} catch (e) {
+			const values = response.values;
+
+			if (this.options.returnObjects) {
+				// Return an array of objects instead of an array of arrays.
+				// Object key is a spreadsheet-like column name; value is data from the corresponding cell.
+				const ret = [];
+
+				for (const row of values) {
+					const obj = {};
+
+					for (let column = 0; column < row.length; column++) {
+						let columnName = GoogleSheets.#columnNames.get(column);
+						if (!columnName) {
+							columnName = GoogleSheets.#getColumnName(column);
+							GoogleSheets.#columnNames.set(column, columnName);
+						}
+
+						obj[columnName] = row[column];
+					}
+
+					ret.push(obj);
+				}
+
+				return ret;
+			}
+
+			return values;
+		}
+		catch (e) {
 			if (e.status === 401) {
 				await this.logout(); // Access token we have is invalid. Discard it.
 			}
@@ -163,6 +190,8 @@ export default class GoogleSheets extends Google {
 	stringify = data => data
 	parse = data => data
 
+	static #columnNames = new Map()
+
 	/**
 	 * Get the range reference.
 	 * @static
@@ -209,6 +238,25 @@ export default class GoogleSheets extends Google {
 		}
 
 		return sheet?.properties?.title;
+	}
+
+	/**
+	 * Get a spreadsheet-like column name by its number.
+	 * @static
+	 * @private
+	 * @param {number} num Column number.
+	 * @returns {string} Column name.
+	 */
+	static #getColumnName (num) {
+		const reminder = num % 26;
+		const letter = String.fromCharCode(65 + reminder);
+		const next = Math.floor(num / 26);
+		if (next > 0) {
+			return GoogleSheets.#getColumnName(next - 1) + letter;
+		}
+		else {
+			return letter;
+		}
 	}
 
 	static apiDomain = "https://sheets.googleapis.com/v4/spreadsheets/";
