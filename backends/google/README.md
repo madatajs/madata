@@ -58,9 +58,15 @@ Write & read data and upload files using all the Google Firebase powers.
 | ✅ Auth | ✅ Writes | ❌ Uploads |
 |---------|-----------|-----------|
 
-Write & read data from public and private Google spreadsheets.
+Use [Google Sheets](https://www.google.com/sheets/about/) as a data source and storage. Collaborate with others on the same public or private spreadsheet simultaneously, using formulas and functions. And then use the obtained data in your app.
 
-**URL format** Spreadsheet URL like `https://docs.google.com/spreadsheets/d/14bzCuziKutrA3iESarKoj2o56dhraR8pzuFAuwTIo-g/edit?usp=sharing`
+### Setting Up
+
+[Share a spreadsheet](https://support.google.com/docs/answer/2494822?hl=en) and use the provided **URL** which has format like `https://docs.google.com/spreadsheets/d/14bzCuziKutrA3iESarKoj2o56dhraR8pzuFAuwTIo-g/edit?usp=sharing`.
+
+To write data back to the spreadsheet (if allowed by specified permissions), you *must* be logged-in.
+
+To read data from and write them back to a private spreadsheet, you *must* be logged-in. The plugin won't let you work with *other's private spreadsheets*, only yours.
 
 ### Constructor options
 
@@ -79,4 +85,30 @@ This is a string like `A1:B2` that refers to a group of cells in the sheet and i
 - `A5:A` refers to all the cells of the first column of the sheet, from row 5 onward.
 - `C2:2` refers to all the cells of the second row of the sheet, from column C onward.
 
-Note that *named ranges* are also supported.
+Note that [named ranges](https://support.google.com/docs/answer/63175?hl=en) are also supported.
+
+### Returned value
+
+Assume the spreadsheet being read has the following data in its sheet:
+
+|   | A      | B      | C       | D         |
+| - | ------ | ------ | ------- | --------- |
+| 1 | Item   | Cost   | Stocked | Ship Date |
+| 2 | Wheel  | $20.50 | 4       | 3/1/2016  |
+| 3 | Door   | $15    | 2       | 3/15/2016 |
+| 4 | Engine | $100   | 1       | 3/20/2016 |
+| 5 | Totals | $135.5 | 7       | 3/20/2016 |
+
+The Google Sheets plugin reads the values from the range `A1:D5` and returns them in the response in the following format:
+
+```js
+[
+ ["Item", "Cost", "Stocked", "Ship Date"],
+ ["Wheel", 20.5, 4, 42430],
+ ["Door", 15, 2, 42444],
+ ["Engine", 100, 1, 42449],
+ ["Totals", 135.5, 7, 42449]
+]
+```
+
+Note that the plugin **omits empty trailing rows and columns**, if any.
