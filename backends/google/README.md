@@ -72,7 +72,7 @@ To read data from and write them back to a private spreadsheet, you *must* be lo
 
 - `sheetTitle`: A sheet to read/write data from/to. If not provided, Madata will try to use the first visible sheet.
 - `range`: A range with data in *A1 notation*. If not provided, Madata will try to use all data on the sheet.
-- `allowAddingSheets`: Whether to add a new sheet on save if there is no sheet with the specified title.
+- `allowAddingSheets`: Whether to add a new sheet on save if there is no sheet with the specified title. Defaults to `false`.
 - `serializeDates`: Whether dates, times, and durations should be represented as strings in their given number format (which depends on the spreadsheet locale). For example, instead of default `44963` might be returned `2/6/2023 12:15:00`. Defaults to `false`.
 
 ### A1 notation for specifying cell ranges
