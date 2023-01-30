@@ -24,6 +24,10 @@ Read events from public and private Google calendars.
 - Public calendar URLs like `https://calendar.google.com/calendar/embed?src=p9d9ld9vvhsk9q93hap417k1ds@group.calendar.google.com` or `https://calendar.google.com/calendar/embed?src=fr.french%23holiday%40group.v.calendar.google.com`
 - URLs from a browser address bar like `https://calendar.google.com/calendar/u/0?cid=cDlkOWxkOXZ2aHNrOXE5M2hhcDQxN2sxZHNAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ`
 
+### Constructor options
+
+You can customize the way the plugin reads data from a calendar by passing a separate `options` parameter to the backend constructor. Its value is either a *query string* (without leading `?`) or an *object* specifying all needed options. The list of *all* supported options (query parameters) you can find in [the documentation](https://developers.google.com/calendar/api/v3/reference/events/list#parameters).
+
 ### Events
 
 The plugin will return *an array of events* from the specified calendar (by default *250* events but not more than *2500* events).
@@ -43,7 +47,23 @@ Every event has *numerous* properties, the most useful of which are the followin
 | `hangoutLink` | An absolute link to the Google Hangout associated with this event. |
 | `attachments` | File attachments for the event. Every element of the collection has the following properties: `title`, `mimeType`, `fileUrl`, etc. |
 
-The list of *all* the supported properties (with description) you can find in [the documentation](https://developers.google.com/calendar/api/v3/reference/events#resource-representations).
+The list of *all* supported properties (with description) you can find in [the documentation](https://developers.google.com/calendar/api/v3/reference/events#resource-representations).
+
+### Example
+
+Assume the calendar being read is the public calendar of official holydays in France with URL `https://calendar.google.com/calendar/embed?src=fr.french%23holiday%40group.v.calendar.google.com`.
+
+```js
+import Backend from "https://madata.dev/src/index.js";
+
+let backend = Backend.create("https://calendar.google.com/calendar/embed?src=fr.french%23holiday%40group.v.calendar.google.com",
+  { options: { singleEvents: true, orderBy: "startTime", maxResults: 15 } });
+let json = await backend.load();
+
+console.log(json);
+```
+
+In the console you'll see the first 15 events ordered by the start time. All recurring events will be expanded into instances (recurring events themselves won't be returned). **Note that you can use `orderBy: "startTime"` only with the `singleEvents: true` option together.**
 
 ## Google Drive
 
