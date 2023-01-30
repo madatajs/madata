@@ -95,6 +95,11 @@ export default class GoogleSheets extends Google {
 			call += "&responseDateTimeRenderOption=formatted_string";
 		}
 
+		if (this.options.objects) {
+			// Transform an array of objects into an array of arrays.
+			data = data.map(obj => Object.values(obj));
+		}
+
 		const body = {
 			"range": rangeReference,
 			"majorDimension": "rows",
