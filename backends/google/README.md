@@ -157,7 +157,7 @@ If additionally to `sheetTitle: "Default"` you specify `serializeDates: true` in
     "A": "Item",
     "B": "Cost",
     "C": "Stocked",
-    "`D`": "Ship Date"
+    "D": "Ship Date"
   },
   {
     "A": "Wheel",
