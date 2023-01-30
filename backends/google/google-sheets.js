@@ -44,31 +44,31 @@ export default class GoogleSheets extends Google {
 			const response = await this.request(call);
 			const values = response.values;
 
-			if (this.options.objects) {
-				// Return an array of objects instead of an array of arrays.
-				// Object key is a spreadsheet-like column name; value is data from the corresponding cell.
-				const ret = [];
-
-				for (const row of values) {
-					const obj = {};
-
-					for (let column = 0; column < row.length; column++) {
-						let columnName = GoogleSheets.#columnNames.get(column);
-						if (!columnName) {
-							columnName = GoogleSheets.#getColumnName(column);
-							GoogleSheets.#columnNames.set(column, columnName);
-						}
-
-						obj[columnName] = row[column];
-					}
-
-					ret.push(obj);
-				}
-
-				return ret;
+			if (this.options.arrays) {
+				return values;
 			}
 
-			return values;
+			// Return an array of objects instead of an array of arrays.
+			// Object key is a spreadsheet-like column name; value is data from the corresponding cell.
+			const ret = [];
+
+			for (const row of values) {
+				const obj = {};
+
+				for (let column = 0; column < row.length; column++) {
+					let columnName = GoogleSheets.#columnNames.get(column);
+					if (!columnName) {
+						columnName = GoogleSheets.#getColumnName(column);
+						GoogleSheets.#columnNames.set(column, columnName);
+					}
+
+					obj[columnName] = row[column];
+				}
+
+				ret.push(obj);
+			}
+
+			return ret;
 		}
 		catch (e) {
 			if (e.status === 401) {
@@ -95,7 +95,7 @@ export default class GoogleSheets extends Google {
 			call += "&responseDateTimeRenderOption=formatted_string";
 		}
 
-		if (this.options.objects) {
+		if (!this.options.arrays) {
 			// Transform an array of objects into an array of arrays.
 			data = data.map(obj => Object.values(obj));
 		}
