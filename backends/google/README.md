@@ -14,11 +14,36 @@ There are four backends here, all using authentication via Google:
 
 Read events from public and private Google calendars.
 
+### Setting up
+
+[Share a calendar](https://www.pcworld.com/article/394972/how-to-share-your-google-calendar-with-others.html) and use the provided **URL** when creating an instance of the backend.
+
 ### URL format
 
 - The user's primary calendar URLs like `https://calendar.google.com/calendar/` or `https://calendar.google.com/calendar/embed?src=user_email`
 - Public calendar URLs like `https://calendar.google.com/calendar/embed?src=p9d9ld9vvhsk9q93hap417k1ds@group.calendar.google.com` or `https://calendar.google.com/calendar/embed?src=fr.french%23holiday%40group.v.calendar.google.com`
 - URLs from a browser address bar like `https://calendar.google.com/calendar/u/0?cid=cDlkOWxkOXZ2aHNrOXE5M2hhcDQxN2sxZHNAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ`
+
+### Events
+
+The plugin will return *an array of events* from the specified calendar (by default *250* events but not more than *2500* events).
+
+Every event has *numerous* properties, the most useful of which are the following:
+
+| Property | Description |
+| -------- | ----------- |
+| `summary` | Title of the event. |
+| `description` | Description of the event. |
+| `location` | (Geographic) location of the event (as text). |
+| `start` | The (inclusive) start time of the event. For a *recurring event*, this is the start time of the first instance. Properties: `date` (if this is an all-day event), `dateTime`, `timeZone`. |
+| `end` | The (exclusive) end time of the event. For a *recurring event*, this is the end time of the first instance. Properties: `date` (if this is an all-day event), `dateTime`, `timeZone`. |
+| `attendees` | The attendees of the event. Every element of the collection has the following properties: `email`, `displayName`, `responseStatus`, etc. |
+| `creator` | The creator of the event with the following properties: `email`, `displayName`, etc. |
+| `organizer` | The organizer of the event with the following properties: `email`, `displayName`, etc. If the organizer is also an attendee, this is indicated with a separate element in the `attendees` collection with the `organizer` property set to *true*. |
+| `hangoutLink` | An absolute link to the Google Hangout associated with this event. |
+| `attachments` | File attachments for the event. Every element of the collection has the following properties: `title`, `mimeType`, `fileUrl`, etc. |
+
+The list of *all* the supported properties (with description) you can find in [the documentation](https://developers.google.com/calendar/api/v3/reference/events#resource-representations).
 
 ## Google Drive
 
@@ -60,7 +85,7 @@ Write & read data and upload files using all the Google Firebase powers.
 
 Use [Google Sheets](https://www.google.com/sheets/about/) as a data source and storage. Collaborate with others on the same public or private spreadsheet simultaneously, using formulas and functions. And then use the obtained data in your app.
 
-### Setting Up
+### Setting up
 
 [Share a spreadsheet](https://www.lifewire.com/sharing-options-for-google-spreadsheets-3124090) and use the provided **URL** which has format like `https://docs.google.com/spreadsheets/d/14bzCuziKutrA3iESarKoj2o56dhraR8pzuFAuwTIo-g/edit?usp=sharing`.
 
