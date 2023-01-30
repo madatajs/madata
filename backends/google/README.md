@@ -51,7 +51,7 @@ The list of *all* supported properties (with description) you can find in [the d
 
 ### Example
 
-Assume the calendar being read is the public calendar of official holydays in France with URL `https://calendar.google.com/calendar/embed?src=fr.french%23holiday%40group.v.calendar.google.com`.
+Assume the calendar being read is the public calendar of official holidays in France with URL `https://calendar.google.com/calendar/embed?src=fr.french%23holiday%40group.v.calendar.google.com`.
 
 ```js
 import Backend from "https://madata.dev/src/index.js";
