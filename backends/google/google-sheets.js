@@ -44,7 +44,7 @@ export default class GoogleSheets extends Google {
 			const response = await this.request(call);
 			const values = response.values;
 
-			if (this.options.returnObjects) {
+			if (this.options.objects) {
 				// Return an array of objects instead of an array of arrays.
 				// Object key is a spreadsheet-like column name; value is data from the corresponding cell.
 				const ret = [];
