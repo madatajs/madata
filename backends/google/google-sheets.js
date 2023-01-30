@@ -248,7 +248,7 @@ export default class GoogleSheets extends Google {
 	 * @returns {string} Column name.
 	 */
 	static #getColumnName (num) {
-		const reminder = num % 26;
+		const remainder = num % 26;
 		const letter = String.fromCharCode(65 + reminder);
 		const next = Math.floor(num / 26);
 		if (next > 0) {
