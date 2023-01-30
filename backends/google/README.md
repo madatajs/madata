@@ -89,7 +89,7 @@ Note that [named ranges](https://support.google.com/docs/answer/63175?hl=en) are
 
 ### Google Sheets version history
 
-Using the plugin you can take advantage of the [Google Sheets version history system](https://www.ablebits.com/office-addins-blog/google-sheets-edit-history/). Before storing the data, simply replace data which wasn't changed with `null`, and the Google Sheets plugin leave them *untouched*.
+With the plugin, you can take advantage of the [Google Sheets version history system](https://www.ablebits.com/office-addins-blog/google-sheets-edit-history/). Before storing the data back, simply replace *unchanged* data with `null`, and the Google Sheets plugin will leave them *untouched* in the sheet.
 
 ### Example
 
