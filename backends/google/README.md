@@ -91,6 +91,8 @@ Note that [named ranges](https://support.google.com/docs/answer/63175?hl=en) are
 
 With the plugin, you can take advantage of the [Google Sheets version history system](https://www.ablebits.com/office-addins-blog/google-sheets-edit-history/). Before storing the data back, simply replace *unchanged* data with `null`, and the Google Sheets plugin will leave them *untouched* in the sheet.
 
+If you want to remove data from the sheet (i.e., clear the corresponding cell), replace every piece of data which needs to be deleted with *an empty string* before you store the data.
+
 ### Example
 
 Assume the spreadsheet being read (with URL `https://docs.google.com/spreadsheets/d/1IMFDv0aWWZ8F4GIdk_gmOwl60DD4-eCnLEX1CV9WBho/edit?usp=sharing`) has the following data in its sheet named `Default`:
