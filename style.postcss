@@ -1,13 +1,20 @@
 @import url('https://prismjs.com/themes/prism-solarizedlight.min.css');
 
 :root {
-	--accent-color-hs: 335 90%;
-	--accent-color: hsl(var(--accent-color-hs) 50%);
-	--color-magenta-hs: var(--accent-color-hs);
-	--accent-color-2-hs: 200 90%;
-	--accent-color-2: hsl(var(--accent-color-2-hs) 50%);
-	--color-blue-hs: var(--accent-color-2-hs);
-	--color-blue: var(--accent-color-2);
+	--color-blue-hs: 200 90%;
+	--color-blue: hsl(var(--color-blue-hs) 50%);
+	--color-magenta-hs: 335 90%;
+	--color-magenta: hsl(var(--color-magenta-hs) 50%);
+	--color-green-hs: 90 90%;
+	--color-green: hsl(var(--color-green-hs) 50%);
+	--color-orange-hs: 30 100%;
+	--color-orange: hsl(var(--color-orange-hs) 50%);
+
+	--accent-color-hs: var(--color-magenta-hs);
+	--accent-color: var(--color-magenta);
+	--accent-color-2-hs: var(--color-blue-hs);
+	--accent-color-2: var(--color-blue);
+
 	--focus-color: var(--color-blue);
 	--gray: 220 10%;
 
@@ -254,4 +261,56 @@ main > h1 {
 
 .gh-only {
 	display: none;
+}
+
+.warning,
+.note,
+.tip {
+	position: relative;
+	padding: 1em 1em .1em;
+	border-left: .8em solid var(--color);
+	margin-top: 1em;
+	background: hsl(var(--gray) 96%);
+
+	&::before {
+		content: var(--label);
+		display: block;
+		margin-bottom: -.5em;
+		font-size: 80%;
+		line-height: 1;
+		font-weight: bold;
+		text-transform: uppercase;
+		color: var(--color);
+	}
+
+	&::after {
+		content: var(--icon);
+		position: absolute;
+		top: -.3em;
+		right: -.3em;
+		font-size: 250%;
+		font-variation-emoji: emoji;
+		font-family: emoji;
+	}
+}
+
+.warning {
+	--icon: "⚠️";
+	--label: "Warning";
+	--color-hs: var(--color-orange-hs);
+	--color: var(--color-orange);
+}
+
+.note {
+	--icon: "📝";
+	--label: "Note";
+	--color-hs: var(--color-blue-hs);
+	--color: var(--color-blue);
+}
+
+.tip {
+	--icon: "💡";
+	--label: "Tip";
+	--color-hs: var(--color-green-hs);
+	--color: var(--color-green);
 }
