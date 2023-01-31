@@ -45,24 +45,40 @@ export default class GoogleSheets extends Google {
 			const values = response.values;
 
 			if (this.options.arrays) {
+				// Return an array of arrays.
 				return values;
 			}
 
-			// Return an array of objects instead of an array of arrays.
-			// Object key is a spreadsheet-like column name; value is data from the corresponding cell.
-			const ret = [];
+			let keys = new Map(); // "string" => "string"
+			if (this.options.headerRow) {
+				// The sheet has a header row. Use the headers from the sheet as object keys.
+				keys = new Map(Object.entries(values[0]));
+			}
 
+			if (this.options.headers) {
+				// Replace the headers from the sheet with the provided headers.
+				const headers = this.options.headers;
+				if (Array.isArray(headers)) {
+					// Headers are in an array
+					keys = new Map(Object.entries(headers));
+				}
+				else if (typeof headers === "function") {
+					// We have a mapping function returning an object key based on a header and column index this header corresponds to
+					const headerRow = values[0];
+					for (let columnIndex = 0; columnIndex < headerRow.length; columnIndex++) {
+						keys.set(columnIndex + "", headers(headerRow[columnIndex], columnIndex));
+					}
+				}
+			}
+
+			// Return an array of objects instead of an array of arrays.
+			const ret = [];
 			for (const row of values) {
 				const obj = {};
 
-				for (let column = 0; column < row.length; column++) {
-					let columnName = GoogleSheets.#columnNames.get(column);
-					if (!columnName) {
-						columnName = GoogleSheets.#getColumnName(column);
-						GoogleSheets.#columnNames.set(column, columnName);
-					}
-
-					obj[columnName] = row[column];
+				for (let columnIndex = 0; columnIndex < row.length; columnIndex++) {
+					const index = columnIndex + "";
+					obj[keys.get(index) || index] = row[columnIndex];
 				}
 
 				ret.push(obj);
@@ -195,8 +211,6 @@ export default class GoogleSheets extends Google {
 	stringify = data => data
 	parse = data => data
 
-	static #columnNames = new Map()
-
 	/**
 	 * Get the range reference.
 	 * @static
@@ -243,25 +257,6 @@ export default class GoogleSheets extends Google {
 		}
 
 		return sheet?.properties?.title;
-	}
-
-	/**
-	 * Get a spreadsheet-like column name by its number.
-	 * @static
-	 * @private
-	 * @param {number} num Column number.
-	 * @returns {string} Column name.
-	 */
-	static #getColumnName (num) {
-		const remainder = num % 26;
-		const letter = String.fromCharCode(65 + remainder);
-		const next = Math.floor(num / 26);
-		if (next > 0) {
-			return GoogleSheets.#getColumnName(next - 1) + letter;
-		}
-		else {
-			return letter;
-		}
 	}
 
 	static apiDomain = "https://sheets.googleapis.com/v4/spreadsheets/";
