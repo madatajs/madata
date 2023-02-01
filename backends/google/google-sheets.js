@@ -44,7 +44,7 @@ export default class GoogleSheets extends Google {
 			const response = await this.request(call);
 			const values = response.values;
 
-			if (this.options.arrays) {
+			if (!this.options.headerRow && !this.options.keys) {
 				// Return an array of arrays.
 				return values;
 			}
@@ -111,7 +111,7 @@ export default class GoogleSheets extends Google {
 			call += "&responseDateTimeRenderOption=formatted_string";
 		}
 
-		if (!this.options.arrays) {
+		if (this.options.headerRow === true || this.options.keys) {
 			// Transform an array of objects into an array of arrays.
 			data = data.map(obj => Object.values(obj));
 		}
