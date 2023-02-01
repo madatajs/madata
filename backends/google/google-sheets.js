@@ -63,7 +63,8 @@ export default class GoogleSheets extends Google {
 					objectKeys = new Map(Object.entries(keys));
 				}
 				else if (typeof keys === "function") {
-					// We have a mapping function returning an object key based on a header and column index this header corresponds to
+					// We have a mapping function. The function should return an object key 
+					// and take header text and column index as arguments
 					const headerRow = values[0];
 					for (let columnIndex = 0; columnIndex < headerRow.length; columnIndex++) {
 						objectKeys.set(columnIndex + "", keys(headerRow[columnIndex], columnIndex));
