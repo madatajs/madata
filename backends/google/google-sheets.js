@@ -49,24 +49,24 @@ export default class GoogleSheets extends Google {
 				return values;
 			}
 
-			let keys = new Map(); // "string" => "string"
+			let objectKeys = new Map(); // "string" => "string"
 			if (this.options.headerRow) {
-				// The sheet has a header row. Use the headers from the sheet as object keys.
-				keys = new Map(Object.entries(values[0]));
+				// The sheet has a header row. Use the headers from the sheet (from the first row) as object keys.
+				objectKeys = new Map(Object.entries(values[0]));
 			}
 
-			if (this.options.headers) {
-				// Replace the headers from the sheet with the provided headers.
-				const headers = this.options.headers;
-				if (Array.isArray(headers)) {
-					// Headers are in an array
-					keys = new Map(Object.entries(headers));
+			if (this.options.keys) {
+				// Use the provided keys as object keys.
+				const keys = this.options.keys;
+				if (Array.isArray(keys)) {
+					// Keys are in an array
+					objectKeys = new Map(Object.entries(keys));
 				}
-				else if (typeof headers === "function") {
+				else if (typeof keys === "function") {
 					// We have a mapping function returning an object key based on a header and column index this header corresponds to
 					const headerRow = values[0];
 					for (let columnIndex = 0; columnIndex < headerRow.length; columnIndex++) {
-						keys.set(columnIndex + "", headers(headerRow[columnIndex], columnIndex));
+						objectKeys.set(columnIndex + "", keys(headerRow[columnIndex], columnIndex));
 					}
 				}
 			}
@@ -78,7 +78,7 @@ export default class GoogleSheets extends Google {
 
 				for (let columnIndex = 0; columnIndex < row.length; columnIndex++) {
 					const index = columnIndex + "";
-					obj[keys.get(index) || index] = row[columnIndex];
+					obj[objectKeys.get(index) || index] = row[columnIndex];
 				}
 
 				ret.push(obj);
