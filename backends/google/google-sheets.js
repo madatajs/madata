@@ -79,7 +79,7 @@ export default class GoogleSheets extends Google {
 
 				for (let columnIndex = 0; columnIndex < row.length; columnIndex++) {
 					const index = columnIndex + "";
-					obj[objectKeys.get(index) || index] = row[columnIndex];
+					obj[objectKeys.get(index) ?? index] = row[columnIndex];
 				}
 
 				ret.push(obj);
