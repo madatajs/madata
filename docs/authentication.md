@@ -93,18 +93,30 @@ logoutButton.addEventListener("click", evt => backend.logout());
 
 <h2 id="custom-auth-provider">Advanced: Creating your own auth provider</h2>
 
-1. First, fork one of the template repos.
-We provide template repos for
-a) Serverless (Netlify, but can easily be adjusted for other providers): [madatajs/auth-serverless](https://github.com/madatajs/auth-serverless)
-b) PHP: [madatajs/auth-php](https://github.com/madatajs/auth-php)
-1. **Make your fork private.** This is essential, since you will be storing secret API keys in it!
-2. Register OAuth applications for each service you wish to support.
-Edit `services.json` with the public API keys and `.secret.json` with the secret API keys of these services.
+1. First, use one of the template repos.
+We provide template repos for the following tech stacks:
+	1. Serverless (Netlify, but can easily be adjusted for other providers): [madatajs/auth-serverless](https://github.com/madatajs/auth-serverless)
+	2. <del>PHP: [madatajs/auth-php](https://github.com/madatajs/auth-php)</del> (Coming soon)
+
+![](images/use-template-button.png)
+
+2. On the template repo of your choice, click "Use this template" and then "Create new Repository".
+3. **Make your new repo private.** This is essential, since you will be storing secret API keys in it!
+4. In your local clone of the repo, run `npm run init-repo` and then `npm run update-repo` to link your new repo to the template repo so you can pull in updates.
+Then, every time you want to pull in updates from the original template repo, you just run `npm run update-repo`.
+6. Register OAuth applications for each service you wish to support.
+Edit `services.json` with the public API keys of these applications.
+Copy `secret.json`, rename it `.secret.json` and edit it with the secret API keys of these services.
+
+That's it, you’re done! Don’t forget to set up a Netlify (or whatever provider you are using)
+website to deploy from your newly created repo!
 
 <div class=warning>
 
 We strongly recommend leaving the confirmation step in place (*“Are you sure you want to log in to [URL]?”*).
-Since all Madata apps using the same auth provider
+Since all Madata apps using the same auth provider share the same API keys,
+without this confirmation step, someone could trick users who have ever authenticated with a particular auth provider
+into logging in to a malicious app, without their intervention.
 
 </div>
 
