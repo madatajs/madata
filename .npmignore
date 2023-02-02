@@ -1,4 +1,14 @@
-README.md
+# Local Netlify folder
+.netlify
+
+# Generated files
+index.html
+*.css
+api/
+
+# Frontend
 *.html
+*.postcss
 logo.svg
 avatar.png
+_headers
