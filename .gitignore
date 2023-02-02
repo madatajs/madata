@@ -1,5 +1,8 @@
-index.html
-*.css
 # Local Netlify folder
 .netlify
+
+
+# Generated files
+index.html
+*.css
 api/

@@ -11,6 +11,14 @@ A spinoff from [Mavo](https://mavo.io).
 
 <main>
 
+<div class="warning">
+
+**Here be dragons** Madata has not yet been officially released, we are trying a “soft launch” first.
+It is currently in pre-alpha and very much a work in progress.
+Please try it out, and [open issues](https://github.com/madatajs/madata/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc) as you find them!
+
+</div>
+
 ## Getting Started
 
 Madata provides a unified API for authentication, reading & storing data, as well as file uploads (where supported), regardless of the storage service used.
