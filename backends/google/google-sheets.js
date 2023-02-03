@@ -52,7 +52,9 @@ export default class GoogleSheets extends Google {
 			let objectKeys = new Map(); // "string" => "string"
 			if (this.options.headerRow) {
 				// The sheet has a header row. Use the headers from the sheet (from the first row) as object keys.
-				objectKeys = new Map(Object.entries(values[0]));
+				// We don't want headers to become a part of the data.
+				file.headers = values.shift();
+				objectKeys = new Map(Object.entries(file.headers));
 			}
 
 			if (this.options.keys) {
@@ -63,11 +65,20 @@ export default class GoogleSheets extends Google {
 					objectKeys = new Map(Object.entries(keys));
 				}
 				else if (typeof keys === "function") {
-					// We have a mapping function. The function should return an object key 
-					// and take header text and column index as arguments
-					const headerRow = values[0];
-					for (let columnIndex = 0; columnIndex < headerRow.length; columnIndex++) {
-						objectKeys.set(columnIndex + "", keys(headerRow[columnIndex], columnIndex));
+					// We have a mapping function. The function should return an object key
+					// and take header text, column index, and array of headers as arguments.
+					if (file.headers) {
+						const headerRow = file.headers;
+						for (let columnIndex = 0; columnIndex < headerRow.length; columnIndex++) {
+							objectKeys.set(columnIndex + "", keys(headerRow[columnIndex], columnIndex, headerRow));
+						}
+					}
+					else {
+						// No header row. We need as many object keys as there are cells in the longest row.
+						const maxIndex = Math.max(...values.map(row => row.length));
+						for (let columnIndex = 0; columnIndex < maxIndex; columnIndex++) {
+							objectKeys.set(columnIndex + "", keys(undefined, columnIndex, undefined));
+						}
 					}
 				}
 			}
@@ -115,6 +126,13 @@ export default class GoogleSheets extends Google {
 		if (this.options.headerRow === true || this.options.keys) {
 			// Transform an array of objects into an array of arrays.
 			data = data.map(obj => Object.values(obj));
+
+			if (file.headers) {
+				// We have a header row. This row is not a part of the data, so we need to add it.
+				// Cells of this row must stay untouched to not mess up the version history.
+				const headerRow = Array(file.headers.length).fill(null); // [null, null, ..., null]
+				data = [headerRow, ...data];
+			}
 		}
 
 		const body = {
