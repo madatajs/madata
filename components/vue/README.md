@@ -27,40 +27,57 @@ Simple example (just data loading):
 </div>
 
 <script type=module>
-import { createApp } from "https://unpkg.com/vue@3/dist/vue.esm-browser.js";
-import MaData from "./madata-vue.js";
+	import { createApp } from "https://unpkg.com/vue@3/dist/vue.esm-browser.js";
+	import MaData from "./madata-vue.js";
 
-createApp({
-	data() {
-		return {
-			"cats": []
-		};
-	},
+	createApp({
+		data() {
+			return {
+				"cats": []
+			};
+		},
 
-	components: {
-		"ma-data": MaData
-	}
-}).mount("#cats_simple")
+		components: {
+			"ma-data": MaData
+		}
+	}).mount("#cats_simple")
 </script>
 ```
-<!--
+
 Example with local storage:
 
 ```html
-<v-app data='{"info": {"name": "Lea Verou"}}'>
-	<data-store v-model="info" src="local:profile"></data-store>
+<div id="local_storage">
+	<ma-data v-model="info" src="local:profile"></ma-data>
 
 	<label>Name: <input v-model="info.name"></label>
 	<button @click="info.save()">Update</button>
-</v-app>
+</div>
+
+<script type=module>
+	import { createApp } from "https://unpkg.com/vue@3/dist/vue.esm-browser.js";
+	import MaData from "./madata-vue.js";
+
+	createApp({
+		data() {
+			return {
+				"info": {"name": "Lea Verou"}
+			};
+		},
+
+		components: {
+			"ma-data": MaData
+		}
+	}).mount("#local_storage")
+</script>
 ```
 
 More advanced example, showcasing authentication, storage, `inProgress` for feedback, passing options.
 
 ```html
-<v-app data='{"cats": []}'>
-	<data-store v-model="cats" :options="{allowForking: true}"
-		src="https://github.com/leaverou/mv-data/cats2.json"></data-store>
+<div id="advanced_cats">
+	<ma-data v-model="cats" :options="{allowForking: true}"
+		src="https://github.com/leaverou/mv-data/cats2.json"></ma-data>
 
 	<p>Progress: {{ cats.inProgress }}</p>
 
@@ -77,9 +94,26 @@ More advanced example, showcasing authentication, storage, `inProgress` for feed
 		<input type="number" v-model="cat.age">
 		years old
 	</article>
-</v-app>
+</div>
+
+<script type=module>
+	import { createApp } from "https://unpkg.com/vue@3/dist/vue.esm-browser.js";
+	import MaData from "./madata-vue.js";
+
+	createApp({
+		data() {
+			return {
+				"cats": []
+			};
+		},
+
+		components: {
+			"ma-data": MaData
+		}
+	}).mount("#advanced_cats")
+</script>
 ```
--->
+
 Also note that you can use `inProgress` to communicate what is happening to the user
 (it will be the empty string if nothing is happening)
 
@@ -88,19 +122,20 @@ Also note that you can use `inProgress` to communicate what is happening to the 
 Autosave calls `save()` when data changes.
 It can either be a time string like `"3s"`, `"500ms"`,
 or a boolean (the attribute simply being present sets it to `true`).
-<!--
+
 Example (using element storage so you can see the data):
 
 ```html
-<v-app data='{"countries": []}'>
-	<data-store v-model="countries" src="#data-countries" autosave="2s"></data-store>
+<div id="autosave_countries">
+	<ma-data v-model="countries" src="#data-countries" autosave="2s"></ma-data>
 
 	<article v-for="country in countries">
 		<label><input v-model="country.code" /></label>
 		<label><input v-model="country.name" /></label>
 	</article>
 	<button @click="countries.push({})">Add country</button>
-</v-app>
+</div>
+
 <pre id="data-countries">
 [
 	{
@@ -113,33 +148,66 @@ Example (using element storage so you can see the data):
 	}
 ]
 </pre>
+
+<script type=module>
+	import { createApp } from "https://unpkg.com/vue@3/dist/vue.esm-browser.js";
+	import MaData from "./madata-vue.js";
+
+	createApp({
+		data() {
+			return {
+				"countries": []
+			};
+		},
+
+		components: {
+			"ma-data": MaData
+		}
+	}).mount("#autosave_countries")
+</script>
 ```
--->
+
 Avoid enabling autosave when you have a lot of data, as it can slow things down quite a lot!
 In those cases, you might be better off just using [event delegation](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Building_blocks/Events#event_delegation)
 (monitoring `input` and `change` events at the root and saving then).
 
 ## `state` object
 
-By default, `<data-store>` hangs a bunch of methods and accessors on the data object you pass through `v-model`.
+By default, `<ma-data>` hangs a bunch of methods and accessors on the data object you pass through `v-model`.
 E.g. if the data is `cats`, you will be using `cats.login()` to login,
 `cats.save()` to save, `cats.inProgress` to display the current progress etc.
 
 Even though these are not actually saved with the data, you may still wish to keep them separate.
 You can pass in another object through the `state` property for that:
-<!--
+
 ```html
-<v-app data='{"info": {"name": "Lea Verou"}, "state": {}}'>
-	<data-store v-model="info" :state="state" src="local:profile"></data-store>
+<div id="state_object">
+	<ma-data v-model="info" :state="state" src="local:profile"></ma-data>
 
 	<label>Name: <input v-model="info.name"></label>
 	<button @click="state.save()">Update</button>
-</v-app>
+</div>
+
+<script type=module>
+	import { createApp } from "https://unpkg.com/vue@3/dist/vue.esm-browser.js";
+	import MaData from "./madata-vue.js";
+
+	createApp({
+		data() {
+			return {
+				"info": {"name": "Lea Verou"},
+				"state": {}
+			};
+		},
+
+		components: {
+			"ma-data": MaData
+		}
+	}).mount("#state_object")
+</script>
 ```
- -->
+
 Please note you need to declare that object in your data and initialize it with an empty object,
 otherwise it will not work!
-
--->
 
 {% endraw %}
