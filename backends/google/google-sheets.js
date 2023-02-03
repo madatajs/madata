@@ -231,6 +231,25 @@ export default class GoogleSheets extends Google {
 	parse = data => data
 
 	/**
+	 * Get an object key taking into account that there might be duplicates among column headers.
+	 * @param {string} header Header text.
+	 * @param {number} index Column index (zero-based).
+	 * @param {[string]} headers Array of column headers.
+	 * @returns {string} Object key.
+	 */
+	static keys = (header, index, headers) => {
+		// Find duplicates.
+		let count = 0;
+		for (let j = 0; j < index; j++) {
+			if (headers[j] === header) {
+				count++;
+			}
+		}
+
+		return count === 0? header : header + (count + 1);
+	}
+
+	/**
 	 * Get the range reference.
 	 * @static
 	 * @private
