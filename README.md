@@ -93,6 +93,7 @@ let fileInfo = await backend.store(json);
 ### Uploads
 
 For backends that support uploads, this is how simple it could be to create an image uploader:
+<p hidden class="demo-ignore"></p>
 
 ```html
 <input type=file id=uploader>
