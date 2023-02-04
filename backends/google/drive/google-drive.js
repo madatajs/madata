@@ -2,7 +2,7 @@
  * @class GoogleDrive
  * @extends Google
  */
-import Google from "./google.js";
+import Google from "../google.js";
 
 export default class GoogleDrive extends Google {
 	update (url, o = {}) {

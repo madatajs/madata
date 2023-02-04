@@ -2,9 +2,9 @@
  * @class GithubFile
  * @extends Github
  */
-import Github from "./github.js";
-import hooks from "../../src/hooks.js";
-import {readFile, delay} from "../../src/util.js";
+import Github from "../github.js";
+import hooks from "../../../src/hooks.js";
+import {readFile, delay} from "../../../src/util.js";
 
 export default class GithubFile extends Github {
 	/**

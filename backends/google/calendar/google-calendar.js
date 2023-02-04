@@ -3,7 +3,7 @@
  * @class GoogleCalendar
  * @extends Google
  */
-import Google from "./google.js";
+import Google from "../google.js";
 
 export default class GoogleCalendar extends Google {
 	async get (file) {

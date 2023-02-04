@@ -6,3 +6,4 @@
 index.html
 *.css
 api/
+!backends/github/api/

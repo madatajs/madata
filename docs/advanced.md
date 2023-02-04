@@ -12,7 +12,7 @@ Instead, you'd be importing the specific backend you need, and constructing obje
 E.g.
 
 ```js
-import Github from "https://madata.dev/backends/github/github-file.js";
+import Github from "https://madata.dev/backends/github/file/github-file.js";
 
 let backend = new Github("https://github.com/leaverou/health-data/exercise.json");
 await backend.load();

@@ -43,17 +43,17 @@ console.log("Stored some data!");
 
 | Service | Auth? | Writes? | Uploads? |
 |---------|----|----|-----|
-| [GitHub](/backends/github/) | ✅ | ✅ | ✅ |
-| [GitHub Gist](/backends/github/) | ✅ | ✅ |  |
-| [GitHub API](/backends/github/) | ✅ |  |  |
-| [Google Drive](/backends/google/) | ✅ | ✅ | ✅ |
-| [Dropbox](/backends/dropbox) | ✅ | ✅ | ✅ |
+| [GitHub Files](/backends/github/file/) | ✅ | ✅ | ✅ |
+| [GitHub Gist](/backends/github/gist/) | ✅ | ✅ |  |
+| [GitHub API](/backends/github/api/) | ✅ |  |  |
+| [Dropbox](/backends/dropbox/) | ✅ | ✅ | ✅ |
+| [Google Drive](/backends/google/drive/) | ✅ | ✅ | ✅ |
 | [Google Firebase](/backends/google/) | ✅ | ✅ | ✅ |
-| [Google Sheets](/backends/google/) | ✅ | ✅ |  |
-| [Google Calendar](/backends/google/) | ✅ |  |  |
-| [Local storage](/backends/basic/) |  | ✅ |  |
-| [HTML Element](/backends/basic/) |  | ✅ |  |
-| [Basic remote fetching](/backends/basic/) |  |  |  |
+| [Google Sheets](/backends/google/sheets/) | ✅ | ✅ |  |
+| [Google Calendar](/backends/google/calendar/) | ✅ |  |  |
+| [Local storage](/backends/basic/#local) |  | ✅ |  |
+| [HTML Element](/backends/basic/#element) |  | ✅ |  |
+| [Basic remote fetching](/backends/basic/#remote) |  |  |  |
 
 ### Authentication
 

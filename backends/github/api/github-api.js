@@ -1,5 +1,5 @@
-import Github from "./github.js";
-import hooks from "../../src/hooks.js";
+import Github from "../github.js";
+// import hooks from "../../../src/hooks.js";
 
 export default class GithubAPI extends Github {
 	update (url, o) {

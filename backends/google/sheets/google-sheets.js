@@ -3,7 +3,7 @@
  * @class GoogleSheets
  * @extends Google
  */
-import Google from "./google.js";
+import Google from "../google.js";
 
 export default class GoogleSheets extends Google {
 	/**
