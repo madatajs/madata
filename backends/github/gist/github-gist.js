@@ -3,8 +3,8 @@
  * @class GithubGist
  * @extends Github
  */
-import Github from "./github.js";
-import hooks from "../../src/hooks.js";
+import Github from "../github.js";
+import hooks from "../../../src/hooks.js";
 
 export default class GithubGist extends Github {
 	async get (file) {

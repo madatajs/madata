@@ -3,11 +3,16 @@
  * @class GoogleCalendar
  * @extends Google
  */
-import Google from "./google.js";
+import Google from "../google.js";
 
 export default class GoogleCalendar extends Google {
 	async get (file) {
 		let call = `${file.calendarId}/events?key=${this.apiKey}`;
+
+		if (this.options.options) {
+			const params = new URLSearchParams(this.options.options);
+			call = call + "&" + params.toString();
+		}
 
 		let calendar;
 		try {

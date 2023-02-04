@@ -11,6 +11,14 @@ A spinoff from [Mavo](https://mavo.io).
 
 <main>
 
+<div class="warning">
+
+**Here be dragons** Madata has not yet been officially released, we are trying a “soft launch” first.
+It is currently in pre-alpha and very much a work in progress.
+Please try it out, and [open issues](https://github.com/madatajs/madata/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc) as you find them!
+
+</div>
+
 ## Getting Started
 
 Madata provides a unified API for authentication, reading & storing data, as well as file uploads (where supported), regardless of the storage service used.
@@ -35,17 +43,17 @@ console.log("Stored some data!");
 
 | Service | Auth? | Writes? | Uploads? |
 |---------|----|----|-----|
-| [GitHub](/backends/github/) | ✅ | ✅ | ✅ |
-| [GitHub Gist](/backends/github/) | ✅ | ✅ |  |
-| [GitHub API](/backends/github/) | ✅ |  |  |
-| [Google Drive](/backends/google/) | ✅ | ✅ | ✅ |
-| [Dropbox](/backends/dropbox) | ✅ | ✅ | ✅ |
+| [GitHub Files](/backends/github/file/) | ✅ | ✅ | ✅ |
+| [GitHub Gist](/backends/github/gist/) | ✅ | ✅ |  |
+| [GitHub API](/backends/github/api/) | ✅ |  |  |
+| [Dropbox](/backends/dropbox/) | ✅ | ✅ | ✅ |
+| [Google Drive](/backends/google/drive/) | ✅ | ✅ | ✅ |
 | [Google Firebase](/backends/google/) | ✅ | ✅ | ✅ |
-| [Google Sheets](/backends/google/) | ✅ | ✅ |  |
-| [Google Calendar](/backends/google/) | ✅ |  |  |
-| [Local storage](/backends/basic/) |  | ✅ |  |
-| [HTML Element](/backends/basic/) |  | ✅ |  |
-| [Basic remote fetching](/backends/basic/) |  |  |  |
+| [Google Sheets](/backends/google/sheets/) | ✅ | ✅ |  |
+| [Google Calendar](/backends/google/calendar/) | ✅ |  |  |
+| [Local storage](/backends/basic/#local) |  | ✅ |  |
+| [HTML Element](/backends/basic/#element) |  | ✅ |  |
+| [Basic remote fetching](/backends/basic/#remote) |  |  |  |
 
 ### Authentication
 
@@ -85,6 +93,7 @@ let fileInfo = await backend.store(json);
 ### Uploads
 
 For backends that support uploads, this is how simple it could be to create an image uploader:
+<p hidden class="demo-ignore"></p>
 
 ```html
 <input type=file id=uploader>

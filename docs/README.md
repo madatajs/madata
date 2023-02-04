@@ -6,5 +6,6 @@ These docs are about how to use Madata.
 For docs on individual backends, please look at [Backends](../backends/)
 
 - [Introduction](introduction/)
+- [Authentication](authentication/)
 - [Localization](localization/)
 - [Advanced Topics](advanced/)

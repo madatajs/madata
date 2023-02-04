@@ -3,8 +3,8 @@
  * @class GoogleFirebase
  * @extends Google
  */
-import Google from "./google.js";
-import { readFile, toArray } from "../../src/util.js";
+import Google from "../google.js";
+import { readFile, toArray } from "../../../src/util.js";
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider, useDeviceLanguage } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
@@ -24,7 +24,7 @@ export default class GoogleFirebase extends Google {
 			};
 
 			this.app = initializeApp(firebaseConfig);
-		
+
 			if (this.app) {
 				resolve(this.app);
 			}

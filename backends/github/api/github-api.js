@@ -1,5 +1,5 @@
-import Github from "./github.js";
-import hooks from "../../src/hooks.js";
+import Github from "../github.js";
+// import hooks from "../../../src/hooks.js";
 
 export default class GithubAPI extends Github {
 	update (url, o) {
@@ -8,12 +8,10 @@ export default class GithubAPI extends Github {
 		Object.assign(this, GithubAPI.parseURL(this.source));
 	}
 
-	async get (url) {
-		let call = url? GithubAPI.parseURL(url) : this.file;
-
-		if (call.query) {
+	async get (file) {
+		if (file.query) {
 			// GraphQL
-			let response = await this.request(call.url, { query: call.query }, "POST");
+			let response = await this.request(file.url, { query: file.query }, "POST");
 			if (response.errors?.length) {
 				throw new Error(response.errors.map(x => x.message).join("\n"));
 			}
@@ -27,12 +25,12 @@ export default class GithubAPI extends Github {
 				"Accept": "application/vnd.github.squirrel-girl-preview"
 			}
 		};
-		let response = await this.request(call.apiCall, {}, "GET", req);
+		let response = await this.request(file.apiCall, {}, "GET", req);
 
 		// Raw API call
 		let json = await response.json();
 
-		let params = new URL(call.apiCall, this.constructor.apiDomain).searchParams;
+		let params = new URL(file.apiCall, this.constructor.apiDomain).searchParams;
 		let maxPages = params.get("max_pages") - 1; /* subtract 1 because we already fetched a page */
 
 		if (maxPages > 0 && params.get("page") === null && Array.isArray(json)) {
