@@ -77,7 +77,7 @@ export default class GoogleSheets extends Google {
 						// No header row. We need as many object keys as there are cells in the longest row.
 						const maxIndex = Math.max(...values.map(row => row.length));
 						for (let columnIndex = 0; columnIndex < maxIndex; columnIndex++) {
-							objectKeys.set(columnIndex + "", keys(undefined, columnIndex, undefined));
+							objectKeys.set(columnIndex + "", keys(undefined, columnIndex));
 						}
 					}
 				}
