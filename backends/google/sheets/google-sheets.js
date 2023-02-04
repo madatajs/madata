@@ -42,8 +42,63 @@ export default class GoogleSheets extends Google {
 
 		try {
 			const response = await this.request(call);
-			return response.values;
-		} catch (e) {
+			const values = response.values;
+
+			if (!this.options.headerRow && !this.options.keys) {
+				// Return an array of arrays.
+				return values;
+			}
+
+			let objectKeys = new Map(); // "string" => "string"
+			if (this.options.headerRow) {
+				// The sheet has a header row. Use the headers from the sheet (from the first row) as object keys.
+				// We don't want headers to become a part of the data.
+				file.headers = values.shift();
+				objectKeys = new Map(Object.entries(file.headers));
+			}
+
+			if (this.options.keys) {
+				// Use the provided keys as object keys.
+				const keys = this.options.keys;
+				if (Array.isArray(keys)) {
+					// Keys are in an array
+					objectKeys = new Map(Object.entries(keys));
+				}
+				else if (typeof keys === "function") {
+					// We have a mapping function. The function should return an object key
+					// and take header text, column index, and array of headers as arguments.
+					if (file.headers) {
+						const headerRow = file.headers;
+						for (let columnIndex = 0; columnIndex < headerRow.length; columnIndex++) {
+							objectKeys.set(columnIndex + "", keys(headerRow[columnIndex], columnIndex, headerRow));
+						}
+					}
+					else {
+						// No header row. We need as many object keys as there are cells in the longest row.
+						const maxIndex = Math.max(...values.map(row => row.length));
+						for (let columnIndex = 0; columnIndex < maxIndex; columnIndex++) {
+							objectKeys.set(columnIndex + "", keys(undefined, columnIndex));
+						}
+					}
+				}
+			}
+
+			// Return an array of objects instead of an array of arrays.
+			const ret = [];
+			for (const row of values) {
+				const obj = {};
+
+				for (let columnIndex = 0; columnIndex < row.length; columnIndex++) {
+					const index = columnIndex + "";
+					obj[objectKeys.get(index) ?? index] = row[columnIndex];
+				}
+
+				ret.push(obj);
+			}
+
+			return ret;
+		}
+		catch (e) {
 			if (e.status === 401) {
 				await this.logout(); // Access token we have is invalid. Discard it.
 			}
@@ -66,6 +121,18 @@ export default class GoogleSheets extends Google {
 		let call = `${file.id}/values/${rangeReference}?key=${this.apiKey}&valueInputOption=user_entered&responseValueRenderOption=unformatted_value&includeValuesInResponse=true`;
 		if (this.options.serializeDates) {
 			call += "&responseDateTimeRenderOption=formatted_string";
+		}
+
+		if (this.options.headerRow === true || this.options.keys) {
+			// Transform an array of objects into an array of arrays.
+			data = data.map(obj => Object.values(obj));
+
+			if (file.headers) {
+				// We have a header row. This row is not a part of the data, so we need to add it.
+				// Cells of this row must stay untouched to not mess up the version history.
+				const headerRow = Array(file.headers.length).fill(null); // [null, null, ..., null]
+				data = [headerRow, ...data];
+			}
 		}
 
 		const body = {
@@ -162,6 +229,25 @@ export default class GoogleSheets extends Google {
 
 	stringify = data => data
 	parse = data => data
+
+	/**
+	 * Get an object key taking into account that there might be duplicates among column headers.
+	 * @param {string} header Header text.
+	 * @param {number} index Column index (zero-based).
+	 * @param {[string]} headers Array of column headers.
+	 * @returns {string} Object key.
+	 */
+	static keys = (header, index, headers) => {
+		// Find duplicates.
+		let count = 0;
+		for (let j = 0; j < index; j++) {
+			if (headers[j] === header) {
+				count++;
+			}
+		}
+
+		return count === 0? header : header + (count + 1);
+	}
 
 	/**
 	 * Get the range reference.
