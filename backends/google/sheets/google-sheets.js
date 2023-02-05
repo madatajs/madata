@@ -35,7 +35,7 @@ export default class GoogleSheets extends Google {
 		}
 
 		const rangeReference = GoogleSheets.#getRangeReference(file);
-		let call = `${file.id}/values/${rangeReference}/?key=${this.apiKey}&majorDimension=rows&valueRenderOption=unformatted_value`;
+		let call = `${file.id}/values/${rangeReference}/?key=${this.apiKey}&majorDimension=${this.options.transpose? "columns" : "rows"}&valueRenderOption=unformatted_value`;
 		if (this.options.serializeDates) {
 			call += "&dateTimeRenderOption=formatted_string";
 		}
@@ -137,7 +137,7 @@ export default class GoogleSheets extends Google {
 
 		const body = {
 			"range": rangeReference,
-			"majorDimension": "rows",
+			"majorDimension": this.options.transpose ? "columns" : "rows",
 			"values": data
 		};
 
