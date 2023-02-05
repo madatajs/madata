@@ -7,7 +7,7 @@
 | [GitHub API](/backends/github/api/) | ✅ |  |  |
 | [Dropbox](/backends/dropbox/) | ✅ | ✅ | ✅ |
 | [Google Drive](/backends/google/drive/) | ✅ | ✅ | ✅ |
-| [Google Firebase](/backends/google/) | ✅ | ✅ | ✅ |
+| [Google Firebase](/backends/google/firebase/) | ✅ | ✅ | ✅ |
 | [Google Sheets](/backends/google/sheets/) | ✅ | ✅ |  |
 | [Google Calendar](/backends/google/calendar/) | ✅ |  |  |
 | [Local storage](/backends/basic/#local) |  | ✅ |  |
