@@ -12,7 +12,7 @@ export default class GoogleSheets extends Google {
 	 * @returns Spreadsheet data.
 	 */
 	async get (file) {
-		if (file.sheetId !== undefined && !file.sheetTitle || GoogleSheets.#getRangeReference(file) === "") {
+		if (file.sheetId !== undefined && !file.sheet || GoogleSheets.#getRangeReference(file) === "") {
 			// Sheet title has priority over sheet id
 			try {
 				const sheetTitle = await this.#getSheetTitle(file);
@@ -22,7 +22,7 @@ export default class GoogleSheets extends Google {
 					return null;
 				}
 
-				this.file.sheetTitle = file.sheetTitle = sheetTitle;
+				file.sheet = sheetTitle;
 			}
 			catch (e) {
 				if (e.status === 401) {
@@ -112,7 +112,7 @@ export default class GoogleSheets extends Google {
 	 * Save data to the spreadsheet.
 	 * @param {*} data Data to save.
 	 * @param {Object} file Spreadsheet to work with.
-	 * @param {Object} options Options: sheetTitle, range.
+	 * @param {Object} options Options: sheet, range.
 	 */
 	async put (data, {file = this.file, ...options} = {}) {
 		file = Object.assign({}, file, {...options});
@@ -147,7 +147,7 @@ export default class GoogleSheets extends Google {
 		}
 		catch (e) {
 			if (e.status === 400) {
-				if (file.sheetTitle) {
+				if (file.sheet) {
 					// It might be there is no sheet with the specified title.
 					// Let's check it.
 					let spreadsheet;
@@ -165,7 +165,7 @@ export default class GoogleSheets extends Google {
 						}
 					}
 
-					const sheet = spreadsheet.sheets?.find?.(sheet => sheet.properties?.title === file.sheetTitle);
+					const sheet = spreadsheet.sheets?.find?.(sheet => sheet.properties?.title === file.sheet);
 
 					if (!sheet && this.options.allowAddingSheets) {
 						// There is no. Let's try to create one.
@@ -174,7 +174,7 @@ export default class GoogleSheets extends Google {
 								{
 									addSheet: {
 										properties: {
-											title: file.sheetTitle
+											title: file.sheet
 										}
 									}
 								}
@@ -185,7 +185,7 @@ export default class GoogleSheets extends Google {
 							await this.request(`${file.id}:batchUpdate`, req, "POST");
 
 							// Warn about the newly created sheet.
-							console.warn(this.constructor.phrase("store_sheet_added", file.sheetTitle));
+							console.warn(this.constructor.phrase("store_sheet_added", file.sheet));
 
 							// Let's try to write data one more time.
 							response = await this.request(call, body, "PUT");
@@ -200,7 +200,7 @@ export default class GoogleSheets extends Google {
 						}
 					}
 					else {
-						throw new Error(this.constructor.phrase("store_no_sheet", file.sheetTitle));
+						throw new Error(this.constructor.phrase("store_no_sheet", file.sheet));
 					}
 				}
 			}
@@ -253,12 +253,12 @@ export default class GoogleSheets extends Google {
 	 * Get the range reference.
 	 * @static
 	 * @private
-	 * @param {string} sheetTitle Sheet title.
+	 * @param {string} sheet Sheet title.
 	 * @param {string} range Range in the A1 notation.
 	 * @returns The range reference in one of the supported formats: 'Sheet title'!Range, 'Sheet title', or Range.
 	 */
-	static #getRangeReference ({sheetTitle, range} = file) {
-		return `${sheetTitle ? `'${sheetTitle}'` : ""}${range ? (sheetTitle ? `!${range}` : range) : ""}`
+	static #getRangeReference ({sheet, range} = file) {
+		return `${sheet ? `'${sheet}'` : ""}${range ? (sheet ? `!${range}` : range) : ""}`
 	}
 
 	/**
@@ -313,7 +313,7 @@ export default class GoogleSheets extends Google {
 		const ret = {
 			url: new URL(source),
 			sheetId: undefined,
-			sheetTitle: undefined,
+			sheet: undefined,
 			range: undefined
 		};
 		const path = ret.url.pathname.slice(1).split("/");
@@ -328,7 +328,7 @@ export default class GoogleSheets extends Google {
 	}
 
 	static phrases = {
-		get_no_sheet: "We could not find the sheet to get data from. Try providing the sheetTitle option with the sheet title.",
+		get_no_sheet: "We could not find the sheet to get data from. Try providing the sheet option with the sheet title.",
 		store_no_sheet: sheet => `We could not find the ${sheet} sheet in the spreadsheet. Try enabling the allowAddingSheets option to create it.`,
 		store_sheet_added: sheet => `We could not find the ${sheet} sheet in the spreadsheet and created it.`
 	}
