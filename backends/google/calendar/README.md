@@ -54,4 +54,10 @@ let json = await backend.load();
 console.log(json);
 ```
 
-In the console you'll see the first 15 events ordered by the start time. All recurring events will be expanded into instances (recurring events themselves won't be returned). **Note that you can use `orderBy: "startTime"` only with the `singleEvents: true` option together.**
+In the console you'll see the first 15 events ordered by the start time. All recurring events will be expanded into instances (recurring events themselves won't be returned).
+
+<div class="note">
+
+  You can use `orderBy: "startTime"` only with the `singleEvents: true` option together.
+
+</div>

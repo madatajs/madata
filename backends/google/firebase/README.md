@@ -59,9 +59,17 @@ If you've already added an app to your Firebase project, click **Add app** to di
 
 5. Select a location for your Cloud Firestore data.
 
-**Note**: If you aren't able to select a location, then your project already has a default resource location. It was set either during project creation or when setting up another service that requires a location setting.
+<div class="note">
 
-**Warning**: After you set your project's default resource location, you cannot change it.
+  If you aren't able to select a location, then your project already has a default resource location. It was set either during project creation or when setting up another service that requires a location setting.
+
+</div>
+
+<div class="warning">
+
+  After you set your project's default resource location, you cannot change it.
+
+</div>
 
 6. Click **Done**.
 
@@ -104,9 +112,17 @@ Cloud Storage for Firebase lets you upload and share user generated content, suc
 
 4. Select a location for your default Storage bucket.
 
-**Note**: If you aren't able to select a location, then your project already has a default resource location. It was set either during project creation or when setting up another service that requires a location setting.
+<div class="note">
 
-**Warning**: After you set your project's default resource location, you cannot change it.
+  If you aren't able to select a location, then your project already has a default resource location. It was set either during project creation or when setting up another service that requires a location setting.
+
+</div>
+
+<div class="warning">
+
+  After you set your project's default resource location, you cannot change it.
+
+</div>
 
 5. Click **Done**.
 
