@@ -23,7 +23,14 @@ export default class GoogleCalendar extends Google {
 				await this.logout(); // Access token we have is invalid. Discard it.
 			}
 
-			const error = (await e.json()).error.message;
+			let error;
+			if (e instanceof Response) {
+				error = (await e.json()).error.message;
+			}
+			else {
+				error = e.message;
+			}
+
 			throw new Error(error);
 		}
 

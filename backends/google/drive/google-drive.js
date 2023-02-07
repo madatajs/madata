@@ -77,7 +77,14 @@ export default class GoogleDrive extends Google {
 					throw new Error(this.constructor.phrase("access_token_invalid"));
 				}
 
-				const error = (await e.json()).error.message;
+				let error;
+				if (e instanceof Response) {
+					error = (await e.json()).error.message;
+				}
+				else {
+					error = e.message;
+				}
+
 				throw new Error(error);
 			}
 		}
@@ -109,7 +116,14 @@ export default class GoogleDrive extends Google {
 							throw new Error(this.constructor.phrase("access_token_invalid"));
 						}
 
-						const error = (await e.json()).error.message;
+						let error;
+						if (e instanceof Response) {
+							error = (await e.json()).error.message;
+						}
+						else {
+							error = e.message;
+						}
+
 						throw new Error(error);
 					}
 				}
@@ -118,7 +132,14 @@ export default class GoogleDrive extends Google {
 				}
 			}
 
-			const error = (await e.json()).error.message;
+			let error;
+			if (e instanceof Response) {
+				error = (await e.json()).error.message;
+			}
+			else {
+				error = e.message;
+			}
+
 			throw new Error(error);
 		}
 	}
@@ -152,7 +173,14 @@ export default class GoogleDrive extends Google {
 				throw new Error(this.constructor.phrase("no_upload_permission"));
 			}
 
-			const error = (await e.json()).error.message;
+			let error;
+			if (e instanceof Response) {
+				error = (await e.json()).error.message;
+			}
+			else {
+				error = e.message;
+			}
+
 			throw new Error(error);
 		}
 	}
@@ -171,7 +199,14 @@ export default class GoogleDrive extends Google {
 				throw new Error(this.constructor.phrase("access_token_invalid"));
 			}
 
-			const error = (await e.json()).error.message;
+			let error;
+			if (e instanceof Response) {
+				error = (await e.json()).error.message;
+			}
+			else {
+				error = e.message;
+			}
+
 			throw new Error(error);
 		}
 	}
