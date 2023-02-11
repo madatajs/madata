@@ -59,6 +59,9 @@ const DataStore = {
 			inProgress: () => this.inProgress,
 			user: () => this.user,
 			username: () => this.user?.username,
+			name: () => this.user?.name,
+			url: () => this.user?.url,
+			avatar: () => this.user?.avatar,
 		}
 
 		for (let property in getters) {
@@ -66,10 +69,6 @@ const DataStore = {
 				get: getters[property]
 			});
 		}
-	},
-
-	computed: {
-		username() { return this.user.username; }
 	},
 
 	watch: {
