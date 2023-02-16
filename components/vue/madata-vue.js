@@ -6,7 +6,7 @@ const exportOnData = [
 	"backend",
 ]
 
-const DataStore = {
+const MaData = {
 	props: {
 		src: String,
 		modelValue: Object,
@@ -40,7 +40,7 @@ const DataStore = {
 	mounted () {
 		// TODO if we attach this when modelValue is set, we can handle cases where the data gets replaced
 		if (!this.modelValue || !Array.isArray(this.modelValue) && typeof this.modelValue !== "object") {
-			throw new TypeError("DataStore: data must be an object or array");
+			throw new TypeError("MaData: data must be an object or array");
 		}
 
 		if (this.state && typeof this.state !== "object") {
@@ -152,7 +152,7 @@ const DataStore = {
 					this.modelValue.push(...data);
 				}
 				else if (data !== null) {
-					console.warn("DataStore: Data is not an array: ", data);
+					console.warn("MaData: Data is not an array: ", data);
 				}
 			}
 			else { // Object
@@ -203,4 +203,4 @@ function parseTime (time) {
 	throw new TypeError("Invalid time");
 }
 
-export default DataStore;
+export default MaData;
