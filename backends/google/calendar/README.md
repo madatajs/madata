@@ -17,7 +17,7 @@ Read events from public and private Google calendars.
 
 ## Constructor options
 
-You can customize the way the plugin reads data from a calendar by passing a separate `options` parameter to the backend constructor. Its value is either a *query string* (without leading `?`) or an *object* specifying all needed options. The list of *all* supported options (query parameters) you can find in [the documentation](https://developers.google.com/calendar/api/v3/reference/events/list#parameters).
+You can customize the way the plugin reads data from a calendar by passing the needed options to the backend constructor. The list of *all* supported options you can find in [the documentation](https://developers.google.com/calendar/api/v3/reference/events/list#parameters).
 
 ## Events
 
@@ -48,7 +48,7 @@ Assume the calendar being read is the public calendar of official holidays in Fr
 import Backend from "https://madata.dev/src/index.js";
 
 let backend = Backend.create("https://calendar.google.com/calendar/embed?src=fr.french%23holiday%40group.v.calendar.google.com",
-  { options: { singleEvents: true, orderBy: "startTime", maxResults: 15 } });
+  { singleEvents: true, orderBy: "startTime", maxResults: 15 });
 let json = await backend.load();
 
 console.log(json);

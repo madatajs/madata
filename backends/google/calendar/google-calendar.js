@@ -9,8 +9,8 @@ export default class GoogleCalendar extends Google {
 	async get (file) {
 		let call = `${file.calendarId}/events?key=${this.apiKey}`;
 
-		if (this.options.options) {
-			const params = new URLSearchParams(this.options.options);
+		if (this.options) {
+			const params = new URLSearchParams(this.options);
 			call = call + "&" + params.toString();
 		}
 
