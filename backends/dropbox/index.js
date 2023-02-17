@@ -13,12 +13,6 @@ export default class Dropbox extends OAuthBackend {
 		this.updatePermissions({ read: true });
 	}
 
-	update (url, o) {
-		super.update(url, o);
-
-		this.file.url = Dropbox.#fixShareURL(url);
-	}
-
 	async upload (file, path) {
 		if (this.path) {
 			path = path.startsWith("/")? path : "/" + path;
@@ -93,6 +87,13 @@ export default class Dropbox extends OAuthBackend {
 	static test (url) {
 		url = new URL(url, location);
 		return /dropbox.com/.test(url.host);
+	}
+
+	static parseURL (source) {
+		let { url } = super.parseURL(source);
+		url = Dropbox.#fixShareURL(url);
+
+		return {url}; 
 	}
 
 	// Transform the dropbox shared URL into something raw and CORS-enabled
