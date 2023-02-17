@@ -4,7 +4,11 @@ const exportOnData = [
 	"login", "logout",
 	"save", "upload",
 	"backend",
-]
+	"inProgress",
+	"unsavedChanges",
+];
+
+const authProperties = ["user", "username", "avatar", "url", "name"];
 
 const MaData = {
 	props: {
@@ -50,24 +54,17 @@ const MaData = {
 		let state = this.state ?? this.modelValue;
 
 		for (let property of exportOnData) {
-			Object.defineProperty(state, property, {
-				value: this[property],
-			});
-		}
-
-		let getters = {
-			inProgress: () => this.inProgress,
-			user: () => this.user,
-			username: () => this.user?.username,
-			name: () => this.user?.name,
-			url: () => this.user?.url,
-			avatar: () => this.user?.avatar,
-		}
-
-		for (let property in getters) {
-			Object.defineProperty(state, property, {
-				get: getters[property]
-			});
+			if (MaData.methods[property]) {
+				// Functions only need to be copied once
+				Object.defineProperty(state, property, {
+					value: this[property],
+				});
+			}
+			else {
+				Object.defineProperty(state, property, {
+					get: () => this[property],
+				});
+			}
 		}
 	},
 
@@ -90,7 +87,13 @@ const MaData = {
 					Object.assign(options, this.options);
 				}
 
+				let previousBackend = this.backend;
 				this.backend = Backend.create(url, options);
+
+				if (this.backend !== previousBackend) {
+					this.backend.addEventListener("mv-login",  evt => copyAuthProperties(this.stateObject));
+					this.backend.addEventListener("mv-logout", evt => copyAuthProperties(this.stateObject));
+				}
 
 				return this.load();
 			},
@@ -129,39 +132,25 @@ const MaData = {
 			this.inProgress = "Logging in...";
 			await this.backend.login(o);
 			this.inProgress = "";
-			return this.user = this.backend.user;
+			return this.backend.user;
 		},
 
 		async logout () {
 			await this.backend.logout();
-			this.user = this.backend.user;
 		},
 
 		async load () {
 			let data = await this.backend.load();
-			// load() also calls login({passive: true})
-			this.user = this.backend.user;
 
 			// Replace data maintaining a reference to its object
-			if (Array.isArray(this.modelValue)) {
-				// Delete existing items
-				this.modelValue.splice(0, this.modelValue.length);
-
-				// Add new items
-				if (Array.isArray(data)) {
-					this.modelValue.push(...data);
-				}
-				else if (data !== null) {
-					console.warn("MaData: Data is not an array: ", data);
-				}
+			try {
+				setPreservingReferences(this.modelValue, data);
 			}
-			else { // Object
-				// Delete old data
-				for (let key in this.modelValue) {
-					delete this.modelValue[key];
+			catch (e) {
+				if (e instanceof TypeError) {
+					// This is a code smell. There are other possible type errors!
+					console.warn(`MaData: Error when fetching data from ${this.src}: ${e.message}. Returned data was:`, data);
 				}
-				// Add new data
-				Object.assign(this.modelValue, data);
 			}
 
 			this.unsavedChanges = false;
@@ -185,7 +174,46 @@ const MaData = {
 		}
 	},
 
+	computed: {
+		stateObject () {
+			return this.state ?? this.modelValue;
+		},
+
+	},
+
 	template: " "
+}
+
+function setPreservingReferences(object, data) {
+	if (Array.isArray(object)) {
+		if (data && !Array.isArray(data)) {
+			throw new TypeError("Array expected, but provided data is not an array");
+		}
+
+		// Delete existing items
+		object.splice(0, object.length);
+
+		// Add new items
+		if (data) {
+			object.push(...data);
+		}
+	}
+	else { // Object
+		if (Array.isArray(data)) {
+			throw new TypeError("Plain object expected, but provided data is an array");
+		}
+
+		// Delete old data
+		for (let key in object) {
+			if (!exportOnData.includes(key) && !authProperties.includes(key)) {
+				delete object[key];
+			}
+
+		}
+
+		// Add new data
+		Object.assign(object, data);
+	}
 }
 
 function parseTime (time) {
@@ -201,6 +229,16 @@ function parseTime (time) {
 	}
 
 	throw new TypeError("Invalid time");
+}
+
+function copyAuthProperties(state) {
+	state.user = state.backend.user;
+
+	state.username = state.user?.username;
+	state.name = state.user?.name;
+	state.url = state.user?.url;
+	state.avatar = state.user?.avatar;
+	window.foo = state;
 }
 
 export default MaData;
