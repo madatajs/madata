@@ -368,6 +368,10 @@ export default class GithubFile extends Github {
 	}
 
 	async getPagesInfo (file = this.file) {
+		if (typeof file === "string") {
+			file = GithubFile.parseURL(file);
+		}
+
 		let repoInfo = await this.getRepoInfo(file);
 
 		if (repoInfo) {
