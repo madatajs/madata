@@ -250,7 +250,6 @@ function copyAuthProperties(state) {
 	state.name = state.user?.name;
 	state.url = state.user?.url;
 	state.avatar = state.user?.avatar;
-	window.foo = state;
 }
 
 export default MaData;
