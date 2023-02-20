@@ -2,7 +2,7 @@ import Backend from "../../src/index.js";
 
 const exportOnData = [
 	"login", "logout",
-	"save", "upload",
+	"load", "save", "upload",
 	"backend",
 	"inProgress",
 	"unsavedChanges",
