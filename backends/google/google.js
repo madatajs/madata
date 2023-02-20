@@ -20,6 +20,7 @@ export default class Google extends OAuthBackend {
 		const info = await this.request("https://www.googleapis.com/oauth2/v2/userinfo");
 
 		return this.user = {
+			username: info.email,
 			name: info.name || info.displayName,
 			avatar: info.picture || info.photoURL,
 			...info

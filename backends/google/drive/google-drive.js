@@ -263,7 +263,7 @@ export default class GoogleDrive extends Google {
 	}
 
 	static apiDomain = "https://www.googleapis.com/";
-	static scopes = ["https://www.googleapis.com/auth/drive", "https://www.googleapis.com/auth/userinfo.profile"];
+	static scopes = ["https://www.googleapis.com/auth/drive", "https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email"];
 
 	static test (url) {
 		url = new URL(url);
