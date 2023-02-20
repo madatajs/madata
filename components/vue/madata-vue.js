@@ -151,10 +151,11 @@ const MaData = {
 		},
 
 		async load () {
-			let data = await this.backend.load();
-
-			// Replace data maintaining a reference to its object
 			try {
+				this.inProgress = "Loading...";
+				let data = await this.backend.load();
+
+				// Replace data maintaining a reference to its object
 				setPreservingReferences(this.modelValue, data);
 			}
 			catch (e) {
