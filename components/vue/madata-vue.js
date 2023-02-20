@@ -31,7 +31,11 @@ const MaData = {
 		state: Object,
 	},
 
-	emits: ["update:modelValue"],
+	emits: [
+		"update:modelValue",
+		"login",
+		"logout",
+	],
 
 	data() {
 		return {
@@ -91,8 +95,15 @@ const MaData = {
 				this.backend = Backend.create(url, options);
 
 				if (this.backend !== previousBackend) {
-					this.backend.addEventListener("mv-login",  evt => copyAuthProperties(this.stateObject));
-					this.backend.addEventListener("mv-logout", evt => copyAuthProperties(this.stateObject));
+					this.backend.addEventListener("mv-login",  evt => {
+						copyAuthProperties(this.stateObject);
+
+						this.$emit("login", this.user);
+					});
+					this.backend.addEventListener("mv-logout", evt => {
+						copyAuthProperties(this.stateObject);
+						this.$emit("logout");
+					});
 				}
 
 				return this.load();
