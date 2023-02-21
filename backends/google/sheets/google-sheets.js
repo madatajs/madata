@@ -145,6 +145,7 @@ export default class GoogleSheets extends Google {
 			// We must preserve the columns' source order.
 			data = data.map(obj => {
 				const ret = [];
+				const newData = [];
 
 				for (const key of Object.keys(obj)) {
 					const index = Number(columnNumbers.get(key) ?? key); // Why “?? key”? Handle the case when object keys are already column indices (e.g., when keys: []).
@@ -156,11 +157,11 @@ export default class GoogleSheets extends Google {
 					else {
 						// If objects have “new” keys, e.g., the user wants to add new columns with data,
 						// add them to the end of the corresponding row.
-						ret.push(obj[key]);
+						newData.push(obj[key]);
 					}
 				}
 
-				return ret;
+				return ret.push(...newData);
 			});
 
 			if (file.headers) {
