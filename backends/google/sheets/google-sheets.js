@@ -56,12 +56,12 @@ export default class GoogleSheets extends Google {
 				return values;
 			}
 
-			let objectKeys = new Map(); // "string" => "string"
+			file.objectKeys = new Map(); // "string" => "string"
 			if (this.options.headerRow) {
 				// The sheet has a header row. Use the headers from the sheet (from the first row) as object keys.
 				// We don't want headers to become a part of the data.
 				file.headers = values.shift();
-				objectKeys = new Map(Object.entries(file.headers));
+				file.objectKeys = new Map(Object.entries(file.headers));
 			}
 
 			if (this.options.keys) {
@@ -69,7 +69,7 @@ export default class GoogleSheets extends Google {
 				const keys = this.options.keys;
 				if (Array.isArray(keys)) {
 					// Keys are in an array
-					objectKeys = new Map(Object.entries(keys));
+					file.objectKeys = new Map(Object.entries(keys));
 				}
 				else if (typeof keys === "function") {
 					// We have a mapping function. The function should return an object key
@@ -77,14 +77,14 @@ export default class GoogleSheets extends Google {
 					if (file.headers) {
 						const headerRow = file.headers;
 						for (let columnIndex = 0; columnIndex < headerRow.length; columnIndex++) {
-							objectKeys.set(columnIndex + "", keys(headerRow[columnIndex], columnIndex, headerRow));
+							file.objectKeys.set(columnIndex + "", keys(headerRow[columnIndex], columnIndex, headerRow));
 						}
 					}
 					else {
 						// No header row. We need as many object keys as there are cells in the longest row.
 						const maxIndex = Math.max(...values.map(row => row.length));
 						for (let columnIndex = 0; columnIndex < maxIndex; columnIndex++) {
-							objectKeys.set(columnIndex + "", keys(undefined, columnIndex));
+							file.objectKeys.set(columnIndex + "", keys(undefined, columnIndex));
 						}
 					}
 				}
@@ -97,7 +97,7 @@ export default class GoogleSheets extends Google {
 
 				for (let columnIndex = 0; columnIndex < row.length; columnIndex++) {
 					const index = columnIndex + "";
-					obj[objectKeys.get(index) ?? index] = row[columnIndex];
+					obj[file.objectKeys.get(index) ?? index] = row[columnIndex];
 				}
 
 				ret.push(obj);
@@ -138,8 +138,31 @@ export default class GoogleSheets extends Google {
 		}
 
 		if (this.options.headerRow === true || this.options.keys) {
+			// Reverse the objectKeys map
+			const columnNumbers = new Map([...file.objectKeys].map(([index, key]) => [key, index]));
+
 			// Transform an array of objects into an array of arrays.
-			data = data.map(obj => Object.values(obj));
+			// We must preserve the columns' source order.
+			data = data.map(obj => {
+				const ret = [];
+				const newData = [];
+
+				for (const key of Object.keys(obj)) {
+					const index = Number(columnNumbers.get(key) ?? key); // Why “?? key”? Handle the case when object keys are already column indices (e.g., when keys: []).
+
+					if (index >= 0) {
+						// The existing key
+						ret[index] = obj[key];
+					}
+					else {
+						// If objects have “new” keys, e.g., the user wants to add new columns with data,
+						// add them to the end of the corresponding row.
+						newData.push(obj[key]);
+					}
+				}
+
+				return ret.push(...newData);
+			});
 
 			if (file.headers) {
 				// We have a header row. This row is not a part of the data, so we need to add it.
