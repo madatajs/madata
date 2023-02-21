@@ -147,11 +147,17 @@ export default class GoogleSheets extends Google {
 				const ret = [];
 
 				for (const key of Object.keys(obj)) {
-					const index = columnNumbers.get(key) ?? key; // Why “?? key”? Handle the case when object keys are already column indices (e.g., when keys: []).
+					const index = Number(columnNumbers.get(key) ?? key); // Why “?? key”? Handle the case when object keys are already column indices (e.g., when keys: []).
 
-					// FIXME: What if objects have “new” keys (i.e., index is not a number), e.g., the user wants to add new columns with data?
-					// What should we do? Should we add them at the end of the corresponding row? Will ret.push(obj[key]) do?
-					ret[index] = obj[key];
+					if (index >= 0) {
+						// The existing key
+						ret[index] = obj[key];
+					}
+					else {
+						// If objects have “new” keys, e.g., the user wants to add new columns with data,
+						// add them to the end of the corresponding row.
+						ret.push(obj[key]);
+					}
 				}
 
 				return ret;
