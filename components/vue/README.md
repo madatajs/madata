@@ -185,7 +185,7 @@ You can pass in another object through the `state` property for that:
 	<ma-data v-model="info" :state="state" src="local:profile"></ma-data>
 
 	<label>Name: <input v-model="info.name"></label>
-	<button @click="state.save()">Update</button>
+	<button @click="state.save()">Save</button>
 </div>
 
 <script type=module>
