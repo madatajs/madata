@@ -161,7 +161,9 @@ export default class GoogleSheets extends Google {
 					}
 				}
 
-				return ret.push(...newData);
+				ret.push(...newData);
+
+				return ret;
 			});
 
 			if (file.headers) {
