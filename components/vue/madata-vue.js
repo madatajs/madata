@@ -96,7 +96,7 @@ const MaData = {
 				this.backend = Backend.create(url, options);
 
 				if (this.backend !== previousBackend) {
-					this.backend.addEventListener("mv-login",  evt => {
+					this.backend.addEventListener("mv-login", evt => {
 						this.user = this.backend.user;
 						this.$emit("login", this.user);
 					});
