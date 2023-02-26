@@ -8,7 +8,7 @@ const exportOnData = [
 	"unsavedChanges",
 ];
 
-const authProperties = ["user", "username", "avatar", "url", "name"];
+const authProperties = ["username", "avatar", "url", "name"];
 
 const MaData = {
 	props: {
@@ -65,8 +65,9 @@ const MaData = {
 				});
 			}
 			else {
-				Object.defineProperty(state, property, {
-					get: () => this[property],
+				// Properties need to be copied every time they change
+				this.$watch(property, newValue => {
+					this.stateObject[property] = newValue;
 				});
 			}
 		}
@@ -96,12 +97,11 @@ const MaData = {
 
 				if (this.backend !== previousBackend) {
 					this.backend.addEventListener("mv-login",  evt => {
-						copyAuthProperties(this.stateObject);
-
+						this.user = this.backend.user;
 						this.$emit("login", this.user);
 					});
 					this.backend.addEventListener("mv-logout", evt => {
-						copyAuthProperties(this.stateObject);
+						this.user = this.backend.user;
 						this.$emit("logout");
 					});
 				}
@@ -135,6 +135,25 @@ const MaData = {
 				}
 			},
 			immediate: true,
+		},
+
+		user: {
+			handler() {
+				let state = this.stateObject;
+				let user = state.user = this.user;
+
+				if (user) {
+					for (let property of authProperties) {
+						state[property] = user[property];
+					}
+				}
+				else {
+					for (let property of authProperties) {
+						state[property] = "";
+					}
+				}
+			},
+			immediate: true,
 		}
 	},
 
@@ -164,6 +183,8 @@ const MaData = {
 					console.warn(`MaData: Error when fetching data from ${this.src}: ${e.message}. Returned data was:`, data);
 				}
 			}
+
+			this.inProgress = "";
 
 			this.unsavedChanges = false;
 
@@ -241,15 +262,6 @@ function parseTime (time) {
 	}
 
 	throw new TypeError("Invalid time");
-}
-
-function copyAuthProperties(state) {
-	state.user = state.backend.user;
-
-	state.username = state.user?.username;
-	state.name = state.user?.name;
-	state.url = state.user?.url;
-	state.avatar = state.user?.avatar;
 }
 
 export default MaData;
