@@ -96,7 +96,7 @@ const MaData = {
 				this.backend = Backend.create(url, options);
 
 				if (this.backend !== previousBackend) {
-					this.backend.addEventListener("mv-login",  evt => {
+					this.backend.addEventListener("mv-login", evt => {
 						this.user = this.backend.user;
 						this.$emit("login", this.user);
 					});
@@ -161,6 +161,11 @@ const MaData = {
 		async login (o) {
 			this.inProgress = "Logging in...";
 			await this.backend.login(o);
+
+			if (this.dataLoaded === false) {
+				await this.load();
+			}
+
 			this.inProgress = "";
 			return this.backend.user;
 		},
@@ -172,7 +177,12 @@ const MaData = {
 		async load () {
 			try {
 				this.inProgress = "Loading...";
+
+				this.dataLoaded ??= false;
 				let data = await this.backend.load();
+				if (data) {
+					this.dataLoaded = true;
+				}
 
 				// Replace data maintaining a reference to its object
 				setPreservingReferences(this.modelValue, data);
