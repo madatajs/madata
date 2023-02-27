@@ -137,6 +137,23 @@ const MaData = {
 			immediate: true,
 		},
 
+		stateObject: {
+			handler (state, oldState) {
+				if (state === this.modelValue) {
+					// If state properties are on data, they should be non-enumerable
+					// to make sure they are not saved together with the data
+					for (let property of [...exportOnData, ...authProperties, "user"]) {
+						Object.defineProperty(state, property, {
+							value: oldState?.[property],
+							writable: true,
+							configurable: true,
+						});
+					}
+				}
+			},
+			immediate: true,
+		},
+
 		user: {
 			handler() {
 				let state = this.stateObject;
