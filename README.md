@@ -41,12 +41,13 @@ await backend.store();
 console.log("Stored some data!");
 ```
 
-<p class="has-removed-contents">
+<!-- {{ ("--" + ">") | safe }}
 {% set backendSummary %}
 {% include 'backends/README.md' %}
 {% endset %}
 {{ backendSummary | md | safe }}
-</p>
+</div>
+{{ ("<!" + "--") | safe }} -->
 <div class="gh-only">
 
 ## Supported backends
