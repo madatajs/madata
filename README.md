@@ -15,7 +15,9 @@ A spinoff from [Mavo](https://mavo.io).
 
 **Here be dragons** Madata has not yet been officially released, we are trying a “soft launch” first.
 It is currently in pre-alpha and very much a work in progress.
+Its API may change. It may have bugs.
 Please try it out, and [open issues](https://github.com/madatajs/madata/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc) as you find them!
+Pull requests are welcome too :)
 
 </div>
 
@@ -39,21 +41,19 @@ await backend.store();
 console.log("Stored some data!");
 ```
 
+<div class="has-removed-contents">
+{% set backendSummary %}
+{% include 'backends/README.md' %}
+{% endset %}
+{{ backendSummary | md | safe }}
+</div>
+<div class="gh-only">
+
 ## Supported backends
 
-| Service | Auth? | Writes? | Uploads? |
-|---------|----|----|-----|
-| [GitHub Files](/backends/github/file/) | ✅ | ✅ | ✅ |
-| [GitHub Gist](/backends/github/gist/) | ✅ | ✅ |  |
-| [GitHub API](/backends/github/api/) | ✅ |  |  |
-| [Dropbox](/backends/dropbox/) | ✅ | ✅ | ✅ |
-| [Google Drive](/backends/google/drive/) | ✅ | ✅ | ✅ |
-| [Google Firebase](/backends/google/firebase/) | ✅ | ✅ | ✅ |
-| [Google Sheets](/backends/google/sheets/) | ✅ | ✅ |  |
-| [Google Calendar](/backends/google/calendar/) | ✅ |  |  |
-| [Local storage](/backends/basic/#local) |  | ✅ |  |
-| [HTML Element](/backends/basic/#element) |  | ✅ |  |
-| [Basic remote fetching](/backends/basic/#remote) |  |  |  |
+Visit [the backends page](/docs/backends/) for the full list.
+
+</div>
 
 ### Authentication
 

@@ -1,4 +1,4 @@
-// let markdownIt = require("markdown-it");
+let markdownIt = require("markdown-it");
 
 module.exports = config => {
 	let data = {
@@ -21,11 +21,21 @@ module.exports = config => {
 
 	config.setDataDeepMerge(true);
 
-	// config.setLibrary("md", markdownIt({
-	// 		html: true,
-	// 	})
-	// 	.disable("code")
-	// );
+	let md = markdownIt({
+		html: true,
+		linkify: true,
+	})
+	.disable("code");
+
+	config.setLibrary("md", md);
+
+	config.addFilter("md", (value) => {
+		return md.render(value);
+	});
+
+	config.addFilter("md_inline", (value) => {
+		return md.renderInline(value);
+	});
 
 	config.addFilter(
 		"relative",
