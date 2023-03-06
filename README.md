@@ -52,7 +52,7 @@ console.log("Stored some data!");
 
 ## Supported backends
 
-Visit [the backends page](/docs/backends/) for the full list.
+Visit [the backends page](/backends/) for the full list.
 
 </div>
 
