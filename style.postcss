@@ -132,6 +132,13 @@ code, pre {
 	font-family: var(--font-mono);
 }
 
+:not(pre) > code {
+	background: hsl(var(--gray) 50% / .1);
+	border-radius: .15em;
+	padding: .25em .4em .15em;
+	color: hsl(var(--gray) 33%);
+}
+
 button, input, textarea, select {
 	font: inherit;
 	box-sizing: border-box;
