@@ -1,4 +1,4 @@
-<header>
+<header class="no-home-link">
 
 <img src="logo.svg" width="100" alt="Logo showing a cloud presented as a tree" />
 
