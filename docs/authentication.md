@@ -60,7 +60,7 @@ Please note that some of these may not be available, e.g. if a service does not 
 
 `backend.logout()` will log the current user out.
 
-If user already has an access token, they will be logged in upon `Backend.create()`,
+If user already has an access token, they will be logged in upon `Backend.from()`,
 as the `Backend` constructor calls `backend.login({passive: true})`.
 
 `Backend` objects are also event targets, and fire `mv-login` and `mv-logout` events.

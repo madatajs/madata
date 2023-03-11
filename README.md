@@ -26,12 +26,12 @@ Pull requests are welcome too :)
 Madata provides a unified API for authentication, reading & storing data, as well as file uploads (where supported), regardless of the storage service used.
 You don’t need to worry about differences between the different APIs, and swapping one storage service for another is as easy as changing a URL!
 Each supported backend documents what kinds of URLs it supports.
-Then `Backend.create(url)` automatically gets you an instance of the corresponding backend.
+Then `Backend.from(url)` automatically gets you an instance of the corresponding backend.
 
 ```js
 import Backend from "https://madata.dev/src/index.js";
 
-let backend = Backend.create("https://github.com/leaverou/repo/data.json");
+let backend = Backend.from("https://github.com/leaverou/repo/data.json");
 let json = await backend.load();
 
 json.happy = true;

@@ -206,7 +206,7 @@ export default class Backend extends EventTarget {
 	 * @param {object} [o] - Options object to be passed to the backend
 	 * @param {Backend | Array<Backend>} [o.existing] - Existing backend object(s) to re-use if possible
 	 */
-	static create (url, o = {}) {
+	static from (url, o = {}) {
 		let Class;
 
 		if (o.type) {

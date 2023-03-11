@@ -35,7 +35,7 @@ that you get by clicking "Share" on a file on the Dropbox UI.
 When there is no "natural" URL for a service, we have invented one, using a custom protocol.
 For example, the `Local` backend uses URLs like `local:key`.
 
-You can use `Backend.create(url, options)` to create an appropriate backend based on a URL.
+You can use `Backend.from(url, options)` to create an appropriate backend based on a URL.
 Because storage parameters are encoded in the URL, you could even expose it in your UI,
 and give end users a choice about where their data will be stored!
 
@@ -44,11 +44,11 @@ To avoid re-creating backend objects when the storage URL changes,
 you can pass in previously created objects through the `existing` parameter:
 
 ```js
-let backend = Backend.create(url, {
+let backend = Backend.from(url, {
 	existing: [github, dropbox, gDrive]
 });
 ```
 
-`Backend.create()` then automatically handles calling `update()` if any of the backends passed are suitable,
+`Backend.from()` then automatically handles calling `update()` if any of the backends passed are suitable,
 and will only create a new object if none are suitable.
 

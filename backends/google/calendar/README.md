@@ -47,7 +47,7 @@ Assume the calendar being read is the public calendar of official holidays in Fr
 ```js
 import Backend from "https://madata.dev/src/index.js";
 
-let backend = Backend.create("https://calendar.google.com/calendar/embed?src=fr.french%23holiday%40group.v.calendar.google.com",
+let backend = Backend.from("https://calendar.google.com/calendar/embed?src=fr.french%23holiday%40group.v.calendar.google.com",
   { singleEvents: true, orderBy: "startTime", maxResults: 15 });
 let json = await backend.load();
 

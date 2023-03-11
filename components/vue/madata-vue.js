@@ -93,7 +93,7 @@ const MaData = {
 				}
 
 				let previousBackend = this.backend;
-				this.backend = Backend.create(url, options);
+				this.backend = Backend.from(url, options);
 
 				if (this.backend !== previousBackend) {
 					this.backend.addEventListener("mv-login", evt => {

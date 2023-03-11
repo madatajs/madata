@@ -30,4 +30,4 @@ If the element's contents change, the backend will fire a `mv-remotedatachange` 
 
 **URL format:** *(anything not matched by other backends)*
 
-Load the URL as a remote resource. This is the default backend when `Backend.create()` cannot find any matching backend.
+Load the URL as a remote resource. This is the default backend when `Backend.from()` cannot find any matching backend.

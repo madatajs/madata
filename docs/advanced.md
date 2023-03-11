@@ -21,7 +21,7 @@ await backend.load();
 ## Adding support for another service
 
 You need to create a new `Backend` subclass.
-For `Backend.create()` to take your class into account, you need to call `Backend.register(MyBackend)`.
+For `Backend.from()` to take your class into account, you need to call `Backend.register(MyBackend)`.
 You can look at the existing backends for what this should look like.
 
 ## Creating plugins
