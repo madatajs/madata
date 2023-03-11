@@ -153,9 +153,7 @@ export default class GithubFile extends Github {
 			}
 		}
 		else if (type === "delete") {
-
 			if (fileInfo !== null) {
-				console.log(fileCall, fileInfo, fileInfo.sha);
 				// Delete file
 				fileInfo = await this.request(fileCall, {
 					message: commitPrefix + this.constructor.phrase("deleted_file", file.path),
