@@ -132,7 +132,7 @@ export default class GoogleSheets extends Google {
 		file = Object.assign({}, file, {...options});
 
 		const rangeReference = GoogleSheets.#getRangeReference(file);
-		let call = `${file.id}/values/${rangeReference}?key=${this.apiKey}&valueInputOption=user_entered&responseValueRenderOption=unformatted_value&includeValuesInResponse=true`;
+		let call = `${file.id}/values/${rangeReference}?key=${this.apiKey}&valueInputOption=${this.options.smartValues? "user_entered" : "raw"}&responseValueRenderOption=unformatted_value&includeValuesInResponse=true`;
 		if (this.options.serializeDates) {
 			call += "&responseDateTimeRenderOption=formatted_string";
 		}
