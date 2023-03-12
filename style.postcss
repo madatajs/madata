@@ -1,4 +1,5 @@
 @import url('https://prismjs.com/themes/prism-solarizedlight.min.css');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+Display:ital,wght@0,900;1,900&subset=latin&display=swap');
 
 :root {
 	--color-blue-hs: 200 90%;
@@ -19,72 +20,11 @@
 	--gray: 220 10%;
 
 	--font-body: system-ui, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+	--font-heading: 'Noto Serif Display', var(--font-body);
 	--font-mono: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
 
 	--page-width: 900px;
-}
-
-body {
-	display: flex;
-	flex-direction: column;
-	margin: 0;
-	min-height: 100vh;
-	font: 100%/1.5 var(--font-body);
-}
-
-body > * {
-	order: 10;
-	padding: 1em clamp(1em, 50vw - var(--page-width) / 2, 50vw);
-
-	&:is(header) {
-		display: grid;
-		grid-template-columns: 1fr auto;
-		grid-auto-flow: dense;
-		order: 0;
-		background: var(--accent-color);
-		color: white;
-
-		& > * {
-			grid-column: 1;
-		}
-
-		& h1 {
-			margin: 0;
-			font-size: 300%;
-
-			& + p {
-				margin: 0;
-				font-weight: bold;
-			}
-		}
-
-		& img {
-			position: relative;
-			width: auto;
-			height: 112%;
-			grid-column: 2;
-			grid-row-end: span 99;
-		}
-
-		& a {
-			color: inherit;
-		}
-
-		& .home {
-			text-transform: uppercase;
-			font-weight: 900;
-			font-size: 75%;
-
-			&:not(:hover) {
-				text-decoration: none;
-			}
-
-			&::before {
-				content: "🏠";
-				margin-right: .3em;
-			}
-		}
-	}
+	--space-x: clamp(1em, 50vw - var(--page-width) / 2, 50vw);
 }
 
 a {
@@ -95,37 +35,35 @@ a {
 	}
 }
 
+h1, h2, h3 {
+	font-family: var(--font-heading);
+	text-shadow: var(--ts-offset) var(--ts-offset) 0 white, calc(2* var(--ts-offset)) calc(2* var(--ts-offset)) 0 var(--ts-color);
+}
+
+h2 {
+	font-size: 250%;
+	--ts-offset: .03em;
+	--ts-color: var(--accent-color);
+}
+
+h3 {
+	font-size: 200%;
+}
+
+h4 {
+	font-size: 150%;
+}
+
+h5 {
+	font-size: 125%;
+}
+
+h6 {
+	font-size: 100%;
+}
+
 img {
 	max-width: 100%;
-}
-
-nav {
-	order: 1;
-	display: flex;
-	padding-top: 0;
-	padding-bottom: 0;
-	background: hsl(var(--accent-color-hs) 65%);
-
-	& > a {
-		flex: 1;
-		padding: .4em .5em;
-		color: white;
-		font-weight: bold;
-		background: linear-gradient(to right, hsl(var(--accent-color-hs) 50%), hsl(var(--accent-color-hs) 75%)) no-repeat left / 0 100%;
-		transition: .3s;
-
-		&:hover {
-			background-size: 100% 100%;
-		}
-
-		&:where(:not(:hover)) {
-			text-decoration: none;
-		}
-	}
-}
-
-md-block {
-	display: contents;
 }
 
 code, pre {
@@ -266,8 +204,108 @@ table {
 	}
 }
 
-main > h1 {
-	color: var(--accent-color);
+body {
+	display: flex;
+	flex-direction: column;
+	margin: 0;
+	min-height: 100vh;
+	font: 100%/1.5 var(--font-body);
+	font-synthesis: none;
+}
+
+body > * {
+	order: 10;
+	padding: 1em var(--space-x);
+
+	&:is(header) {
+		display: grid;
+		grid-template-columns: 1fr auto;
+		grid-auto-flow: dense;
+		order: 0;
+		background: var(--accent-color);
+		color: white;
+
+		& > * {
+			grid-column: 1;
+		}
+
+		& h1 {
+			margin: 0;
+			font-size: 300%;
+			font: 900 italic 300%/1 var(--font-heading);
+
+			& .ma {
+				color: black;
+			}
+
+			& + p {
+				margin: 0;
+				margin-top: .3em;
+				font-weight: bold;
+			}
+		}
+
+		& img {
+			position: absolute;
+			right: var(--space-x);
+			width: auto;
+			height: 7em;
+		}
+
+		& a {
+			color: inherit;
+		}
+
+		& .home {
+			text-transform: uppercase;
+			font-weight: 900;
+			font-size: 75%;
+
+			&:not(:hover) {
+				text-decoration: none;
+			}
+
+			&::before {
+				content: "🏠";
+				margin-right: .3em;
+			}
+		}
+	}
+}
+
+nav {
+	order: 1;
+	display: flex;
+	padding-top: 0;
+	padding-bottom: 0;
+	background: hsl(var(--accent-color-hs) 65%);
+
+	& > a {
+		flex: 1;
+		padding: .4em .5em;
+		color: white;
+		font-weight: bold;
+		background: linear-gradient(to right, hsl(var(--accent-color-hs) 50%), hsl(var(--accent-color-hs) 75%)) no-repeat left / 0 100%;
+		transition: .3s;
+
+		&:hover {
+			background-size: 100% 100%;
+		}
+
+		&:where(:not(:hover)) {
+			text-decoration: none;
+		}
+	}
+}
+
+main {
+	& > h1,
+	& > h2:first-child:only-of-type {
+		font-size: 300%;
+		color: var(--accent-color);
+		--ts-offset: .03em;
+		--ts-color: hsl(var(--gray) 30%);
+	}
 }
 
 .gh-only {
@@ -324,4 +362,35 @@ main > h1 {
 	--label: "Tip";
 	--color-hs: var(--color-green-hs);
 	--color: var(--color-green);
+}
+
+#promo {
+	background: hsl(var(--gray) 96%);
+	padding-top: .4em;
+	padding-bottom: .4em;
+	font-size: 250%;
+	font-weight: 300;
+
+	& span[data-alternates] {
+		color: var(--accent-color);
+	}
+}
+
+span[data-alternates] {
+	display: inline-grid;
+	align-items: baseline;
+	--dur: .3s;
+
+	& > div {
+		transition: var(--dur) font-size, 0s var(--dur) transform, 0s var(--dur) opacity;
+		grid-column: 1;
+		grid-row: 1;
+
+		&:not(.active) {
+			transform: translateY(-1.5em);
+			transition: 0s;
+			font-size: 0%;
+			opacity: 0;
+		}
+	}
 }
