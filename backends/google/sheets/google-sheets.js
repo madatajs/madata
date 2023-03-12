@@ -137,7 +137,7 @@ export default class GoogleSheets extends Google {
 			call += "&responseDateTimeRenderOption=formatted_string";
 		}
 
-		if (this.options.headerRow === true || this.options.keys) {
+		if (file.objectKeys) {
 			// Reverse the objectKeys map
 			const columnNumbers = new Map([...file.objectKeys].map(([index, key]) => [key, index]));
 
