@@ -90,20 +90,7 @@ export default class GoogleSheets extends Google {
 				}
 			}
 
-			// Return an array of objects instead of an array of arrays.
-			const ret = [];
-			for (const row of values) {
-				const obj = {};
-
-				for (let columnIndex = 0; columnIndex < row.length; columnIndex++) {
-					const index = columnIndex + "";
-					obj[file.objectKeys.get(index) ?? index] = row[columnIndex];
-				}
-
-				ret.push(obj);
-			}
-
-			return ret;
+			return GoogleSheets.#toObjects(file.objectKeys, values);
 		}
 		catch (e) {
 			if (e.status === 401) {
@@ -274,6 +261,17 @@ export default class GoogleSheets extends Google {
 			}
 		}
 
+		// Updated (stored) data should have the format as the one in the get() method.
+		if (response.updatedData?.values && file.objectKeys) {
+			const values = response.updatedData.values;
+			if (this.options.headerRow === true) {
+				// The header row shouldn't be a part of the data.
+				values.shift();
+			}
+
+			response.updatedData.values = GoogleSheets.#toObjects(file.objectKeys, values);
+		}
+
 		return response;
 	}
 
@@ -362,6 +360,31 @@ export default class GoogleSheets extends Google {
 		}
 
 		return sheet?.properties?.title;
+	}
+
+	/**
+	 * Transform an array of arrays to an array of objects.
+	 * @static
+	 * @private
+	 * @param {Map<string, string>} keys A map between column indices and object keys.
+	 * @param {Array<Array<any>>} values An array of values from a spreadsheet. Each nested array corresponds to an individual spreadsheet row.
+	 * @returns {Array<Object>} An array of objects. Each object corresponds to an individual spreadsheet row.
+	 */
+	static #toObjects (keys, values) {
+		const ret = [];
+
+		for (const row of values) {
+			const obj = {};
+
+			for (let columnIndex = 0; columnIndex < row.length; columnIndex++) {
+				const index = columnIndex + "";
+				obj[keys.get(index) ?? index] = row[columnIndex];
+			}
+
+			ret.push(obj);
+		}
+
+		return ret;
 	}
 
 	static apiDomain = "https://sheets.googleapis.com/v4/spreadsheets/";
