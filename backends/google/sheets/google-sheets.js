@@ -57,7 +57,7 @@ export default class GoogleSheets extends Google {
 			}
 
 			file.objectKeys = new Map(); // "string" => "string"
-			if (this.options.headerRow === true) {
+			if (this.options.headerRow) {
 				// The sheet has a header row. Use the headers from the sheet (from the first row) as object keys.
 				// We don't want headers to become a part of the data.
 				file.headers = values.shift();
