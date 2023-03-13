@@ -148,7 +148,7 @@ export default class GoogleSheets extends Google {
 					}
 				}
 
-				ret.push(...newData)
+				ret.push(...newData);
 
 				return ret;
 			});
@@ -285,8 +285,8 @@ export default class GoogleSheets extends Google {
 		return user;
 	}
 
-	stringify = data => data
-	parse = data => data
+	stringify = data => data;
+	parse = data => data;
 
 	/**
 	 * Get an object key taking into account that there might be duplicates among column headers.
@@ -305,7 +305,7 @@ export default class GoogleSheets extends Google {
 		}
 
 		return count === 0? header : header + (count + 1);
-	}
+	};
 
 	/**
 	 * Get the range reference.
@@ -316,7 +316,7 @@ export default class GoogleSheets extends Google {
 	 * @returns The range reference in one of the supported formats: 'Sheet title'!Range, 'Sheet title', or Range.
 	 */
 	static #getRangeReference ({sheet, range} = file) {
-		return `${sheet ? `'${sheet}'` : ""}${range ? (sheet ? `!${range}` : range) : ""}`
+		return `${sheet ? `'${sheet}'` : ""}${range ? (sheet ? `!${range}` : range) : ""}`;
 	}
 
 	/**
@@ -421,5 +421,5 @@ export default class GoogleSheets extends Google {
 		get_no_sheet: "We could not find the sheet to get data from. Try providing the sheet option with the sheet title.",
 		store_no_sheet: sheet => `We could not find the ${sheet} sheet in the spreadsheet. Try enabling the allowAddingSheets option to create it.`,
 		store_sheet_added: sheet => `We could not find the ${sheet} sheet in the spreadsheet and created it.`
-	}
+	};
 }
