@@ -125,33 +125,8 @@ export default class GoogleSheets extends Google {
 		}
 
 		if (file.objectKeys) {
-			// Reverse the objectKeys map
-			const columnNumbers = new Map([...file.objectKeys].map(([index, key]) => [key, index]));
-
-			// Transform an array of objects into an array of arrays.
-			// We must preserve the columns' source order.
-			data = data.map(obj => {
-				const ret = [];
-				const newData = [];
-
-				for (const key of Object.keys(obj)) {
-					const index = Number(columnNumbers.get(key) ?? key); // Why “?? key”? Handle the case when object keys are already column indices (e.g., when keys: []).
-
-					if (index >= 0) {
-						// The existing key
-						ret[index] = obj[key];
-					}
-					else {
-						// If objects have “new” keys, e.g., the user wants to add new columns with data,
-						// add them to the end of the corresponding row.
-						newData.push(obj[key]);
-					}
-				}
-
-				ret.push(...newData);
-
-				return ret;
-			});
+			// We have an array of objects and must transform it into an array of arrays as Google API demands.
+			data = GoogleSheets.#fromObjects(file.objectKeys, data);
 
 			if (file.headers) {
 				// We have a header row. This row is not a part of the data, so we need to add it.
@@ -360,6 +335,43 @@ export default class GoogleSheets extends Google {
 		}
 
 		return sheet?.properties?.title;
+	}
+
+	/**
+	 * Transform an array of objects to an array of arrays.
+	 * @static
+	 * @private
+	 * @param {Map<string, string>} keys A map between column indices and object keys.
+	 * @param {Array<Object>} values An array of objects. Each object corresponds to an individual spreadsheet row.
+	 * @returns {Array<Array<any>>} An array of arrays. Each nested array corresponds to an individual spreadsheet row.
+	 */
+	static #fromObjects (keys, values) {
+		// Reverse the keys map
+		const columnNumbers = new Map([...keys].map(([index, key]) => [key, index]));
+
+		return values.map(obj => {
+			const ret = [];
+			const newData = [];
+
+			for (const key of Object.keys(obj)) {
+				// We must preserve the columns' source order.
+				const index = Number(columnNumbers.get(key) ?? key); // Why “?? key”? Handle the case when object keys are already column indices (e.g., when keys: []).
+
+				if (index >= 0) {
+					// The existing key
+					ret[index] = obj[key];
+				}
+				else {
+					// If objects have “new” keys, e.g., the user wants to add new columns with data,
+					// add them to the end of the corresponding row.
+					newData.push(obj[key]);
+				}
+			}
+
+			ret.push(...newData);
+
+			return ret;
+		});
 	}
 
 	/**
