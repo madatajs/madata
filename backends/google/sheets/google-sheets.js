@@ -90,20 +90,7 @@ export default class GoogleSheets extends Google {
 				}
 			}
 
-			// Return an array of objects instead of an array of arrays.
-			const ret = [];
-			for (const row of values) {
-				const obj = {};
-
-				for (let columnIndex = 0; columnIndex < row.length; columnIndex++) {
-					const index = columnIndex + "";
-					obj[file.objectKeys.get(index) ?? index] = row[columnIndex];
-				}
-
-				ret.push(obj);
-			}
-
-			return ret;
+			return GoogleSheets.#toObjects(file.objectKeys, values);
 		}
 		catch (e) {
 			if (e.status === 401) {
@@ -132,39 +119,14 @@ export default class GoogleSheets extends Google {
 		file = Object.assign({}, file, {...options});
 
 		const rangeReference = GoogleSheets.#getRangeReference(file);
-		let call = `${file.id}/values/${rangeReference}?key=${this.apiKey}&valueInputOption=user_entered&responseValueRenderOption=unformatted_value&includeValuesInResponse=true`;
+		let call = `${file.id}/values/${rangeReference}?key=${this.apiKey}&valueInputOption=${this.options.smartValues? "user_entered" : "raw"}&responseValueRenderOption=unformatted_value&includeValuesInResponse=true`;
 		if (this.options.serializeDates) {
 			call += "&responseDateTimeRenderOption=formatted_string";
 		}
 
-		if (this.options.headerRow === true || this.options.keys) {
-			// Reverse the objectKeys map
-			const columnNumbers = new Map([...file.objectKeys].map(([index, key]) => [key, index]));
-
-			// Transform an array of objects into an array of arrays.
-			// We must preserve the columns' source order.
-			data = data.map(obj => {
-				const ret = [];
-				const newData = [];
-
-				for (const key of Object.keys(obj)) {
-					const index = Number(columnNumbers.get(key) ?? key); // Why “?? key”? Handle the case when object keys are already column indices (e.g., when keys: []).
-
-					if (index >= 0) {
-						// The existing key
-						ret[index] = obj[key];
-					}
-					else {
-						// If objects have “new” keys, e.g., the user wants to add new columns with data,
-						// add them to the end of the corresponding row.
-						newData.push(obj[key]);
-					}
-				}
-
-				ret.push(...newData)
-
-				return ret;
-			});
+		if (file.objectKeys) {
+			// We have an array of objects and must transform it into an array of arrays as Google API demands.
+			data = GoogleSheets.#fromObjects(file.objectKeys, data);
 
 			if (file.headers) {
 				// We have a header row. This row is not a part of the data, so we need to add it.
@@ -274,6 +236,17 @@ export default class GoogleSheets extends Google {
 			}
 		}
 
+		// Updated (stored) data should have the format as the one in the get() method.
+		if (response.updatedData?.values && file.objectKeys) {
+			const values = response.updatedData.values;
+			if (this.options.headerRow === true) {
+				// The header row shouldn't be a part of the data.
+				values.shift();
+			}
+
+			response.updatedData.values = GoogleSheets.#toObjects(file.objectKeys, values);
+		}
+
 		return response;
 	}
 
@@ -287,8 +260,8 @@ export default class GoogleSheets extends Google {
 		return user;
 	}
 
-	stringify = data => data
-	parse = data => data
+	stringify = data => data;
+	parse = data => data;
 
 	/**
 	 * Get an object key taking into account that there might be duplicates among column headers.
@@ -307,7 +280,7 @@ export default class GoogleSheets extends Google {
 		}
 
 		return count === 0? header : header + (count + 1);
-	}
+	};
 
 	/**
 	 * Get the range reference.
@@ -317,8 +290,8 @@ export default class GoogleSheets extends Google {
 	 * @param {string} range Range in the A1 notation.
 	 * @returns The range reference in one of the supported formats: 'Sheet title'!Range, 'Sheet title', or Range.
 	 */
-	static #getRangeReference ({sheet, range} = file) {
-		return `${sheet ? `'${sheet}'` : ""}${range ? (sheet ? `!${range}` : range) : ""}`
+	static #getRangeReference ({sheet, range} = {}) {
+		return `${sheet ? `'${sheet}'` : ""}${range ? (sheet ? `!${range}` : range) : ""}`;
 	}
 
 	/**
@@ -364,6 +337,68 @@ export default class GoogleSheets extends Google {
 		return sheet?.properties?.title;
 	}
 
+	/**
+	 * Transform an array of objects to an array of arrays.
+	 * @static
+	 * @private
+	 * @param {Map<string, string>} keys A map between column indices and object keys.
+	 * @param {Array<Object>} values An array of objects. Each object corresponds to an individual spreadsheet row.
+	 * @returns {Array<Array<any>>} An array of arrays. Each nested array corresponds to an individual spreadsheet row.
+	 */
+	static #fromObjects (keys, values) {
+		// Reverse the keys map
+		const columnNumbers = new Map([...keys].map(([index, key]) => [key, index]));
+
+		return values.map(obj => {
+			const ret = [];
+			const newData = [];
+
+			for (const key of Object.keys(obj)) {
+				// We must preserve the columns' source order.
+				const index = Number(columnNumbers.get(key) ?? key); // Why “?? key”? Handle the case when object keys are already column indices (e.g., when keys: []).
+
+				if (index >= 0) {
+					// The existing key
+					ret[index] = obj[key];
+				}
+				else {
+					// If objects have “new” keys, e.g., the user wants to add new columns with data,
+					// add them to the end of the corresponding row.
+					newData.push(obj[key]);
+				}
+			}
+
+			ret.push(...newData);
+
+			return ret;
+		});
+	}
+
+	/**
+	 * Transform an array of arrays to an array of objects.
+	 * @static
+	 * @private
+	 * @param {Map<string, string>} keys A map between column indices and object keys.
+	 * @param {Array<Array<any>>} values An array of values from a spreadsheet. Each nested array corresponds to an individual spreadsheet row.
+	 * @returns {Array<Object>} An array of objects. Each object corresponds to an individual spreadsheet row.
+	 */
+	static #toObjects (keys, values) {
+		const ret = [];
+
+		for (const row of values) {
+			const obj = {};
+
+			for (let columnIndex = 0; columnIndex < row.length; columnIndex++) {
+				const index = columnIndex + "";
+				obj[keys.get(index) ?? index] = row[columnIndex];
+			}
+
+			ret.push(obj);
+		}
+
+		return ret;
+	}
+
 	static apiDomain = "https://sheets.googleapis.com/v4/spreadsheets/";
 	static scopes = ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email"];
 
@@ -398,5 +433,5 @@ export default class GoogleSheets extends Google {
 		get_no_sheet: "We could not find the sheet to get data from. Try providing the sheet option with the sheet title.",
 		store_no_sheet: sheet => `We could not find the ${sheet} sheet in the spreadsheet. Try enabling the allowAddingSheets option to create it.`,
 		store_sheet_added: sheet => `We could not find the ${sheet} sheet in the spreadsheet and created it.`
-	}
+	};
 }
