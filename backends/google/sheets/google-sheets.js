@@ -290,7 +290,7 @@ export default class GoogleSheets extends Google {
 	 * @param {string} range Range in the A1 notation.
 	 * @returns The range reference in one of the supported formats: 'Sheet title'!Range, 'Sheet title', or Range.
 	 */
-	static #getRangeReference ({sheet, range} = file) {
+	static #getRangeReference ({sheet, range} = {}) {
 		return `${sheet ? `'${sheet}'` : ""}${range ? (sheet ? `!${range}` : range) : ""}`;
 	}
 
