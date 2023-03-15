@@ -27,6 +27,7 @@ export default class GoogleSheets extends Google {
 			catch (e) {
 				if (e.status === 401) {
 					await this.logout(); // Access token we have is invalid. Discard it.
+					throw new Error(this.constructor.phrase("access_token_invalid"));
 				}
 
 				let error;
@@ -95,6 +96,21 @@ export default class GoogleSheets extends Google {
 		catch (e) {
 			if (e.status === 401) {
 				await this.logout(); // Access token we have is invalid. Discard it.
+				throw new Error(this.constructor.phrase("access_token_invalid"));
+			}
+			else if (e.status === 400) {
+				const message = (await e.json()).error.message;
+
+				if (message.startsWith("Unable to parse range:")) {
+					// Invalid sheet name and/or data range
+					console.warn(this.constructor.phrase("get_no_sheet_or_invalid_range", file.sheet, file.range));
+				}
+				else {
+					// No spreadsheet (e.g., invalid URL)
+					console.warn(this.constructor.phrase("get_no_spreadsheet", this.source));
+				}
+
+				return null;
 			}
 
 			let error;
@@ -159,6 +175,7 @@ export default class GoogleSheets extends Google {
 						catch (e) {
 							if (e.status === 401) {
 								await this.logout(); // Access token we have is invalid. Discard it.
+								throw new Error(this.constructor.phrase("access_token_invalid"));
 							}
 
 							let error;
@@ -201,6 +218,7 @@ export default class GoogleSheets extends Google {
 						catch (e) {
 							if (e.status === 401) {
 								await this.logout(); // Access token we have is invalid. Discard it.
+								throw new Error(this.constructor.phrase("access_token_invalid"));
 							}
 
 							let error;
@@ -222,6 +240,7 @@ export default class GoogleSheets extends Google {
 			else {
 				if (e.status === 401) {
 					await this.logout(); // Access token we have is invalid. Discard it.
+					throw new Error(this.constructor.phrase("access_token_invalid"));
 				}
 
 				let error;
@@ -311,6 +330,7 @@ export default class GoogleSheets extends Google {
 		catch (e) {
 			if (e.status === 401) {
 				await this.logout(); // Access token we have is invalid. Discard it.
+				throw new Error(this.constructor.phrase("access_token_invalid"));
 			}
 
 			let error;
@@ -430,8 +450,28 @@ export default class GoogleSheets extends Google {
 	}
 
 	static phrases = {
-		get_no_sheet: "We could not find the sheet to get data from. Try providing the sheet option with the sheet title.",
-		store_no_sheet: sheet => `We could not find the ${sheet} sheet in the spreadsheet. Try enabling the allowAddingSheets option to create it.`,
-		store_sheet_added: sheet => `We could not find the ${sheet} sheet in the spreadsheet and created it.`
+		get_no_sheet: "We could not find the sheet to get data from. Try providing the “sheet” option with the sheet title.",
+		get_no_spreadsheet: url => `We could not find the spreadsheet with URL: ${url}. Check whether the spreadsheet URL is correct.`,
+		store_no_sheet: sheet => `We could not find the “${sheet}” sheet in the spreadsheet. Try enabling the “allowAddingSheets” option to create it.`,
+		store_sheet_added: sheet => `We could not find the “${sheet}” sheet in the spreadsheet and created it.`,
+		get_no_sheet_or_invalid_range: (sheet, range) => {
+			let message;
+
+			if (sheet) {
+				message = `There is no sheet “${sheet}” in the spreadsheet`;
+
+				if (range) {
+					message += `, and/or “${range}” is not a valid cell range.`;
+				}
+				else {
+					message += ".";
+				}
+			}
+			else if (range) {
+				message = `“${range}” is not a valid cell range.`;
+			}
+
+			return message;
+		}
 	};
 }
