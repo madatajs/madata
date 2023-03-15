@@ -20,7 +20,7 @@ export default class Local extends Backend {
 			return localStorage[this.file.key];
 		}
 
-		throw null;
+		return null;
 	}
 
 	async put (serialized) {
