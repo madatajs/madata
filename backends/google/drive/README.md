@@ -3,6 +3,12 @@
 | ✅ Auth | ✅ Writes | ✅ Uploads |
 |---------|-----------|-----------|
 
+<div class="warning">
+
+	If you decide to <a href="https://madata.dev/docs/authentication/">self-host your authentication server</a>, <a href="https://support.google.com/cloud/answer/6158849?hl=en">register an OAuth application</a> supporting the Google backends, and <a href="https://support.google.com/googleapi/answer/6310037?hl=en">restrict the API key</a> for (not only but including) the Google Drive API, you might face reading and/or storing data issues (for detail, see <a href="https://stackoverflow.com/questions/75346659/im-trying-to-restrict-an-api-key-to-google-drive-api-but-its-behaving-like-i">the question on Stackoverflow</a>). If this is an issue for your use case, you can either not restrict the API key for any APIs or use <a href="https://madata.dev/backends/">alternate backends</a> meanwhile.
+
+</div>
+
 ## URL format
 
 - Regular file URLs like `https://drive.google.com/file/d/1aV-SUER-bXvph4PH28ppAu6lxoIlnA4F/view?usp=sharing`
