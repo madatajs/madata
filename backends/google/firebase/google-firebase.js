@@ -222,9 +222,10 @@ export default class GoogleFirebase extends Google {
 			}
 		}
 
-		const user = await super.login({ passive: true });
+		const user = await this.getUser();
 		if (user) {
-			this.updatePermissions({ edit: true, save: true });
+			this.dispatchEvent(new CustomEvent("mv-login"));
+			this.updatePermissions({ login: false, logout: true, edit: true, save: true });
 		}
 
 		return user;
