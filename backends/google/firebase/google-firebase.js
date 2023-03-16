@@ -6,8 +6,8 @@
 import Google from "../google.js";
 import { readFile, toArray } from "../../../src/util.js";
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
-import { getAuth, signInWithPopup, GoogleAuthProvider, useDeviceLanguage } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+import { getApps, initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signInWithPopup, signOut, GoogleAuthProvider, useDeviceLanguage } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
 import { getFirestore, doc, collection, getDoc, getDocs, setDoc, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore-lite.js";
 import { getStorage, ref, uploadString, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-storage.js";
 
@@ -23,9 +23,31 @@ export default class GoogleFirebase extends Google {
 				storageBucket: this.file.storageBucket
 			};
 
-			this.app = initializeApp(firebaseConfig);
+			if (!getApps().length) {
+				this.app = initializeApp(firebaseConfig);
+			}
+			else {
+				// We want all apps with the same project ID to share the same instance of the Firebase app.
+				// Create one if there is no previously created Firebase app with the specified project ID.
+				this.app = getApps().find(app => app.options.projectId === firebaseConfig.projectId) ?? initializeApp(firebaseConfig, firebaseConfig.projectId);
+			}
 
 			if (this.app) {
+				const auth = getAuth(this.app);
+				onAuthStateChanged(auth, async (user) => {
+					if (user) {
+						// User is signed in
+						this.user = {
+							username: user.email,
+							name: user.displayName,
+							avatar: user.photoURL,
+							...user
+						};
+
+						this.accessToken = user.accessToken;
+					}
+				});
+
 				resolve(this.app);
 			}
 			else {
@@ -193,10 +215,7 @@ export default class GoogleFirebase extends Google {
 				// Apply the default browser preference.
 				useDeviceLanguage(auth);
 
-				const res = await signInWithPopup(auth, provider);
-				const credential = GoogleAuthProvider.credentialFromResult(res);
-				this.accessToken = localStorage[this.constructor.tokenKey] = credential.accessToken;
-				this.user = res.user;
+				await signInWithPopup(auth, provider);
 			}
 			catch (e) {
 				throw new Error(e.message);
@@ -211,25 +230,19 @@ export default class GoogleFirebase extends Google {
 		return user;
 	}
 
+	async logout () {
+		try {
+			const auth = getAuth(this.app);
+			await signOut(auth);
+			await super.logout();
+		}
+		catch (e) {
+			throw new Error(e.message);
+		}
+	}
+
 	async getUser () {
-		if (this.user) {
-			return this.user;
-		}
-
-		const auth = getAuth(this.app);
-		const user = auth.currentUser;
-
-		if (user) {
-			return this.user = {
-				username: user.email,
-				name: user.displayName,
-				avatar: user.photoURL,
-				...user
-			};
-		}
-		else {
-			return super.getUser();
-		}
+		return this.user;
 	}
 
 	#applyDefaults (file = this.file) {
@@ -240,8 +253,8 @@ export default class GoogleFirebase extends Google {
 		return file;
 	}
 
-	stringify = data => data
-	parse = data => data
+	stringify = data => data;
+	parse = data => data;
 
 	static #isCollection (file) {
 		const path = file.path.split("/");
@@ -252,7 +265,7 @@ export default class GoogleFirebase extends Google {
 
 	static defaults = {
 		path: "madata/data"
-	}
+	};
 
 	static test (url) {
 		url = new URL(url);
@@ -284,5 +297,5 @@ export default class GoogleFirebase extends Google {
 
 	static phrases = {
 		delete_collection_warning: "Deleting collections from a Web client is not recommended. See https://firebase.google.com/docs/firestore/manage-data/delete-data#collections for details."
-	}
+	};
 }
