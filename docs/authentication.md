@@ -96,7 +96,7 @@ logoutButton.addEventListener("click", evt => backend.logout());
 1. First, use one of the template repos.
 We provide template repos for the following tech stacks:
 	1. Serverless (Netlify, but can easily be adjusted for other providers): [madatajs/auth-serverless](https://github.com/madatajs/auth-serverless)
-	2. <del>PHP: [madatajs/auth-php](https://github.com/madatajs/auth-php)</del> (Coming soon)
+	2. PHP: [madatajs/auth-php](https://github.com/madatajs/auth-php)
 
 ![](images/use-template-button.png)
 
