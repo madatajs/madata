@@ -10,7 +10,16 @@ export default class GoogleCalendar extends Google {
 		let call = `${file.calendarId}/events?key=${this.apiKey}`;
 
 		if (this.options) {
-			const params = new URLSearchParams(this.options);
+			file.params = Object.assign({}, this.options);
+			for (const o of Object.keys(this.options)) {
+				// Do not include in the request options not supported by the Google Calendar API
+				// to avoid getting the “Bad Request” error if possible.
+				if (!GoogleCalendar.supportedOptions.includes(o)) {
+					delete file.params[o];
+				}
+			}
+
+			const params = new URLSearchParams(file.params);
 			call = call + "&" + params.toString();
 		}
 
@@ -21,6 +30,11 @@ export default class GoogleCalendar extends Google {
 		catch (e) {
 			if (e.status === 401) {
 				await this.logout(); // Access token we have is invalid. Discard it.
+				throw new Error(this.constructor.phrase("access_token_invalid"));
+			}
+
+			if (e.status === 400) {
+				throw new Error(this.constructor.phrase("bad_options", file.params));
 			}
 
 			let error;
@@ -34,9 +48,10 @@ export default class GoogleCalendar extends Google {
 			throw new Error(error);
 		}
 
-		return calendar.items;
+		return calendar?.items;
 	}
 
+	static supportedOptions = ["iCalUID", "maxAttendees", "maxResults", "orderBy", "pageToken", "privateExtendedProperty", "q", "sharedExtendedProperty", "showDeleted", "showHiddenInvitations", "singleEvents", "syncToken", "timeMax", "timeMin", "timeZone", "updatedMin"];
 	static apiDomain = "https://www.googleapis.com/calendar/v3/calendars/";
 	static scopes = ["https://www.googleapis.com/auth/calendar.events", "https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email"];
 
@@ -69,4 +84,16 @@ export default class GoogleCalendar extends Google {
 
 		return ret;
 	}
+
+	static phrases = {
+		bad_options: params => {
+			let message = "The options you provided might have values not supported by the Google Calendar backend.";
+
+			if (params) {
+				message += ` The options were: ${JSON.stringify(params)}.`;
+			}
+
+			return message;
+		}
+	};
 }

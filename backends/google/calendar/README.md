@@ -17,7 +17,7 @@ Read events from public and private Google calendars.
 
 ## Constructor options
 
-You can customize the way the plugin reads data from a calendar by passing the needed options to the backend constructor. The list of *all* supported options you can find in [the documentation](https://developers.google.com/calendar/api/v3/reference/events/list#parameters).
+You can customize how the plugin reads data from a calendar by passing the needed options to the backend constructor—the list of all supported options you can find in [the documentation](https://developers.google.com/calendar/api/v3/reference/events/list#parameters). You can also programmatically read which options are supported by accessing `GoogleCalendar.supportedOptions`.
 
 ## Events
 
