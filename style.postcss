@@ -36,8 +36,30 @@ a {
 }
 
 h1, h2, h3 {
+	position: relative;
 	font-family: var(--font-heading);
 	text-shadow: var(--ts-offset) var(--ts-offset) 0 white, calc(2* var(--ts-offset)) calc(2* var(--ts-offset)) 0 var(--ts-color);
+
+	& > a:only-child { /* Permalinks */
+		color: inherit;
+		font: inherit;
+		text-decoration: none;
+
+		&::before {
+			content: "#";
+			position: absolute;
+			right: calc(100% + .3em);
+			transform: .4s opacity;
+			color: var(--color-blue);
+			font-weight: bold;
+		}
+
+		&:not(:hover, :focus) {
+			&::before {
+				opacity: 0;
+			}
+		}
+	}
 }
 
 h2 {

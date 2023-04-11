@@ -117,7 +117,7 @@ export default class Backend extends EventTarget {
 
 		let response = await this.get(file, ...args);
 
-		if (typeof response != "string") {
+		if (typeof response !== "string") {
 			// Backend did the parsing, we're done here
 			return response;
 		}
