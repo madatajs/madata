@@ -1,6 +1,7 @@
 // Website scripts
 import "https://prismjs.com/prism.js";
 import "https://prismjs.com/plugins/normalize-whitespace/prism-normalize-whitespace.js";
+import "https://prismjs.com/components/prism-typescript.js";
 
 const $$ = document.querySelectorAll.bind(document);
 
