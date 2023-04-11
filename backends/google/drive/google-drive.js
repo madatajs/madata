@@ -44,7 +44,7 @@ export default class GoogleDrive extends Google {
 			}
 
 			const call = `drive/v3/files/${file.id}?key=${this.apiKey}&alt=media`;
-			return await this.request(call);
+			return this.request(call);
 		}
 		catch (e) {
 			if (e.status === 401) {
@@ -90,7 +90,7 @@ export default class GoogleDrive extends Google {
 		}
 
 		try {
-			return await this.#updateFile(file, serialized);
+			return this.#updateFile(file, serialized);
 		}
 		catch (e) {
 			if (e.status === 401) {
@@ -108,7 +108,7 @@ export default class GoogleDrive extends Google {
 						file.id = fileInfo.id;
 						file.info = fileInfo;
 
-						return await this.#updateFile(file, serialized);
+						return this.#updateFile(file, serialized);
 					}
 					catch (e) {
 						if (e.status === 401) {
@@ -191,7 +191,7 @@ export default class GoogleDrive extends Google {
 		}
 
 		try {
-			return await this.request(`drive/v3/files/${file.id}?key=${this.apiKey}`, {trashed: true}, "PATCH");
+			return this.request(`drive/v3/files/${file.id}?key=${this.apiKey}`, {trashed: true}, "PATCH");
 		}
 		catch (e) {
 			if (e.status === 401) {
@@ -231,17 +231,17 @@ export default class GoogleDrive extends Google {
 			metadata.parents = [file.folderId];
 		}
 
-		return await this.request(`drive/v3/files?key=${this.apiKey}&fields=${file.fields}`, metadata, "POST");
+		return this.request(`drive/v3/files?key=${this.apiKey}&fields=${file.fields}`, metadata, "POST");
 	}
 
 	async #updateFile (file, data) {
 		const call = `upload/drive/v3/files/${file.id}?key=${this.apiKey}&fields=${file.fields}&uploadType=multipart`;
-		return await this.request(call, data, "PATCH");
+		return this.request(call, data, "PATCH");
 	}
 
 	async #getFileInfo (file) {
 		const call = `drive/v3/files/${file.id}?key=${this.apiKey}&fields=${file.fields}`;
-		return await this.request(call);
+		return this.request(call);
 	}
 
 	static #getFolderId (url) {
