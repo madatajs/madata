@@ -90,11 +90,9 @@ export default class Backend extends EventTarget {
 	}
 
 	#getFile (ref) {
-		let file;
-
 		if (typeof ref === "string") {
 			// ref is a URL
-			if (/^\w+:/.test(file)) {
+			if (/^\w+:/.test(ref)) {
 				// Absolute URL
 				return this.constructor.parseURL(ref);
 			}
