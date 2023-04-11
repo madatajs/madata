@@ -136,6 +136,7 @@ export default class Backend extends EventTarget {
 	 * Subclasses should usually NOT override this method.
 	 * @param {object} data - Data to write to the backend
 	 * @param {object} [o] - Options object
+	 * @returns {object} - If successsful, info about the file
 	 */
 	async store (data, o = {}) {
 		await this.ready;
@@ -150,11 +151,7 @@ export default class Backend extends EventTarget {
 
 		let serialized = typeof data === "string"? data : await this.stringify(data);
 
-		let fileInfo = await this.put(serialized, {file, ...options});
-
-		// TODO add data and serialized onto fileInfo so we can just return a single value?
-
-		return {data, serialized, fileInfo};
+		return this.put(serialized, {file, ...options});
 	}
 
 	async remove (file = this.file) {
