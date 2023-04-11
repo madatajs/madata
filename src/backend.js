@@ -89,6 +89,24 @@ export default class Backend extends EventTarget {
 		return null;
 	}
 
+	#getFile (ref) {
+		let file;
+
+		if (typeof ref === "string") {
+			// ref is a URL
+			if (/^\w+:/.test(file)) {
+				// Absolute URL
+				return this.constructor.parseURL(ref);
+			}
+
+			// Relative path
+			return Object.assign({}, this.file, {path: ref});
+		}
+
+		// Either file object, or empty value
+		return ref ?? this.file;
+	}
+
 	/**
 	 * Higher-level method for reading data from the backend.
 	 * Subclasses should usually NOT override this method.
@@ -99,21 +117,7 @@ export default class Backend extends EventTarget {
 	async load (url, ...args) {
 		await this.ready;
 
-		let file;
-
-		if (url) {
-			if (/^\w+:/.test(url)) {
-				// Absolute URL
-				file = this.constructor.parseURL(url);
-			}
-			else {
-				// Relative path
-				file = Object.assign({}, this.file, {path: url});
-			}
-		}
-		else {
-			file = this.file;
-		}
+		let file = this.#getFile(url);
 
 		let response = await this.get(file, ...args);
 
@@ -144,19 +148,7 @@ export default class Backend extends EventTarget {
 
 		let {file, url, ...options} = o;
 
-		if (url) {
-			if (/^\w+:/.test(url)) {
-				// Absolute URL
-				file = this.constructor.parseURL(url);
-			}
-			else {
-				// Relative path
-				file = Object.assign({}, this.file, {path: url});
-			}
-		}
-		else if (!file) {
-			file = this.file;
-		}
+		file = this.#getFile(file);
 
 		let serialized = typeof data === "string"? data : await this.stringify(data);
 
@@ -170,19 +162,11 @@ export default class Backend extends EventTarget {
 	async remove (file = this.file) {
 		await this.ready;
 
-		if (typeof file === "string") {
-			if (/^\w+:/.test(file)) {
-				// Absolute URL
-				file = this.constructor.parseURL(file);
-			}
-			else {
-				// Relative path
-				file = Object.assign({}, this.file, {path: file});
-			}
+		if (!this.delete) {
+			throw new Error("This backend does not support deleting files");
 		}
-		else if (!file) {
-			file = this.file;
-		}
+
+		file = this.#getFile(file);
 
 		return this.delete(file);
 	}
