@@ -47,7 +47,7 @@ export default class Element extends Backend {
 	async put (serialized) {
 		this.observer.disconnect();
 
-		let ret = this.element.textContent = serialized;
+		this.element.textContent = serialized;
 
 		this.observer.observe(this.element, {
 			childList: true,
@@ -55,7 +55,7 @@ export default class Element extends Backend {
 			subtree: true
 		});
 
-		return ret;
+		return {};
 	}
 
 	static test (url) {

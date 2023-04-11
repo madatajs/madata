@@ -80,6 +80,8 @@ export default class GithubGist extends Github {
 			let env = {context: this, file};
 			hooks.run("gh-new-gist", env);
 		}
+
+		return gistInfo;
 	}
 
 	async canPush (file = this.file) {

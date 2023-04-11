@@ -26,12 +26,12 @@ export default class Local extends Backend {
 	async put (serialized) {
 		if (!serialized) {
 			delete localStorage[this.file.key];
-		}
-		else {
-			localStorage[this.file.key] = serialized;
+			return {type: "delete"}
 		}
 
-		return serialized;
+		let exists = this.file.key in localStorage;
+		localStorage[this.file.key] = serialized;
+		return {type: exists? "update" : "create"}
 	}
 
 	static parseURL(source) {
