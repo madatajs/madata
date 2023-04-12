@@ -14,7 +14,7 @@ For consistency, they are asynchronous even when wrapping a synchronous API (e.g
 ## Reading data with `backend.load()` { #load }
 
 ```ts
-async function load(url?: string) : Promise<any>;
+async load(url?: string) : Promise<any>;
 ```
 
 `backend.load()` returns a `Promise` that resolves to the data that was loaded, parsed as JSON.
@@ -57,13 +57,15 @@ let backend = Backend.create("https://...", {
 ## Storing data with `backend.store()` { #store }
 
 ```ts
-async function store(data: any, url?: string) : Promise<{data, serialized, fileInfo}>;
+async store(data: any, url?: string) : Promise<object | null>;
 ```
+
+This function stores data to the backend, and returns an object with information about the file and/or the editing operation.
 
 ## Deleting files with `backend.remove()` { #remove }
 
 ```ts
-async function remove(url?: string) : Promise<void>;
+async remove(url?: string) : Promise<void>;
 ```
 
 Not every backend supports deleting files, but typically file-based backends (e.g. GitHub File, Google Drive, Dropbox) do.
@@ -72,10 +74,10 @@ You can check if `backend.delete` is truthy to see if it's supported.
 ## Uploading files with `backend.upload()` { #upload }
 
 ```ts
-async function upload(file: File, path?: string) : Promise<string>;
+async upload(file: File, path?: string) : Promise<string>;
 ```
 
-This function uploads a `File` object and returns an absolute URL to that file.
+This function uploads a [`File`](https://developer.mozilla.org/en-US/docs/Web/API/File) object and returns an absolute URL to that file.
 
 Not every backend supports uploads, but typically file-based backends (e.g. GitHub File, Google Drive, Dropbox) do.
 You can check if `backend.upload` is truthy to see if it's supported.
