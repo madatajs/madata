@@ -416,3 +416,24 @@ span[data-alternates] {
 		}
 	}
 }
+
+pre.language-ts {
+	position: relative;
+	&::before {
+		content: "TypeScript Definition";
+		position: absolute;
+		top: .6em;
+		right: .6em;
+		padding: .35em .5em;
+		border-radius: .2em;
+		background: inherit;
+		max-width: 10em;
+		width: min-content;
+		white-space: normal;
+		filter: brightness(0.8) saturate(4);
+		color: hsla(0 0% 0% / .6);
+		text-align: center;
+		font: bold 80%/1.2 var(--font-body);
+		text-transform: uppercase;
+	}
+}
