@@ -205,7 +205,7 @@ export default class GoogleFirebase extends Google {
 	}
 
 	async login ({ passive } = {}) {
-		let user = await super.login(...args);
+		let user = await super.login(...arguments);
 
 		if (user) {
 			this.updatePermissions({edit: true, save: true});
