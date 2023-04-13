@@ -139,7 +139,7 @@ export default class OAuthBackend extends AuthBackend {
 			return this.getUser();
 		}
 
-		await passiveLogin(rest);
+		await this.passiveLogin(rest);
 
 		if (this.isAuthenticated()) {
 			try {
