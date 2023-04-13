@@ -34,7 +34,7 @@ export default class GoogleFirebase extends Google {
 
 			if (this.app) {
 				const auth = getAuth(this.app);
-				onAuthStateChanged(auth, async (user) => {
+				onAuthStateChanged(auth, (user) => {
 					if (user) {
 						// User is signed in
 						this.user = {
