@@ -16,7 +16,7 @@ export default class AuthBackend extends Backend {
 
 	/**
 	 * Is current user authenticated?
-	 * Sycnrhonous because it must not trigger any API calls, use passiveLogin() for that
+	 * Synchronous because it must not trigger any API calls, use passiveLogin() for that
 	 * @returns {boolean}
 	 */
 	isAuthenticated () {
@@ -43,11 +43,11 @@ export default class AuthBackend extends Backend {
 			return this.getUser();
 		}
 
-		await passiveLogin(rest);
+		await this.passiveLogin(rest);
 
 		if (this.isAuthenticated()) {
 			try {
-				await this.getUser()
+				await this.getUser();
 			}
 			catch (e) {
 				if (e.status == 401) {
@@ -116,5 +116,5 @@ export default class AuthBackend extends Backend {
 
 	static phrases = {
 		"authentication_error": "Authentication error",
-	}
+	};
 }
