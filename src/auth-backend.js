@@ -1,5 +1,6 @@
 import Backend from "./backend.js";
 /**
+ * @abstract
  * Backend that supports authentication
  */
 export default class AuthBackend extends Backend {
@@ -51,7 +52,7 @@ export default class AuthBackend extends Backend {
 			catch (e) {
 				if (e.status == 401) {
 					// Unauthorized. We have corrupt local data, discard it
-					this.logout({force: true})
+					this.deleteLocalUserInfo();
 				}
 			}
 		}
@@ -84,7 +85,34 @@ export default class AuthBackend extends Backend {
 		throw new TypeError("Not implemented");
 	}
 
-	async logout () {}
+	async logout () {
+		let wasAuthenticated = this.isAuthenticated();
+
+		if (wasAuthenticated || force) {
+			this.deleteLocalUserInfo();
+
+			// TODO does this really represent all backends? Should it be a setting?
+			this.updatePermissions({
+				login: true
+			});
+
+			this.user = null;
+
+			if (wasAuthenticated) {
+				// We may force logout to clean up corrupt data
+				// But we don't want to trigger a logout event in that case
+				this.dispatchEvent(new CustomEvent("mv-logout"));
+			}
+		}
+	}
+
+	/**
+	 * @abstract
+	 * Delete any info used to log users in passively
+	 */
+	deleteLocalUserInfo () {
+		throw new TypeError("Not implemented");
+	}
 
 	static phrases = {
 		"authentication_error": "Authentication error",

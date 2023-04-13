@@ -205,30 +205,28 @@ export default class GoogleFirebase extends Google {
 	}
 
 	async login ({ passive } = {}) {
-		await this.ready;
+		let user = await super.login(...args);
 
-		if (!passive) {
-			try {
-				const auth = getAuth(this.app);
-				const provider = new GoogleAuthProvider();
-
-				// Apply the default browser preference.
-				useDeviceLanguage(auth);
-
-				await signInWithPopup(auth, provider);
-			}
-			catch (e) {
-				throw new Error(e.message);
-			}
-		}
-
-		const user = await this.getUser();
 		if (user) {
-			this.dispatchEvent(new CustomEvent("mv-login"));
-			this.updatePermissions({ login: false, logout: true, edit: true, save: true });
+			this.updatePermissions({edit: true, save: true});
 		}
 
 		return user;
+	}
+
+	async activeLogin () {
+		try {
+			const auth = getAuth(this.app);
+			const provider = new GoogleAuthProvider();
+
+			// Apply the default browser preference.
+			useDeviceLanguage(auth);
+
+			await signInWithPopup(auth, provider);
+		}
+		catch (e) {
+			throw new Error(e.message);
+		}
 	}
 
 	async logout () {
@@ -240,10 +238,6 @@ export default class GoogleFirebase extends Google {
 		catch (e) {
 			throw new Error(e.message);
 		}
-	}
-
-	async getUser () {
-		return this.user;
 	}
 
 	#applyDefaults (file = this.file) {

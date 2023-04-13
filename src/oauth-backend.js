@@ -218,30 +218,26 @@ export default class OAuthBackend extends AuthBackend {
 	/**
 	 * oAuth logout helper
 	 */
-	async logout ({force = false} = {}) {
-		let wasAuthenticated = this.isAuthenticated();
+	async logout () {
+		super.logout();
 
-		if (wasAuthenticated || force) {
-			localStorage.removeItem(this.constructor.tokenKey);
-			delete this.accessToken;
-
+		if (!this.isAuthenticated()) {
 			// TODO does this really represent all backends? Should it be a setting?
 			this.updatePermissions({
 				edit: false,
 				add: false,
 				delete: false,
 				save: false,
-				login: true
 			});
-
-			this.user = null;
-
-			if (wasAuthenticated) {
-				// We may force logout to clean up corrupt data
-				// But we don't want to trigger a logout event in that case
-				this.dispatchEvent(new CustomEvent("mv-logout"));
-			}
 		}
+	}
+
+	/**
+	 * Delete any info used to log users in passively
+	 */
+	deleteLocalUserInfo () {
+		localStorage.removeItem(this.constructor.tokenKey);
+		delete this.accessToken;
 	}
 
 	static get tokenKey () {
