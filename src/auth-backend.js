@@ -88,7 +88,7 @@ export default class AuthBackend extends Backend {
 	async logout () {
 		let wasAuthenticated = this.isAuthenticated();
 
-		if (wasAuthenticated || force) {
+		if (wasAuthenticated) {
 			this.deleteLocalUserInfo();
 
 			// TODO does this really represent all backends? Should it be a setting?
