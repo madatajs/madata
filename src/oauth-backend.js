@@ -130,7 +130,7 @@ export default class OAuthBackend extends AuthBackend {
 	 * @param [options] {object}
 	 * @param [options.passive] {boolean} - Do not trigger any login UI, just return the current user if already logged in
 	 */
-	async login ({passive = false} = {}) {
+	async login ({passive = false, ...rest} = {}) {
 		if (this.ready) {
 			await this.ready;
 		}
@@ -139,11 +139,12 @@ export default class OAuthBackend extends AuthBackend {
 			return this.getUser();
 		}
 
-		let oAuthBackend = this.constructor.getOAuthBackend();
+		// We try passive login first even if this is an active login
+		// Or should we not? Perhaps we should treat an active log in as an implicit log out request?
+		await this.passiveLogin(rest);
 
-		this.accessToken = localStorage[this.constructor.tokenKey];
-
-		if (this.accessToken) {
+		if (this.isAuthenticated()) {
+			// We seem to have credentials already, but are they valid?
 			try {
 				await this.getUser()
 			}
@@ -157,44 +158,7 @@ export default class OAuthBackend extends AuthBackend {
 		}
 
 		if (!passive) {
-			// Show window
-			let popup = {
-				width: Math.min(1000, innerWidth - 100),
-				height: Math.min(800, innerHeight - 100)
-			};
-
-			popup.top = (screen.height - popup.height)/2;
-			popup.left = (screen.width - popup.width)/2;
-
-			var state = {
-				url: location.href,
-				backend: oAuthBackend.name
-			};
-
-			this.authPopup = open(`${this.constructor.oAuth}?client_id=${this.clientId}&state=${encodeURIComponent(JSON.stringify(state))}` + this.oAuthParams(),
-				"popup", `width=${popup.width},height=${popup.height},left=${popup.left},top=${popup.top}`);
-
-			if (!this.authPopup) {
-				throw new Error(this.constructor.phrase("popup_blocked"));
-			}
-
-			let accessToken = await new Promise((resolve, reject) => {
-				addEventListener("message", evt => {
-					if (evt.source === this.authPopup) {
-						if (evt.data.backend == oAuthBackend.name) {
-							resolve(evt.data.token);
-						}
-
-						if (!this.accessToken) {
-							reject(Error(this.constructor.phrase("authentication_error")));
-						}
-					}
-				});
-			});
-
-			this.accessToken = localStorage[this.constructor.tokenKey] = accessToken;
-
-			hooks.run("oauth-login-success", this);
+			await this.activeLogin(rest);
 		}
 
 		if (this.isAuthenticated()) {
@@ -205,27 +169,78 @@ export default class OAuthBackend extends AuthBackend {
 		}
 	}
 
+	async activeLogin () {
+		let oAuthBackend = this.constructor.getOAuthBackend();
+
+		// Show window
+		let popup = {
+			width: Math.min(1000, innerWidth - 100),
+			height: Math.min(800, innerHeight - 100)
+		};
+
+		popup.top = (screen.height - popup.height)/2;
+		popup.left = (screen.width - popup.width)/2;
+
+		var state = {
+			url: location.href,
+			backend: oAuthBackend.name
+		};
+
+		this.authPopup = open(`${this.constructor.oAuth}?client_id=${this.clientId}&state=${encodeURIComponent(JSON.stringify(state))}` + this.oAuthParams(),
+			"popup", `width=${popup.width},height=${popup.height},left=${popup.left},top=${popup.top}`);
+
+		if (!this.authPopup) {
+			throw new Error(this.constructor.phrase("popup_blocked"));
+		}
+
+		let accessToken = await new Promise((resolve, reject) => {
+			addEventListener("message", evt => {
+				if (evt.source === this.authPopup) {
+					if (evt.data.backend == oAuthBackend.name) {
+						resolve(evt.data.token);
+					}
+
+					if (!this.accessToken) {
+						reject(Error(this.constructor.phrase("authentication_error")));
+					}
+				}
+			});
+		});
+
+		this.accessToken = localStorage[this.constructor.tokenKey] = accessToken;
+
+		hooks.run("oauth-login-success", this);
+
+		return this.accessToken;
+	}
+
+	async passiveLogin () {
+		this.accessToken = localStorage[this.constructor.tokenKey];
+	}
+
 	/**
 	 * oAuth logout helper
 	 */
 	async logout () {
-		if (this.isAuthenticated()) {
-			localStorage.removeItem(this.constructor.tokenKey);
-			delete this.accessToken;
+		super.logout();
 
+		if (!this.isAuthenticated()) {
 			// TODO does this really represent all backends? Should it be a setting?
 			this.updatePermissions({
 				edit: false,
 				add: false,
 				delete: false,
 				save: false,
-				login: true
 			});
-
-			this.user = null;
-
-			this.dispatchEvent(new CustomEvent("mv-logout"));
 		}
+	}
+
+	/**
+	 * Delete any info used to log users in passively
+	 */
+	deleteLocalUserInfo () {
+		localStorage.removeItem(this.constructor.tokenKey);
+		delete this.accessToken;
 	}
 
 	static get tokenKey () {
