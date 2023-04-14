@@ -139,9 +139,12 @@ export default class OAuthBackend extends AuthBackend {
 			return this.getUser();
 		}
 
+		// We try passive login first even if this is an active login
+		// Or should we not? Perhaps we should treat an active log in as an implicit log out request?
 		await this.passiveLogin(rest);
 
 		if (this.isAuthenticated()) {
+			// We seem to have credentials already, but are they valid?
 			try {
 				await this.getUser()
 			}
