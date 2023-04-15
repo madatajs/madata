@@ -90,9 +90,6 @@ Value: <input id="valueInput" oninput="json.value = this.value">
 import Backend from "https://madata.dev/src/index.js";
 
 globalThis.backend = Backend.from("https://github.com/leaverou/repo/data.json");
-globalThis.json = (await backend.load()) ?? {value: 0};
-
-valueInput.value = json.value;
 
 backend.addEventListener("mv-login", evt => {
 	loginButton.hidden = true;
@@ -103,6 +100,9 @@ backend.addEventListener("mv-logout", evt => {
 	logoutButton.hidden = true;
 	myUsername.textContent = "";
 });
+
+globalThis.json = (await backend.load()) ?? {value: 0};
+valueInput.value = json.value;
 </script>
 ```
 
