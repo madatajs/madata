@@ -1,0 +1,71 @@
+{
+	// Provide predefined global variables
+	"env": {
+		"browser": true, // browser global variables
+		"es2021": true, // all ECMAScript 2021 globals
+		"node": true // Node.js global variables and Node.js scoping
+	},
+	"extends": "eslint:recommended",
+	"parserOptions": {
+		"ecmaVersion": "latest", // The version of ECMAScript to support — the most recent supported version
+		"sourceType": "module" // The type of JavaScript source code — ECMAScript modules (ESM)
+	},
+	"rules": {
+		// Tabbed indentation (https://eslint.org/docs/latest/rules/indent)
+		"indent": [
+			"error",
+			"tab",
+			{
+				"outerIIFEBody": 0 // Do not indent IIFE body (https://eslint.org/docs/latest/rules/indent#outeriifebody)
+			}
+		],
+		// Unix line endings: \n for LF (https://eslint.org/docs/latest/rules/linebreak-style)
+		"linebreak-style": [
+			"error",
+			"unix"
+		],
+		// Double quotes wherever possible (https://eslint.org/docs/latest/rules/quotes)
+		"quotes": [
+			"error",
+			"double",
+			{
+				"allowTemplateLiterals": true // (https://eslint.org/docs/latest/rules/quotes#allowtemplateliterals)
+			}
+		],
+		// Never omit curly braces around blocks (https://eslint.org/docs/latest/rules/curly)
+		"curly": "error",
+		// Never omit semicolons at the end of statements (https://eslint.org/docs/latest/rules/semi)
+		"semi": [
+			"error",
+			"always"
+		],
+		// Stroustrup brace style for blocks (https://eslint.org/docs/latest/rules/brace-style#stroustrup)
+		"brace-style": [
+			"error",
+			"stroustrup",
+			{
+				"allowSingleLine": true // if (foo) { bar(); } is an example of allowed style of block
+			}
+		],
+		// Never omit whitespace between the function name or function keyword and the opening paren (https://eslint.org/docs/latest/rules/space-before-function-paren)
+		"space-before-function-paren": [
+			"error",
+			"always"
+		],
+		// Disallow multiple empty lines (https://eslint.org/docs/latest/rules/no-multiple-empty-lines)
+		"no-multiple-empty-lines": [
+			"error",
+			{
+				"max": 1, // maximum number of consecutive empty lines
+				"maxEOF": 0 // maximum number of consecutive empty lines at the end of files
+			}
+		],
+		// Disallow empty block statements (https://eslint.org/docs/latest/rules/no-empty)
+		"no-empty": [
+			"error",
+			{
+				"allowEmptyCatch": true // except the catch block
+			}
+		]
+	}
+}
