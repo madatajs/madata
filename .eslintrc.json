@@ -42,10 +42,7 @@
 		// Stroustrup brace style for blocks (https://eslint.org/docs/latest/rules/brace-style#stroustrup)
 		"brace-style": [
 			"error",
-			"stroustrup",
-			{
-				"allowSingleLine": true // if (foo) { bar(); } is an example of allowed style of block
-			}
+			"stroustrup"
 		],
 		// Never omit whitespace between the function name or function keyword and the opening paren (https://eslint.org/docs/latest/rules/space-before-function-paren)
 		"space-before-function-paren": [
