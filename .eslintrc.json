@@ -49,6 +49,11 @@
 			"error",
 			"always"
 		],
+		// Disallow spacing between function identifiers and their invocations (https://eslint.org/docs/latest/rules/func-call-spacing)
+		"func-call-spacing": [
+			"error",
+			"never"
+		],
 		// Disallow multiple empty lines (https://eslint.org/docs/latest/rules/no-multiple-empty-lines)
 		"no-multiple-empty-lines": [
 			"error",
