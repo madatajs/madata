@@ -2,10 +2,10 @@
 
 Reading and writing data is done using four high-level methods on `Backend` instances:
 
-- `backend.load()`
-- `backend.store()`
-- `backend.remove()`
-- `backend.upload()`
+- [`backend.load()`](#load)
+- [`backend.store()`](#store)
+- [`backend.remove()`](#remove)
+- [`backend.upload()`](#upload)
 
 All are asynchronous (i.e. return a `Promise` object).
 For consistency, they are asynchronous even when wrapping a synchronous API (e.g. `localStorage`).
@@ -82,3 +82,15 @@ This function uploads a [`File`](https://developer.mozilla.org/en-US/docs/Web/AP
 Not every backend supports uploads, but typically file-based backends (e.g. GitHub File, Google Drive, Dropbox) do.
 You can check if `backend.upload` is truthy to see if it's supported.
 Whether uploads are supported is also listed at the top of the backend's documentation page.
+
+
+## Low level methods
+
+In addition to the high level methods (which are implemented on superclasses),
+each `Backend` subclass implements corresponding lower level methods:
+
+- `backend.get()` (used by [`backend.load()`](#load))
+- `backend.put()` (used by [`backend.store()`](#store))
+- `backend.delete()` (used by [`backend.remove()`](#remove))
+
+These methods are not meant to be used directly, except for very specific, niche use cases.
