@@ -32,6 +32,8 @@
 				"allowTemplateLiterals": true // (https://eslint.org/docs/latest/rules/quotes#allowtemplateliterals)
 			}
 		],
+		// Require let or const instead of var (https://eslint.org/docs/latest/rules/no-var#rule-details)
+		"no-var": "error",
 		// Never omit curly braces around blocks (https://eslint.org/docs/latest/rules/curly)
 		"curly": "error",
 		// Never omit semicolons at the end of statements (https://eslint.org/docs/latest/rules/semi)
