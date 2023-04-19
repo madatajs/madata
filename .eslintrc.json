@@ -58,6 +58,8 @@
 			"warn",
 			"never"
 		],
+		// Disallow multiple whitespace around logical expressions, conditional expressions, declarations, array elements, object properties, sequences and function parameters (https://eslint.org/docs/latest/rules/no-multi-spaces)
+		"no-multi-spaces": "warn",
 		// Disallow multiple empty lines (https://eslint.org/docs/latest/rules/no-multiple-empty-lines)
 		"no-multiple-empty-lines": [
 			"warn",
