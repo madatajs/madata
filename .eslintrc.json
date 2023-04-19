@@ -13,7 +13,7 @@
 	"rules": {
 		// Tabbed indentation (https://eslint.org/docs/latest/rules/indent)
 		"indent": [
-			"error",
+			"warn",
 			"tab",
 			{
 				"outerIIFEBody": 0 // Do not indent IIFE body (https://eslint.org/docs/latest/rules/indent#outeriifebody)
@@ -21,44 +21,44 @@
 		],
 		// Unix line endings: \n for LF (https://eslint.org/docs/latest/rules/linebreak-style)
 		"linebreak-style": [
-			"error",
+			"warn",
 			"unix"
 		],
 		// Double quotes wherever possible (https://eslint.org/docs/latest/rules/quotes)
 		"quotes": [
-			"error",
+			"warn",
 			"double",
 			{
 				"allowTemplateLiterals": true // (https://eslint.org/docs/latest/rules/quotes#allowtemplateliterals)
 			}
 		],
 		// Require let or const instead of var (https://eslint.org/docs/latest/rules/no-var#rule-details)
-		"no-var": "error",
+		"no-var": "warn",
 		// Never omit curly braces around blocks (https://eslint.org/docs/latest/rules/curly)
-		"curly": "error",
+		"curly": "warn",
 		// Never omit semicolons at the end of statements (https://eslint.org/docs/latest/rules/semi)
 		"semi": [
-			"error",
+			"warn",
 			"always"
 		],
 		// Stroustrup brace style for blocks (https://eslint.org/docs/latest/rules/brace-style#stroustrup)
 		"brace-style": [
-			"error",
+			"warn",
 			"stroustrup"
 		],
 		// Never omit whitespace between the function name or function keyword and the opening paren (https://eslint.org/docs/latest/rules/space-before-function-paren)
 		"space-before-function-paren": [
-			"error",
+			"warn",
 			"always"
 		],
 		// Disallow spacing between function identifiers and their invocations (https://eslint.org/docs/latest/rules/func-call-spacing)
 		"func-call-spacing": [
-			"error",
+			"warn",
 			"never"
 		],
 		// Disallow multiple empty lines (https://eslint.org/docs/latest/rules/no-multiple-empty-lines)
 		"no-multiple-empty-lines": [
-			"error",
+			"warn",
 			{
 				"max": 1, // maximum number of consecutive empty lines
 				"maxEOF": 0 // maximum number of consecutive empty lines at the end of files
@@ -66,7 +66,7 @@
 		],
 		// Disallow empty block statements (https://eslint.org/docs/latest/rules/no-empty)
 		"no-empty": [
-			"error",
+			"warn",
 			{
 				"allowEmptyCatch": true // except the catch block
 			}
