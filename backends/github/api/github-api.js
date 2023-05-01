@@ -27,6 +27,10 @@ export default class GithubAPI extends Github {
 		};
 		let response = await this.request(file.apiCall, {}, "GET", req);
 
+		if (!response || !response.ok) {
+			return null;
+		}
+
 		// Raw API call
 		let json = await response.json();
 
