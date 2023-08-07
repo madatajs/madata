@@ -6,7 +6,7 @@
 import Google from "../google.js";
 
 export default class GoogleCalendar extends Google {
-	async get (file) {
+	async get (file = this.file) {
 		let call = `${file.calendarId}/events?key=${this.apiKey}`;
 
 		if (this.options) {

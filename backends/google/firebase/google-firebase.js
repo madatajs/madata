@@ -56,7 +56,7 @@ export default class GoogleFirebase extends Google {
 		})
 	]);
 
-	async get (file) {
+	async get (file = this.file) {
 		file = this.#applyDefaults(file);
 
 		const firestore = getFirestore(this.app);

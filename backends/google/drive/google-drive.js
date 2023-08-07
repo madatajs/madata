@@ -29,7 +29,7 @@ export default class GoogleDrive extends Google {
 		}
 	}
 
-	async get (file) {
+	async get (file = this.file) {
 		if (!file.id) {
 			// There is no file to work with.
 			// We might have a URL of a folder (instead of a file) in which the file will be stored.

@@ -8,7 +8,7 @@ export default class GithubAPI extends Github {
 		Object.assign(this, GithubAPI.parseURL(this.source));
 	}
 
-	async get (file) {
+	async get (file = this.file) {
 		if (file.query) {
 			// GraphQL
 			let response = await this.request(file.url, { query: file.query }, "POST");

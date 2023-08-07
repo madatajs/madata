@@ -7,7 +7,7 @@ import Github from "../github.js";
 import hooks from "../../../src/hooks.js";
 
 export default class GithubGist extends Github {
-	async get (file) {
+	async get (file = this.file) {
 		if (this.isAuthenticated()) {
 			// Authenticated API call
 			if (file.gistId) {
