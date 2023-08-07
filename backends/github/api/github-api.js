@@ -82,10 +82,15 @@ export default class GithubAPI extends Github {
 			url: new URL(source, location)
 		};
 
-		if (ret.url.hash && ret.url.pathname == "/graphql") {
-			// https://api.github.com/graphql#query{...}
-			ret.query = source.match(/#([\S\s]+)/)?.[1]; // url.hash drops line breaks
-			ret.url.hash = "";
+		if (ret.url.pathname == "/graphql") {
+			if (ret.url.hash) {
+				// https://api.github.com/graphql#query{...}
+				ret.query = source.match(/#([\S\s]+)/)?.[1]; // url.hash drops line breaks
+				ret.url.hash = "";
+			}
+			else {
+				ret.query = "";
+			}
 		}
 		else {
 			// Raw API call
