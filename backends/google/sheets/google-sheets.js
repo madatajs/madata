@@ -134,10 +134,37 @@ export default class GoogleSheets extends Google {
 	async put (data, {file = this.file, ...options} = {}) {
 		file = Object.assign({}, file, {...options});
 
+		if (file.sheetId !== undefined && !file.sheet || GoogleSheets.#getRangeReference(file) === "") {
+			// We need to know the name of a worksheet where to store data.
+			try {
+				file.sheet = await this.#getSheetTitle(file);
+			}
+			catch (e) {
+				if (e.status === 401) {
+					await this.logout(); // Access token we have is invalid. Discard it.
+					throw new Error(this.constructor.phrase("access_token_invalid"));
+				}
+
+				let error;
+				if (e instanceof Response) {
+					error = (await e.json()).error.message;
+				}
+				else {
+					error = e.message;
+				}
+
+				throw new Error(error);
+			}
+		}
+
 		const rangeReference = GoogleSheets.#getRangeReference(file);
 		let call = `${file.id}/values/${rangeReference}?key=${this.apiKey}&valueInputOption=${this.options.smartValues? "user_entered" : "raw"}&responseValueRenderOption=unformatted_value&includeValuesInResponse=true`;
 		if (this.options.serializeDates) {
 			call += "&responseDateTimeRenderOption=formatted_string";
+		}
+
+		if (!file.objectKeys && data.some(el => !Array.isArray(el))) {
+			file.objectKeys = new Map();
 		}
 
 		if (file.objectKeys) {
