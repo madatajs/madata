@@ -39,6 +39,17 @@
 
 {% if page.url and page.url !== "/" %}</main>{% endif %}
 
+<footer>
+	<div class="logo">
+		<img src="{{ page | relative }}/logo.svg" alt="logo" /> madata
+	</div>
+
+	<nav>
+		<a href="/terms-of-service">Terms of Service</a> &bull;
+		<a href="/privacy-policy">Privacy Policy</a>
+	</nav>
+</footer>
+
 <script src="{{ page | relative }}/global.js" type="module"></script>
 
 </body>
