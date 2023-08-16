@@ -23,7 +23,7 @@ export default class MadataAuth extends HTMLElement {
 
 	constructor() {
 		super();
-		console.log(this.backend)
+
 		this.attachShadow({ mode: "open" });
 		this.shadowRoot.innerHTML = `<style>${styles}</style>
 		<slot></slot>

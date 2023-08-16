@@ -40,7 +40,7 @@ export default class Format {
 	}
 
 	static toBlob (str, options) {
-		if (options.stringify || (typeof str !== "string" && !(str instanceof String))) {
+		if (options?.stringify || (typeof str !== "string" && !(str instanceof String))) {
 			str = this.stringify(str, options);
 		}
 
