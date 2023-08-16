@@ -20,6 +20,10 @@ export default class Backend extends EventTarget {
 		this.update(url, o);
 	}
 
+	static get title () {
+		return this.name.replace(/([a-z])([A-Z])/g, "$1 $2");
+	}
+
 	/**
 	 * Update an existing backend instance with new parameters
 	 * @param {string} url - Same as constructor

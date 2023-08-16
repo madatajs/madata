@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Document</title>
+</head>
+<body>
+	<madata-auth id="auth"></madata-auth>
+	<script type="module">
+		import Backend from "../../src/index.js";
+		import MadataAuth from './index.js';
+
+		let gsheets = Backend.from("https://docs.google.com/spreadsheets/d/13SdiaC9YQ8PwrMNvtd8n8qRhh90aOq96hr4jUgt0Efg/edit#gid=0");
+		auth.backend = gsheets;
+	</script>
+</body>
+</html>

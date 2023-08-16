@@ -8,9 +8,9 @@
 	<link rel="icon" href="{{ page | relative }}/logo.svg">
 	<link rel="stylesheet" href="{{ page | relative }}/style.css" />
 
-	{% if id and id != "v-app" %}
-	<script src="{{ id }}.js" type="module"></script>
-	{% endif %}
+	{% if js -%}
+	<script src="index.js" type="module"></script>
+	{%- endif %}
 	{{ includes | safe }}
 </head>
 <body>
