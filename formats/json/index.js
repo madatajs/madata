@@ -1,7 +1,7 @@
 import Format from "../../src/format.js";
 
 // name is not JSON to avoid conflict with the built-in JSON object
-export default class Json extends Format {
+export default class JSON extends Format {
 	static defaultOptions = {
 		replacer: null,
 		space: "\t"
@@ -10,11 +10,11 @@ export default class Json extends Format {
 	static mimeTypes = ["application/json"];
 
 	static parse (str) {
-		return JSON.parse(str);
+		return globalThis.JSON.parse(str);
 	}
 
 	static stringify (obj, options) {
 		options = this.resolveOptions(options);
-		return JSON.stringify(obj, options.replacer, options.space);
+		return globalThis.JSON.stringify(obj, options.replacer, options.space);
 	}
 }
