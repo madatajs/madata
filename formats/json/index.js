@@ -1,6 +1,7 @@
 import Format from "../../src/format.js";
 
-export default class JSON extends Format {
+// name is not JSON to avoid conflict with the built-in JSON object
+export default class Json extends Format {
 	static defaultOptions = {
 		replacer: null,
 		space: "\t"
@@ -16,4 +17,4 @@ export default class JSON extends Format {
 		options = this.resolveOptions(options);
 		return JSON.stringify(obj, options.replacer, options.space);
 	}
-};
+}
