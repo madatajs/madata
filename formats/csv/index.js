@@ -9,7 +9,7 @@ export default class CSV extends Format {
 		cast: true
 	};
 
-	static extensions = [".csv"];
+	static extensions = ["csv"];
 	static mimeTypes = ["text/csv"];
 
 	static parse (str, options) {
