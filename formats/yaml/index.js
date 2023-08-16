@@ -3,7 +3,7 @@ import { parse, stringify } from "../../node_modules/yaml/browser/index.js";
 
 export default class YAML extends Format {
 	static extensions = ["yaml", "yml"];
-	static mimeTypes = ["application/x-yaml", "text/yaml"];
+	static mimeTypes = ["application/yaml", "application/x-yaml", "text/yaml"];
 
 	static parse(str, options) {
 		options = this.resolveOptions(options);
