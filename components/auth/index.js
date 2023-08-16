@@ -31,8 +31,8 @@ export default class MadataAuth extends HTMLElement {
 			<button part="button">Log in</button>
 		</slot>
 		<div id="status">
-			<img id="avatar" alt="Avatar" />
-			<span id="username"></span>
+			<img id="avatar" alt="Avatar" part="avatar" />
+			<span id="username" part="username"></span>
 		</div>
 		<slot name="logout">
 			<button part="button">Log out</button>
