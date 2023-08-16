@@ -32,6 +32,8 @@
 				"allowTemplateLiterals": true // (https://eslint.org/docs/latest/rules/quotes#allowtemplateliterals)
 			}
 		],
+		// Do not error on unused vars, just warn (https://eslint.org/docs/latest/rules/no-unused-vars#rule-details)
+		"no-unused-vars": "warn",
 		// Require let or const instead of var (https://eslint.org/docs/latest/rules/no-var#rule-details)
 		"no-var": "warn",
 		// Never omit curly braces around blocks (https://eslint.org/docs/latest/rules/curly)
