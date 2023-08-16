@@ -213,7 +213,7 @@ export default class Backend extends EventTarget {
 
 	static find (url, o) {
 		if (url) {
-			for (let backend of Backend.types) {
+			for (let backend of Backend.all) {
 				// Check first if backend is a descendant class of this
 				// This allows calling create on child classes to narrow the scope of the search
 				// And then if the URL is one of the URLs handlded by it
@@ -226,11 +226,11 @@ export default class Backend extends EventTarget {
 		return null;
 	}
 
-	static types = []
+	static all = []
 
 	static register (Class) {
 		Backend[Class.name] = Class;
-		Backend.types.push(Class);
+		Backend.all.push(Class);
 		return Class;
 	}
 

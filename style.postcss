@@ -425,8 +425,12 @@ main {
 	background: hsl(var(--gray) 96%);
 	padding-top: .4em;
 	padding-bottom: .4em;
-	font-size: 250%;
 	font-weight: 300;
+	white-space: nowrap;
+
+	@media (width > 700px) {
+		font-size: 250%;
+	}
 
 	& span[data-alternates] {
 		color: var(--accent-color);

@@ -1,3 +1,7 @@
+Backends are at the core of Madata.
+They are the adapters to the different services and data sources supported by Madata.
+You can read about how to use them in the [docs](/docs/).
+
 ## Supported backends
 
 | Service | Auth? | Writes? | Uploads? |

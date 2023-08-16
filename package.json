@@ -12,7 +12,7 @@
     "watch:html": "npx @11ty/eleventy --config=.eleventy.cjs --watch",
     "watch": "npx concurrently -n w: npm:watch:*",
     "docs": "npx documentation build src/** -f html --github -o api",
-    "dev": "http-server -p 58504 --cors"
+    "dev": "http-server -p 58504 --cors & open http://localhost:58504"
   },
   "repository": {
     "type": "git",
@@ -32,11 +32,15 @@
     "@11ty/eleventy": "^2.0.0",
     "concurrently": "^7.6.0",
     "documentation": "^14.0.1",
+    "eslint": "^8.38.0",
     "markdown-it-anchor": "^8.6.7",
     "markdown-it-attrs": "^4.1.6",
     "postcss": "^8.3.9",
     "postcss-cli": "^9.0.1",
-    "postcss-nesting": "^8.0.1",
-    "eslint": "^8.38.0"
+    "postcss-nesting": "^12.0.1"
+  },
+  "dependencies": {
+    "csv": "^6.3.1",
+    "yaml": "^2.3.1"
   }
 }
