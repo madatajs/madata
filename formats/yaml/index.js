@@ -2,9 +2,6 @@ import Format from "../../src/format.js";
 import { parse, stringify } from "../../node_modules/yaml/browser/index.js";
 
 export default class YAML extends Format {
-	static defaultOptions = {
-
-	};
 	static extensions = ["yaml", "yml"];
 	static mimeTypes = ["application/x-yaml", "text/yaml"];
 
