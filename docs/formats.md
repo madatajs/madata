@@ -44,8 +44,8 @@ export default class Foo extends Format {
 	parse (str) { /* ... */ }
 	stringify (obj) { /* ... */ }
 
-	static parse(str, options) { /* ... */ }
-	static stringify(obj, options) { /* ... */}
+	static parse (str, options) { /* ... */ }
+	static stringify (obj, options) { /* ... */}
 }
 ```
 
@@ -55,7 +55,7 @@ You do not need to define the instance methods as well, they will be automatical
 This is good for cases where specifying the configuration each time is cheap.
 1. You only define instance `parse(str)` and `stringify(obj)` methods.
 You do not need to define the static methods as well, they will be automatically generated for you (well, inherited),
-and will be wrappers around the instance methods of a `ClassName.defaultInstance` object, which will be created the first time they are called.`
+and will be wrappers around the instance methods of a `ClassName.defaultInstance` object, which will be created the first time they are called.
 This is good for cases where certain options involve upfront costs, such as fetching a whole new module.
 
 Of course, if you want to implement both, that’s fine too.
