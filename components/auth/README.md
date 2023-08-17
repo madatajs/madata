@@ -21,7 +21,7 @@ Customization with slots:
 <madata-auth id="gs_auth">
 	Google Sheets:
 	<button slot="login">Let me in!</button>
-	<button slot="login">Let me out!</button>
+	<button slot="logout">Let me out!</button>
 </madata-auth>
 <script type="module">
 import Backend from "https://madata.dev/src/index.js";
