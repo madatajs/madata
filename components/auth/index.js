@@ -18,7 +18,6 @@ let styles = `
 `;
 
 export default class MadataAuth extends HTMLElement {
-	#inited = {dom: false, api: false};
 	#backend;
 	#progress;
 	#dom = {};
@@ -31,6 +30,21 @@ export default class MadataAuth extends HTMLElement {
 		this.#dom.status = this.shadowRoot.querySelector("#status");
 		this.#dom.login = this.shadowRoot.querySelector("slot[name=login]");
 		this.#dom.logout = this.shadowRoot.querySelector("slot[name=logout]");
+
+		this.#dom.login.addEventListener("click", _ => this.login());
+		this.#dom.logout.addEventListener("click", _ => this.logout());
+
+		this.addEventListener("login", _ => {
+			this.progress = "";
+			let user = this.backend.user;
+			this.shadowRoot.querySelector("#username").textContent = user.username;
+			this.shadowRoot.querySelector("#avatar").src = user.avatar;
+			this.setAttribute("authenticated", "");
+		});
+
+		this.addEventListener("logout", _ => {
+			this.removeAttribute("authenticated");
+		});
 	}
 
 	#template () {
@@ -49,45 +63,27 @@ export default class MadataAuth extends HTMLElement {
 		`;
 	}
 
-	connectedCallback() {
-		if (this.#inited.dom) {
-			return;
-		}
-
-		this.#inited.dom = true;
-
-		this.addEventListener("init", _ => {
-			this.#dom.login.addEventListener("click", _ => {
-				this.backend.login();
-				this.progress = "Logging in";
-			});
-			this.#dom.logout.addEventListener("click", _ => this.backend.logout());
-
-			this.backend.addEventListener("mv-login", _ => {
-				this.progress = "";
-				let user = this.backend.user;
-				this.shadowRoot.querySelector("#username").textContent = user.username;
-				this.shadowRoot.querySelector("#avatar").src = user.avatar;
-				this.setAttribute("authenticated", "");
-			});
-			this.backend.addEventListener("mv-logout", _ => {
-				this.removeAttribute("authenticated");
-			});
-		});
-	}
-
 	get backend() {
 		return this.#backend;
 	}
 
 	set backend (backend) {
-		this.#backend = backend;
-		this.#dom.login.style.setProperty("--backend", `"${backend.constructor.title}"`);
-		this.#inited.api = true;
-		this.dispatchEvent(new Event("init"));
+		if (backend && backend !== this.#backend) {
+			this.#backend = backend;
+			this.#dom.login.style.setProperty("--backend", `"${backend.constructor.title}"`);
+
+			this.backend.addEventListener("mv-login", _ => {
+				this.dispatchEvent(new CustomEvent("login"));
+			});
+			this.backend.addEventListener("mv-logout", _ => {
+				this.dispatchEvent(new CustomEvent("logout"));
+			});
+
+			this.dispatchEvent(new CustomEvent("backendchange"));
+		}
 	}
 
-	get progress() {
+	get progress () {
 		return this.#progress;
 	}
 
@@ -99,6 +95,18 @@ export default class MadataAuth extends HTMLElement {
 		else {
 			delete this.shadowRoot.getElementById("status").dataset.inprogress;
 		}
+	}
+
+	async login () {
+		let ret = this.backend.login();
+		this.progress = this.constructor.phrase("logging-in");
+		await ret;
+		this.progress = "";
+		return ret;
+	}
+
+	logout () {
+		return this.backend.logout();
 	}
 
 	static phrases = {
