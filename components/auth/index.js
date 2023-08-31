@@ -1,3 +1,5 @@
+import { phrase } from "../../src/util.js";
+
 let styles = `
 :host {
 	display: flex;
@@ -25,22 +27,26 @@ export default class MadataAuth extends HTMLElement {
 		super();
 
 		this.attachShadow({ mode: "open" });
-		this.shadowRoot.innerHTML = `<style>${styles}</style>
+		this.shadowRoot.innerHTML = this.#template();
+		this.#dom.status = this.shadowRoot.querySelector("#status");
+		this.#dom.login = this.shadowRoot.querySelector("slot[name=login]");
+		this.#dom.logout = this.shadowRoot.querySelector("slot[name=logout]");
+	}
+
+	#template () {
+		return `<style>${styles}</style>
 		<slot></slot>
 		<slot name="login">
-			<button part="button">Log in</button>
+			<button part="button">${ this.constructor.phrase("log_in") }</button>
 		</slot>
 		<div id="status">
 			<img id="avatar" alt="Avatar" part="avatar" />
 			<span id="username" part="username"></span>
 		</div>
 		<slot name="logout">
-			<button part="button">Log out</button>
+			<button part="button">${ this.constructor.phrase("log_out") }</button>
 		</slot>
 		`;
-		this.#dom.status = this.shadowRoot.querySelector("#status");
-		this.#dom.login = this.shadowRoot.querySelector("slot[name=login]");
-		this.#dom.logout = this.shadowRoot.querySelector("slot[name=logout]");
 	}
 
 	connectedCallback() {
@@ -93,6 +99,16 @@ export default class MadataAuth extends HTMLElement {
 		else {
 			delete this.shadowRoot.getElementById("status").dataset.inprogress;
 		}
+	}
+
+	static phrases = {
+		"logging_in": "Logging in",
+		"log_in": "Log in",
+		"log_out": "Log out",
+	}
+
+	static phrase (id, ...args) {
+		return phrase(this, id, ...args);
 	}
 }
 
