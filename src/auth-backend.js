@@ -12,6 +12,10 @@ export default class AuthBackend extends Backend {
 		});
 
 		this.login({passive: true});
+
+		if (o.syncWith) {
+			this.syncWith(o.syncWith);
+		}
 	}
 
 	/**
@@ -124,15 +128,16 @@ export default class AuthBackend extends Backend {
 	 * @param {AuthBackend} backend
 	 */
 	syncWith (backend) {
+		if (backend.isAuthenticated() && !this.isAuthenticated()) {
+			this.passiveLogin();
+			this.user = backend.user;
+		}
+
 		backend.addEventListener("mv-login", async _ => {
-			await backend.getUser();
-
-			if (this.isAuthenticated()) {
-				await this.logout();
+			if (!this.isAuthenticated()) {
+				this.passiveLogin();
+				this.user = backend.user;
 			}
-
-			this.login({passive: true});
-			this.user ??= backend.user; // save a request
 		});
 
 		backend.addEventListener("mv-logout", _ => this.logout());
