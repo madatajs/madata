@@ -23,10 +23,13 @@ export default class AuthBackend extends Backend {
 		return !!this.user;
 	}
 
+	/**
+	 * Get info about the current user, if logged in.
+	 * Subclasses are generally expected to override this.
+	 * @returns {Promise<object>} - User info
+	 */
 	async getUser () {
-		if (this.user) {
-			return this.user;
-		}
+		return this.user ?? null;
 	}
 
 	/**
@@ -112,6 +115,27 @@ export default class AuthBackend extends Backend {
 	 */
 	deleteLocalUserInfo () {
 		throw new TypeError("Not implemented");
+	}
+
+	/**
+	 * Sync the logged in user, i.e. log in passively when another backend has logged in and log out when another backend has logged out.
+	 * Generally intended to be used for backends with the same authentication mechanism.
+	 * Syncing is not two-way, you need to call this on the other backend as well to make it so.
+	 * @param {AuthBackend} backend
+	 */
+	syncWith (backend) {
+		backend.addEventListener("mv-login", async _ => {
+			await backend.getUser();
+
+			if (this.isAuthenticated()) {
+				await this.logout();
+			}
+
+			this.login({passive: true});
+			this.user ??= backend.user; // save a request
+		});
+
+		backend.addEventListener("mv-logout", _ => this.logout());
 	}
 
 	static phrases = {
