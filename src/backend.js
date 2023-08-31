@@ -122,17 +122,21 @@ export default class Backend extends EventTarget {
 		let file = this.#getFile(url);
 
 		let response = await this.get(file, ...args);
+		let data;
 
 		if (typeof response !== "string") {
 			// Backend did the parsing, we're done here
-			return response;
+			data = response;
+		}
+		else {
+			response = response.replace(/^\ufeff/, ""); // Remove Unicode BOM
+
+			data = this.parse(response);
 		}
 
-		response = response.replace(/^\ufeff/, ""); // Remove Unicode BOM
+		this.dispatchEvent(new CustomEvent("mv-load", { detail: {url, file, response, data} }));
 
-		let json = this.parse(response);
-
-		return json;
+		return data;
 	}
 
 	/**
