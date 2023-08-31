@@ -181,7 +181,7 @@ export default class OAuthBackend extends AuthBackend {
 		popup.top = (screen.height - popup.height)/2;
 		popup.left = (screen.width - popup.width)/2;
 
-		var state = {
+		let state = {
 			url: location.href,
 			backend: oAuthBackend.name
 		};
