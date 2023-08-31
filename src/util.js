@@ -54,3 +54,32 @@ export function delay(ms) {
 export function toArray(value) {
 	return Array.isArray(value)? value : [value];
 }
+
+/**
+ * Low-level function to facilitate localization
+ * @param {*} me - Class or object containing the phrases
+ * @param {*} id - Phrase id
+ * @param  {...any} args - Optional arguments to pass to the phrase
+ * @returns {string}
+ */
+export function phrase (me, id, ...args) {
+	let ret = me.phrases?.[id];
+
+	if (ret) {
+		if (typeof ret === "function") {
+			return ret(...args);
+		}
+
+		return ret;
+	}
+
+	// Not found, look in ancestors
+	let parent = Object.getPrototypeOf(me);
+	if (parent?.phrases) {
+		return phrase(parent, id, ...args);
+	}
+
+	// We're on the root class and still can't find it
+	// Fall back to just displaying the id and all the args right after it
+	return id + " " + args.join(" ");
+}
