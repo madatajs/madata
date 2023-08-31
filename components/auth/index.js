@@ -99,7 +99,7 @@ export default class MadataAuth extends HTMLElement {
 
 	async login () {
 		let ret = this.backend.login();
-		this.progress = this.constructor.phrase("logging-in");
+		this.progress = this.constructor.phrase("logging_in");
 		await ret;
 		this.progress = "";
 		return ret;
