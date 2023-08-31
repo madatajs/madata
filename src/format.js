@@ -39,6 +39,20 @@ export default class Format {
 		return Class;
 	}
 
+	/**
+	 * Find a registered Format by its MIME type or extension
+	 * @param {object} criteria
+	 * @param {string} [criteria.mimeType]
+	 * @param {string} [criteria.extension]
+	 * @returns
+	 */
+	static find ({ mimeType, extension }) {
+		return this.all.find(format => {
+			return (mimeType && format.mimeTypes.includes(mimeType)) ||
+				(extension && format.extensions.includes(extension));
+		});
+	}
+
 	static toBlob (str, options) {
 		if (options?.stringify || (typeof str !== "string" && !(str instanceof String))) {
 			str = this.stringify(str, options);
