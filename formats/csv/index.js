@@ -13,12 +13,12 @@ export default class CSV extends Format {
 	static mimeTypes = ["text/csv"];
 
 	static parse (str, options) {
-		options = this.resolveOptions(options);
+		options = CSV.resolveOptions(options);
 		return parse(str, options);
 	}
 
 	static stringify (obj, options) {
-		options = this.resolveOptions(options);
+		options = CSV.resolveOptions(options);
 		return stringify(obj, options);
 	}
 }

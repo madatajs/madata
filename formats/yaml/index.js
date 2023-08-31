@@ -6,12 +6,12 @@ export default class YAML extends Format {
 	static mimeTypes = ["application/yaml", "application/x-yaml", "text/yaml"];
 
 	static parse(str, options) {
-		options = this.resolveOptions(options);
+		options = YAML.resolveOptions(options);
 		return parse(str, options);
 	}
 
 	static stringify(obj, options) {
-		options = this.resolveOptions(options);
+		options = YAML.resolveOptions(options);
 		return stringify(obj, options);
 	}
 }

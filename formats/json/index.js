@@ -14,7 +14,7 @@ export default class JSON extends Format {
 	}
 
 	static stringify (obj, options) {
-		options = this.resolveOptions(options);
+		options = JSON.resolveOptions(options);
 		return globalThis.JSON.stringify(obj, options.replacer, options.space);
 	}
 }
