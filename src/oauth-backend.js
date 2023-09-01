@@ -214,6 +214,9 @@ export default class OAuthBackend extends AuthBackend {
 				});
 			});
 		}
+		else {
+			accessToken = o.accessToken;
+		}
 
 		this.accessToken = localStorage[this.constructor.tokenKey] = accessToken;
 
