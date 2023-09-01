@@ -4,15 +4,17 @@ export default class Format {
 	static mimeTypes = [];
 
 	constructor (options = {}) {
-		this.options = this.constructor.resolveOptions(options);
+		this.options = options;
 	}
 
 	parse (str) {
-		return this.constructor.parse(str, this.options);
+		let options = this.constructor.resolveOptions(this.options, "parse");
+		return this.constructor.parse(str, options);
 	}
 
 	stringify (obj) {
-		return this.constructor.stringify(obj, this.options);
+		let options = this.constructor.resolveOptions(this.options, "stringify");
+		return this.constructor.stringify(obj, options);
 	}
 
 	static parse (str) {
@@ -27,8 +29,21 @@ export default class Format {
 		return this.defaultInstance.stringify(obj);
 	}
 
-	static resolveOptions (options) {
-		return Object.assign({}, this.defaultOptions, options);
+	static resolveOptions (options, action) {
+		let ret = Object.assign({}, this.defaultOptions);
+
+		if (action && this.defaultOptions[action]) {
+			Object.assign(ret, this.defaultOptions[action]);
+		}
+
+		if (options) {
+			Object.assign(options, options[action]);
+		}
+
+		delete ret.parse;
+		delete ret.stringify;
+
+		return ret;
 	}
 
 	static all = [];
