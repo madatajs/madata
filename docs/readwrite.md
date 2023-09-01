@@ -39,7 +39,7 @@ Do note that a relative URL is not interpreted as relative to the URL passed to 
 but rather relative to the storage location indicated by that URL.
 To use the GitHub example, if you create a Backend with the URL `https://github.com/leaverou/mydata/dir1/dir2/foo.json`,
 then `backend.load("bar.json")` will not load `https://github.com/leaverou/mydata/dir1/dir2/bar.json`
-but `https://github.com/leaverou/mydata/dir1/dir2/bar.json`
+but `https://github.com/leaverou/mydata/bar.json`
 
 </div>
 
