@@ -3,7 +3,7 @@
  * @class OAuthBackend
  * @extends AuthBackend
  */
-import hooks from './hooks.js';
+import hooks from "./hooks.js";
 import AuthBackend from "./auth-backend.js";
 import {type} from "./util.js";
 
@@ -33,7 +33,7 @@ export default class OAuthBackend extends AuthBackend {
 	 * @param {string} url - Same as constructor
 	 * @param {object} o - Same as constructor
 	 */
-	update(url, o) {
+	update (url, o) {
 		super.update(url, o);
 
 		if (o.apiKey) {
@@ -115,7 +115,7 @@ export default class OAuthBackend extends AuthBackend {
 		}
 	}
 
-	static getOAuthBackend() {
+	static getOAuthBackend () {
 		if (this.hasOwnProperty("oAuth")) {
 			return this;
 		}
@@ -161,7 +161,7 @@ export default class OAuthBackend extends AuthBackend {
 		if (this.isAuthenticated()) {
 			// We seem to have credentials already, but are they valid?
 			try {
-				await this.getUser()
+				await this.getUser();
 			}
 			catch (e) {
 				if (e.status == 401) {
@@ -276,5 +276,5 @@ export default class OAuthBackend extends AuthBackend {
 	static phrases = {
 		"popup_blocked": "Login popup was blocked! Please check your popup blocker settings.",
 		"something_went_wrong_while_connecting": name => "Something went wrong while connecting to " + name,
-	}
+	};
 }
