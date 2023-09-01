@@ -166,8 +166,7 @@ export default class OAuthBackend extends AuthBackend {
 			catch (e) {
 				if (e.status == 401) {
 					// Unauthorized. Access token we have is invalid, discard it
-					localStorage.removeItem(this.constructor.tokenKey);
-					delete this.accessToken;
+					this.deleteLocalUserInfo();
 				}
 			}
 		}
