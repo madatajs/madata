@@ -1,5 +1,7 @@
 # Privacy Policy
 
+Last updated: August 31, 2023
+
 At Madata, accessible from [https://madata.dev/](https://madata.dev/), one of our main priorities is the privacy of our visitors. This Privacy Policy document contains types of information that is collected and recorded by Madata and how we use it.
 
 If you have additional questions or require more information about our Privacy Policy, do not hesitate to contact us.
@@ -45,6 +47,8 @@ Note that Madata has no access to or control over these cookies that are used by
 Madataʼs Privacy Policy does not apply to other advertisers or websites. Thus, we are advising you to consult the respective Privacy Policies of these third-party ad servers for more detailed information. It may include their practices and instructions about how to opt-out of certain options.
 
 You can choose to disable cookies through your individual browser options. To know more detailed information about cookie management with specific web browsers, it can be found at the browsersʼ respective websites.
+
+Madata’s use and transfer of information received from Google APIs to any other app will adhere to [Google API Services User Data Policy](https://developers.google.com/terms/api-services-user-data-policy), including the Limited Use requirements, to the extent that this can be guaranteed by Madata. Madata users should also be mindful of and follow these policies.
 
 ## CCPA Privacy Rights (Do Not Sell My Personal Information)
 
