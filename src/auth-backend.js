@@ -114,6 +114,16 @@ export default class AuthBackend extends Backend {
 	}
 
 	/**
+	 * Store info that can be used to log users in passively
+	 * @abstract
+	 * @param {object} [options]
+	 * @returns
+	 */
+	async storeLocalUserInfo (o = {}) {
+		throw new TypeError("Not implemented");
+	}
+
+	/**
 	 * @abstract
 	 * Delete any info used to log users in passively
 	 */
