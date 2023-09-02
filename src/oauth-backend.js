@@ -219,7 +219,7 @@ export default class OAuthBackend extends AuthBackend {
 
 		this.accessToken = localStorage[this.constructor.tokenKey] = accessToken;
 
-		if (o.accessToken) {
+		if (o?.accessToken) {
 			// We were given an access token, but we need to check if it's valid
 			await this.validateAccessToken();
 		}
