@@ -15,17 +15,19 @@ export default class OAuthBackend extends AuthBackend {
 	constructor (url, o = {}) {
 		super(url, o);
 
-		// Subclasses that also have async dependencies must do
-		// this.ready = Promise.all([super.ready, ...])
-		// instead of just overwriting this.ready
-		this.ready = Promise.resolve(this.constructor.authProviderServices).then(services => {
-			let meta = services[this.constructor.getOAuthBackend().name];
-			this.clientId = meta.client_id;
+		if (this.constructor.oAuth) {
+			// Subclasses that also have async dependencies must do
+			// this.ready = Promise.all([super.ready, ...])
+			// instead of just overwriting this.ready
+			this.ready = Promise.resolve(this.constructor.authProviderServices).then(services => {
+				let meta = services[this.constructor.getOAuthBackend().name];
+				this.clientId = meta.client_id;
 
-			if (meta.api_key && !("apiKey" in this.options)) {
-				this.apiKey = meta.api_key;
-			}
-		});
+				if (meta.api_key && !("apiKey" in this.options)) {
+					this.apiKey = meta.api_key;
+				}
+			});
+		}
 	}
 
 	/**
@@ -119,10 +121,14 @@ export default class OAuthBackend extends AuthBackend {
 		if (this.hasOwnProperty("oAuth")) {
 			return this;
 		}
-		else {
-			let parent = Object.getPrototypeOf(this);
-			return parent.getOAuthBackend?.();
+
+		let parent = Object.getPrototypeOf(this);
+
+		if (this.prototype.getUser !== parent.prototype.getUser) {
+			return this;
 		}
+
+		return parent.getOAuthBackend?.();
 	}
 
 	/**
