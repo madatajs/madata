@@ -3,7 +3,7 @@
  * @class OAuthBackend
  * @extends AuthBackend
  */
-import hooks from './hooks.js';
+import hooks from "./hooks.js";
 import AuthBackend from "./auth-backend.js";
 import {type} from "./util.js";
 
@@ -33,7 +33,7 @@ export default class OAuthBackend extends AuthBackend {
 	 * @param {string} url - Same as constructor
 	 * @param {object} o - Same as constructor
 	 */
-	update(url, o) {
+	update (url, o) {
 		super.update(url, o);
 
 		if (o.apiKey) {
@@ -115,7 +115,7 @@ export default class OAuthBackend extends AuthBackend {
 		}
 	}
 
-	static getOAuthBackend() {
+	static getOAuthBackend () {
 		if (this.hasOwnProperty("oAuth")) {
 			return this;
 		}
@@ -143,19 +143,7 @@ export default class OAuthBackend extends AuthBackend {
 		// Or should we not? Perhaps we should treat an active log in as an implicit log out request?
 		await this.passiveLogin(rest);
 
-		if (this.isAuthenticated()) {
-			// We seem to have credentials already, but are they valid?
-			try {
-				await this.getUser()
-			}
-			catch (e) {
-				if (e.status == 401) {
-					// Unauthorized. Access token we have is invalid, discard it
-					localStorage.removeItem(this.constructor.tokenKey);
-					delete this.accessToken;
-				}
-			}
-		}
+		this.validateAccessToken();
 
 		if (!passive) {
 			await this.activeLogin(rest);
@@ -169,47 +157,76 @@ export default class OAuthBackend extends AuthBackend {
 		}
 	}
 
-	async activeLogin () {
-		let oAuthBackend = this.constructor.getOAuthBackend();
-
-		// Show window
-		let popup = {
-			width: Math.min(1000, innerWidth - 100),
-			height: Math.min(800, innerHeight - 100)
-		};
-
-		popup.top = (screen.height - popup.height)/2;
-		popup.left = (screen.width - popup.width)/2;
-
-		let state = {
-			url: location.href,
-			backend: oAuthBackend.name
-		};
-
-		this.authPopup = open(`${this.constructor.oAuth}?client_id=${this.clientId}&state=${encodeURIComponent(JSON.stringify(state))}` + this.oAuthParams(),
-			"popup", `width=${popup.width},height=${popup.height},left=${popup.left},top=${popup.top}`);
-
-		if (!this.authPopup) {
-			throw new Error(this.constructor.phrase("popup_blocked"));
-		}
-
-		let accessToken = await new Promise((resolve, reject) => {
-			addEventListener("message", evt => {
-				if (evt.source === this.authPopup) {
-					if (evt.data.backend == oAuthBackend.name) {
-						resolve(evt.data.token);
-					}
-
-					if (!this.accessToken) {
-						reject(Error(this.constructor.phrase("authentication_error")));
-					}
+	async validateAccessToken () {
+		if (this.isAuthenticated()) {
+			// We seem to have credentials already, but are they valid?
+			try {
+				await this.getUser();
+			}
+			catch (e) {
+				if (e.status == 401) {
+					// Unauthorized. Access token we have is invalid, discard it
+					this.deleteLocalUserInfo();
 				}
+			}
+		}
+	}
+
+	async activeLogin (o) {
+		let accessToken;
+
+		if (!o?.accessToken) {
+			let oAuthBackend = this.constructor.getOAuthBackend();
+
+			// Show window
+			let popup = {
+				width: Math.min(1000, innerWidth - 100),
+				height: Math.min(800, innerHeight - 100)
+			};
+
+			popup.top = (screen.height - popup.height)/2;
+			popup.left = (screen.width - popup.width)/2;
+
+			let state = {
+				url: location.href,
+				backend: oAuthBackend.name
+			};
+
+			this.authPopup = open(`${this.constructor.oAuth}?client_id=${this.clientId}&state=${encodeURIComponent(JSON.stringify(state))}` + this.oAuthParams(),
+				"popup", `width=${popup.width},height=${popup.height},left=${popup.left},top=${popup.top}`);
+
+			if (!this.authPopup) {
+				throw new Error(this.constructor.phrase("popup_blocked"));
+			}
+
+			accessToken = await new Promise((resolve, reject) => {
+				addEventListener("message", evt => {
+					if (evt.source === this.authPopup) {
+						if (evt.data.backend == oAuthBackend.name) {
+							resolve(evt.data.token);
+						}
+
+						if (!this.accessToken) {
+							reject(Error(this.constructor.phrase("authentication_error")));
+						}
+					}
+				});
 			});
-		});
+		}
+		else {
+			accessToken = o.accessToken;
+		}
 
 		this.accessToken = localStorage[this.constructor.tokenKey] = accessToken;
 
-		hooks.run("oauth-login-success", this);
+		if (o?.accessToken) {
+			// We were given an access token, but we need to check if it's valid
+			await this.validateAccessToken();
+		}
+
+		if (this.isAuthenticated()) {
+			hooks.run("oauth-login-success", this);
+		}
 
 		return this.accessToken;
 	}
@@ -259,5 +276,5 @@ export default class OAuthBackend extends AuthBackend {
 	static phrases = {
 		"popup_blocked": "Login popup was blocked! Please check your popup blocker settings.",
 		"something_went_wrong_while_connecting": name => "Something went wrong while connecting to " + name,
-	}
+	};
 }
