@@ -129,6 +129,7 @@ export default class OAuthBackend extends AuthBackend {
 	 * Helper method for authenticating in OAuth APIs
 	 * @param [options] {object}
 	 * @param [options.passive] {boolean} - Do not trigger any login UI, just return the current user if already logged in
+	 * @return {Promise<UserObject | null>}
 	 */
 	async login ({passive = false, accessToken, ...rest} = {}) {
 		if (this.ready) {
@@ -153,7 +154,7 @@ export default class OAuthBackend extends AuthBackend {
 		// so that if it's invalid, we can show the login UI
 		this.validateUserCredentials();
 
-		if (!passive) {
+		if (!passive && !accessToken) {
 			await this.activeLogin(rest);
 		}
 
