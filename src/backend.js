@@ -4,7 +4,7 @@
  * @extends EventTarget
  */
 import hooks from './hooks.js';
-import { toArray, phrase } from './util.js';
+import { toArray, phrase, type } from './util.js';
 
 /**
  * @param {string} url - URL string describing the data location
@@ -43,11 +43,19 @@ export default class Backend extends EventTarget {
 	}
 
 	async parse (data) {
-		return this.options.parse? this.options.parse(data) : JSON.parse(data);
+		if (type(data) !== "string") {
+			return data;
+		}
+
+		return this.options.format?.parse(data) ?? this.options.parse?.(data) ?? JSON.parse(data);
 	}
 
 	async stringify (data) {
-		return this.options.stringify? this.options.stringify(data) : JSON.stringify(data, null, "\t");
+		if (type(data) === "string") {
+			return data;
+		}
+
+		return this.options.format?.stringify(data) ?? this.options.stringify?.(data) ?? JSON.stringify(data, null, "\t");
 	}
 
 	updatePermissions(o) {
