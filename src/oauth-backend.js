@@ -55,6 +55,13 @@ export default class OAuthBackend extends AuthBackend {
 
 	/**
 	 * Helper for making OAuth requests with JSON-based APIs.
+	 * @param {string} call - API endpoint
+	 * @param {object} [data] - Data to send with the request
+	 * @param {string} [method=GET] - HTTP method
+	 * @param {object} [req] - Extra request options
+	 * @param {string} [req.responseType=json] - Response type
+	 * @param {object} [req.headers] - Extra headers
+	 * @return {Promise<object>} - JSON response
 	 */
 	async request (call, data, method = "GET", req = {}) {
 		req = Object.assign({}, req); // clone
