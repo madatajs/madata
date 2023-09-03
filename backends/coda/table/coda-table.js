@@ -22,17 +22,13 @@ export default class CodaTable extends Coda {
 
 			// Drop weird backticks from plain text values
 			for (let column in ret) {
-				let value = ret[column];
-				if (typeof value === "string" && /^```(?!\n)[\S\s]*```$/.test(value)) {
-					value = value.slice(3, -3);
+				let value = fixPlainText(ret[column]);
 
-					if (value) {
-						value = new String(value);
-						value.plainText = true;
-					}
-
-					ret[column] = value;
+				if (Array.isArray(value)) {
+					value = value.map(fixPlainText);
 				}
+
+				ret[column] = value;
 			}
 
 			return ret;
@@ -90,4 +86,17 @@ export default class CodaTable extends Coda {
 
 		return {};
 	}
+}
+
+function fixPlainText (value) {
+	if (typeof value === "string" && /^```(?!\n)[\S\s]*```$/.test(value)) {
+		value = value.slice(3, -3);
+
+		if (value) {
+			value = new String(value);
+			value.plainText = true;
+		}
+	}
+
+	return value;
 }
