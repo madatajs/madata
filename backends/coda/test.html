@@ -13,10 +13,10 @@
 		window.backend = new Backend.CodaTable("https://coda.io/d/Copy-of-Features_d1vzGrjN9JH/Features_suxwa#Features-Considered_tuBch");
 		auth.backend = backend;
 		backend.addEventListener("mv-login", async evt => {
-			let data = await backend.load();
-			console.log("Loaded", data);
+			window.data = await backend.load();
+			// console.log("Loaded", data);
 			// data[0].Question = "`<foobar>`";
-			backend.store(data);
+			// backend.store(data);
 		})
 	</script>
 </body>

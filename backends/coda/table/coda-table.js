@@ -19,6 +19,17 @@ export default class CodaTable extends Coda {
 			let ret = row.values;
 			Object.defineProperty(ret, "__meta", {value: row, configurable: true, enumerable: false, writable: true});
 			delete ret.__meta.values;
+
+			// Drop weird backticks from plain text values
+			for (let column in ret) {
+				let value = ret[column];
+				if (typeof value === "string" && /^```(?!\n)[\S\s]*```$/.test(value)) {
+					value = new String(value.slice(3, -3));
+					value.plainText = true;
+					ret[column] = value;
+				}
+			}
+
 			return ret;
 		});
 	}
