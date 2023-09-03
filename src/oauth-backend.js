@@ -120,7 +120,9 @@ export default class OAuthBackend extends AuthBackend {
 			return null;
 		}
 		else {
-			throw response;
+			let isJSON = response.headers.get("content-type")?.includes("application/json");
+			let error = isJSON? await response.json() : await response.text();
+			throw error;
 		}
 	}
 
