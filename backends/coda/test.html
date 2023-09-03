@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Document</title>
+	<script type="module" src="../../components/auth/index.js"></script>
+</head>
+<body>
+	<madata-auth id="auth">Coda: </madata-auth>
+	<script type="module">
+		import Backend from "../../src/index.js"
+		window.backend = new Backend.CodaTable("https://coda.io/d/Copy-of-Features_d1vzGrjN9JH/Features_suxwa#Features-Considered_tuBch");
+		auth.backend = backend;
+		backend.addEventListener("mv-login", async evt => {
+			let data = await backend.load();
+			console.log("Loaded", data);
+			// data[0].Question = "`<foobar>`";
+			backend.store(data);
+		})
+	</script>
+</body>
+</html>
