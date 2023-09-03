@@ -7,9 +7,9 @@ Write & read data and upload files in GitHub repositories.
 
 ## URL format
 
-* Regular file URLs like `https://github.com/username/repo/blob/main/path/file.js`
-* Simplified URLs like `https://github.com/username/repo/path/file.js`
-* "Raw" URLs like `https://raw.githubusercontent.com/username/repo/main/path/file.js`
+* Regular file URLs like `https://github.com/:owner/:repo/blob/:branch/:path`
+* Simplified URLs like `https://github.com/:owner/:repo/:path` (default branch)
+* "Raw" URLs like `https://raw.githubusercontent.com/:owner/:repo/:branch/:path`
 
 Note that if the branch name is not in the URL, Madata will try `main`, and then `master`.
 
