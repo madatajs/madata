@@ -23,14 +23,14 @@ export default class Local extends Backend {
 		return null;
 	}
 
-	async put (serialized) {
-		if (!serialized) {
+	async put (data) {
+		if (!data) {
 			delete localStorage[this.file.key];
 			return {type: "delete"}
 		}
 
 		let exists = this.file.key in localStorage;
-		localStorage[this.file.key] = serialized;
+		localStorage[this.file.key] = await this.stringify(data);
 		return {type: exists? "update" : "create"}
 	}
 

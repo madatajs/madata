@@ -59,7 +59,8 @@ export default class GoogleDrive extends Google {
 		}
 	}
 
-	async put (serialized, {file} = {}) {
+	async put (data, {file} = {}) {
+		const serialized = await this.stringify(data);
 		let fileInfo;
 
 		if (!file.id) {

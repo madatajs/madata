@@ -44,10 +44,10 @@ export default class Element extends Backend {
 		return this.element.textContent;
 	}
 
-	async put (serialized) {
+	async put (data) {
 		this.observer.disconnect();
 
-		this.element.textContent = serialized;
+		this.element.textContent = await this.stringify(data);
 
 		this.observer.observe(this.element, {
 			childList: true,

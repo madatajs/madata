@@ -81,7 +81,8 @@ export default class GithubFile extends Github {
 	 * @param {String} path - Optional file path
 	 * @return {Promise} A promise that resolves when the file is saved.
 	 */
-	async put (serialized, {file, isEncoded} = {}) {
+	async put (data, {file, isEncoded} = {}) {
+		const serialized = await this.stringify(data);
 		return this.#write("put", file, serialized, {isEncoded});
 	}
 

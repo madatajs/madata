@@ -157,9 +157,7 @@ export default class Backend extends EventTarget {
 
 		file = this.#getFile(file ?? url);
 
-		let serialized = typeof data === "string"? data : await this.stringify(data);
-
-		return this.put(serialized, {file, ...options});
+		return this.put(data, {file, ...options});
 	}
 
 	async remove (file = this.file) {
