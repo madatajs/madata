@@ -7,4 +7,5 @@ index.html
 *.css
 api/
 !backends/github/api/
+!backends/coda/api/
 lib
