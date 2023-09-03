@@ -5,12 +5,12 @@
   "main": "index.html",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build:css": "npx postcss \"**/*.postcss\" --base . --dir . --ext .css --config postcss.config.cjs",
-    "build:html": "npx @11ty/eleventy --config=.eleventy.cjs",
+    "build:css": "npx postcss \"**/*.postcss\" --base . --dir . --ext .css --config _build/postcss.config.cjs",
+    "build:html": "npx @11ty/eleventy --config=_build/.eleventy.cjs",
     "build:lib": "rm -rf lib && mkdir -p lib && cp -R node_modules/csv node_modules/yaml lib",
-    "build": "npm run build:lib && npm run build:html && npm run build:css && npm run docs",
-    "watch:css": "npx postcss \"**/*.postcss\" --base . --dir . --ext .css --config postcss.config.cjs --watch",
-    "watch:html": "npx @11ty/eleventy --config=.eleventy.cjs --watch",
+    "build": "npm run build:lib && npm run build:html && npm run build:css",
+    "watch:css": "npx postcss \"**/*.postcss\" --base . --dir . --ext .css --config _build/postcss.config.cjs --watch",
+    "watch:html": "npx @11ty/eleventy --config=_build/.eleventy.cjs --watch",
     "watch": "npx concurrently -n w: npm:watch:*",
     "docs": "npx documentation build src/** -f html --github -o api",
     "dev": "http-server -p 58504 --cors & open http://localhost:58504"
