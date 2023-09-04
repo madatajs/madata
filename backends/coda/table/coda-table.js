@@ -21,15 +21,7 @@ export default class CodaTable extends Coda {
 			delete ret.__meta.values;
 
 			// Drop weird backticks from plain text values
-			for (let column in ret) {
-				let value = fixPlainText(ret[column]);
-
-				if (Array.isArray(value)) {
-					value = value.map(fixPlainText);
-				}
-
-				ret[column] = value;
-			}
+			transformRowColumns(ret, fixPlainText);
 
 			return ret;
 		});
@@ -100,6 +92,32 @@ export default class CodaTable extends Coda {
 
 		return {};
 	}
+
+	/**
+	 * Convert JSON-LD structured objects to plain strings whenever possible
+	 * Can we do this by default? or will we not be able to write back?
+	 * @param {Array<object>} rows
+	 */
+	static simplifyData (rows) {
+		return rows.map(row => {
+			row = Object.assign({}, row);
+
+			transformRowColumns(row, value => {
+				if (!value || typeof value !== "object" || !("@type" in value)) {
+					return value;
+				}
+
+				switch (value["@type"]) {
+					case "StructuredValue":
+						return value.name;
+					case "WebPage":
+						return value.url;
+				}
+			});
+
+			return row;
+		});
+	}
 }
 
 function fixPlainText (value) {
@@ -113,4 +131,19 @@ function fixPlainText (value) {
 	}
 
 	return value;
+}
+
+function transformRowColumns (columns, fn) {
+	for (let column in columns) {
+		let value = columns[column];
+
+		if (Array.isArray(value)) {
+			value = value.map(fn);
+		}
+		else {
+			value = fn(value);
+		}
+
+		columns[column] = value;
+	}
 }
