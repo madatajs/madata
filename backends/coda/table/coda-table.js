@@ -35,6 +35,20 @@ export default class CodaTable extends Coda {
 		});
 	}
 
+	// // WIP. Does not work.
+	// async put (data, {file = this.file} = {}) {
+	// 	data = {
+	// 		rows: data.map(item => {
+	// 			return {
+	// 				cells: Object.entries(item).map(([column, value]) => ({column, value}))
+	// 			};
+	// 		})
+	// 	};
+
+	// 	let serialized = await this.stringify(data);
+	// 	return this.request(`docs/${file.docId}/tables/${file.tableId}/rows`, serialized, "POST");
+	// }
+
 	async resolveFile (file = this.file) {
 		if (!file.docId) {
 			throw new Error("Missing doc id");
