@@ -16,7 +16,8 @@
 			"warn",
 			"tab",
 			{
-				"outerIIFEBody": 0 // Do not indent IIFE body (https://eslint.org/docs/latest/rules/indent#outeriifebody)
+				"outerIIFEBody": 0, // Do not indent IIFE body (https://eslint.org/docs/latest/rules/indent#outeriifebody)
+				"SwitchCase": 1 // Indent switch cases (https://eslint.org/docs/latest/rules/indent#switchcase)
 			}
 		],
 		// Unix line endings: \n for LF (https://eslint.org/docs/latest/rules/linebreak-style)
