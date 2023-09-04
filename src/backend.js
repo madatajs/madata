@@ -142,7 +142,7 @@ export default class Backend extends EventTarget {
 			data = this.parse(response);
 		}
 
-		this.dispatchEvent(new CustomEvent("mv-load", { detail: {url, file, response, data} }));
+		this.dispatchEvent(new CustomEvent("mv-load", { detail: {url, file, response, data, backend: this} }));
 
 		return data;
 	}
