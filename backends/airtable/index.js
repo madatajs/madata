@@ -10,7 +10,7 @@ export default class Airtable extends OAuthBackend {
 	 * @param {Object} file A table to get records from.
 	 * @returns {Array<Object> | null} An array of records from the table.
 	 */
-	async get (file) {
+	async get (file = this.file) {
 		const call = `${file.base}/${file.table}`;
 
 		try {
