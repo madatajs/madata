@@ -16,9 +16,9 @@ export default class Airtable extends OAuthBackend {
 		const call = `${file.base}/${file.table}`;
 
 		try {
-			const ret = [];
+			const records = [];
 			let response = await this.request(call);
-			ret.push(...response.records);
+			records.push(...response.records);
 
 			// Fetch the next pages of records (if any).
 			while (response.offset) {
@@ -27,10 +27,17 @@ export default class Airtable extends OAuthBackend {
 				params.set("offset", response.offset);
 
 				response = await this.request(url);
-				ret.push(...response.records);
+				records.push(...response.records);
 			}
 
-			return ret;
+			// Transform records to a more usable format (the way we do it in the CodaTable backend).
+			return records.map(record => {
+				let ret = record.fields;
+				Object.defineProperty(ret, "__meta", {value: record, configurable: true, enumerable: false, writable: true});
+				delete ret.__meta.fields;
+
+				return ret;
+			});
 		}
 		catch (e) {
 			if (e.status === 401) {
