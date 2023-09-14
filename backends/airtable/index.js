@@ -56,9 +56,13 @@ export default class Airtable extends OAuthBackend {
 		return `&redirect_uri=${this.constructor.authProvider}/&response_type=code&scope=${encodeURIComponent(Airtable.scopes.join(" "))}`;
 	}
 
-	static oAuth = "https://airtable.com/oauth2/v1/authorize";
+	// oAuthParams () {
+	// 	return `&redirect_uri=${this.constructor.authProvider}/&response_type=code&scope=${encodeURIComponent(Airtable.scopes.join(" "))}`;
+	// }
+
+	// static oAuth = "https://airtable.com/oauth2/v1/authorize";
+	// static scopes = ["data.records:read", "data.records:write"];
 	static apiDomain = "https://api.airtable.com/v0/";
-	static scopes = ["data.records:read", "data.records:write"];
 
 	static test (url) {
 		url = new URL(url, location);
