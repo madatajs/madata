@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Airtable Backend Tests</title>
+	<script type="module" src="../../components/auth/index.js"></script>
+</head>
+
+<body>
+	<madata-auth id="auth">Airtable: </madata-auth>
+	<script type="module">
+		import Backend from "../../src/index.js"
+
+		window.backend = new Backend.Airtable("https://airtable.com/appPArNjdWduWbopy/tblhmxy2yKH1W5yag/viwMYzuk3bP12yS56?blocks=hide");
+		auth.backend = backend;
+
+		backend.addEventListener("mv-login", async evt => {
+			window.data = await backend.load();
+			console.log("Loaded", data);
+		});
+	</script>
+</body>
+
+</html>
