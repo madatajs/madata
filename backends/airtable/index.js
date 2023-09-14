@@ -52,8 +52,26 @@ export default class Airtable extends OAuthBackend {
 		}
 	}
 
-	oAuthParams () {
-		return `&redirect_uri=${this.constructor.authProvider}/&response_type=code&scope=${encodeURIComponent(Airtable.scopes.join(" "))}`;
+	async getUser () {
+		if (this.user) {
+			return this.user;
+		}
+
+		let info = await this.request("meta/whoami");
+
+		return this.user = {
+			username: info.email ?? info.id,
+			email: info.email,
+			raw: info
+		};
+	}
+
+	async activeLogin () {
+		let accessToken = prompt(this.constructor.phrase("login_prompt"));
+
+		if (accessToken) {
+			this.storeLocalUserInfo({accessToken});
+		}
 	}
 
 	// oAuthParams () {
@@ -88,6 +106,7 @@ export default class Airtable extends OAuthBackend {
 	}
 
 	static phrases = {
-		access_token_invalid: "Access token is invalid. Please, log in again."
+		access_token_invalid: "Access token is invalid. Please, log in again.",
+		login_prompt: "Enter your Airtable personal access token. You can find it in your personal access tokens panel at https://airtable.com/create/tokens."
 	};
 }
