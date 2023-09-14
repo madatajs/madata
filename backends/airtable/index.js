@@ -4,6 +4,8 @@
  */
 import OAuthBackend from "../../src/oauth-backend.js";
 
+import { md5 } from "/lib/hash-wasm/dist/index.esm.min.js";
+
 export default class Airtable extends OAuthBackend {
 	/**
 	 * Get records from a table.
@@ -57,13 +59,31 @@ export default class Airtable extends OAuthBackend {
 			return this.user;
 		}
 
-		let info = await this.request("meta/whoami");
+		const info = await this.request("meta/whoami");
 
-		return this.user = {
-			username: info.email ?? info.id,
-			email: info.email,
+		// Since Airtable doesn't provide user-specific info except for ID and email (if the user allows),
+		// we can try using Gravatar when possible.
+		let user = {
+			username: info.id,
 			raw: info
 		};
+
+		if (info.email) {
+			const hash = await md5(info.email);
+			const profile = (await this.request(`https://en.gravatar.com/${hash}.json`))?.entry?.[0];
+			if (profile) {
+				user = {
+					...user,
+					username: profile.preferredUsername,
+					name: profile.displayName,
+					avatar: `${profile.thumbnailUrl}?size=256`,
+					url: profile.profileUrl,
+					email: info.email
+				};
+			}
+		}
+
+		return this.user = user;
 	}
 
 	async activeLogin () {
