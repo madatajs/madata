@@ -30,14 +30,19 @@ export default class Backend extends EventTarget {
 	 * @param {object} o - Same as constructor
 	 */
 	update (url, o = {}) {
-		this.source = url;
-		this.file = this.constructor.parseURL(url);
-		this.options = o;
+		if (url) {
+			this.source = url;
+			this.file = this.#getFile(url);
+		}
 
-		// Options object has higher priority than url
-		for (let prop in this.file) {
-			if (prop in o) {
-				this.file[prop] = o[prop];
+		if (o) {
+			this.options = Object.assign(this.options ?? {}, o);
+
+			// Options object has higher priority than url
+			for (let prop in this.file) {
+				if (prop in o) {
+					this.file[prop] = o[prop];
+				}
 			}
 		}
 	}

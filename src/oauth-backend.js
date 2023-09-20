@@ -38,7 +38,7 @@ export default class OAuthBackend extends AuthBackend {
 	update (url, o) {
 		super.update(url, o);
 
-		if (o.apiKey) {
+		if (o?.apiKey) {
 			// Some backends (e.g. Firebase) require a separate API key per project
 			this.apiKey = o.apiKey;
 		}
