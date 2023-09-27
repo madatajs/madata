@@ -238,6 +238,10 @@ export default class Backend extends EventTarget {
 		return Class? new Class(url, o) : null;
 	}
 
+	static async load (url, o) {
+		return this.from(url, o)?.load(url, o);
+	}
+
 	static find (url, o) {
 		if (url) {
 			for (let backend of Backend.all) {
