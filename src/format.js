@@ -75,6 +75,10 @@ export default class Format {
 
 		return new Blob([str], {type: this.mimeTypes[0]});
 	}
+
+	static toBlobURL (str, options) {
+		return URL.createObjectURL(this.toBlob(str, options));
+	}
 }
 
 function prepare (name, self) {
