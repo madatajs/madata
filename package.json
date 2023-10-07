@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build:css": "npx postcss \"**/*.postcss\" --base . --dir . --ext .css --config _build/postcss.config.cjs",
     "build:html": "npx @11ty/eleventy --config=_build/.eleventy.cjs",
-    "build:lib": "rm -rf lib && mkdir -p lib && cp -R node_modules/csv node_modules/yaml lib",
+    "build:lib": "rm -rf lib && mkdir -p lib && cp -R node_modules/csv node_modules/yaml node_modules/hash-wasm lib",
     "build": "npm run build:lib && npm run build:html && npm run build:css",
     "watch:css": "npx postcss \"**/*.postcss\" --base . --dir . --ext .css --config _build/postcss.config.cjs --watch",
     "watch:html": "npx @11ty/eleventy --config=_build/.eleventy.cjs --watch",
@@ -42,6 +42,7 @@
   },
   "dependencies": {
     "csv": "^6.3.1",
+    "hash-wasm": "^4.9.0",
     "yaml": "^2.3.1"
   }
 }
