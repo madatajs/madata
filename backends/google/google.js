@@ -31,10 +31,10 @@ export default class Google extends OAuthBackend {
 		return `&redirect_uri=${this.constructor.authProvider}&response_type=code&scope=${encodeURIComponent(this.constructor.scopes.join(" "))}`;
 	}
 
-	static oAuth = "https://accounts.google.com/o/oauth2/auth"
-	static useCache = false
+	static oAuth = "https://accounts.google.com/o/oauth2/auth";
+	static useCache = false;
 
 	static phrases = {
 		access_token_invalid: "Access token is invalid. Please, log in again."
-	}
+	};
 }
