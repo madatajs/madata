@@ -1,9 +1,9 @@
 /**
  * Google Firebase backend.
  * @class GoogleFirebase
- * @extends Google
+ * @extends OAuthBackend
  */
-import Google from "../google.js";
+import OAuthBackend from "../../../src/oauth-backend.js";
 import { readFile, toArray } from "../../../src/util.js";
 
 import { getApps, initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
@@ -11,7 +11,13 @@ import { getAuth, onAuthStateChanged, signInWithPopup, signOut, GoogleAuthProvid
 import { getFirestore, doc, collection, getDoc, getDocs, setDoc, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore-lite.js";
 import { getStorage, ref, uploadString, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-storage.js";
 
-export default class GoogleFirebase extends Google {
+export default class GoogleFirebase extends OAuthBackend {
+	constructor (url, o) {
+		super(url, o);
+
+		this.updatePermissions({ read: true });
+	}
+
 	ready = Promise.all([
 		super.ready,
 		new Promise((resolve, reject) => {
@@ -44,7 +50,7 @@ export default class GoogleFirebase extends Google {
 							...user
 						};
 
-						this.accessToken = user.accessToken;
+						this.login({passive: true, accessToken: user.accessToken});
 					}
 				});
 
