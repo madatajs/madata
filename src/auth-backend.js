@@ -100,7 +100,8 @@ export default class AuthBackend extends Backend {
 
 			// TODO does this really represent all backends? Should it be a setting?
 			this.updatePermissions({
-				login: true
+				login: true,
+				logout: false
 			});
 
 			this.user = null;
