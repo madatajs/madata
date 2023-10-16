@@ -29,6 +29,9 @@ And what's better, it’s completely **free and open source**!
 Madata is an evolution of the storage component of our language [Mavo](https://mavo.io/),
 as we got many requests from developers who wanted to use it without the rest of Mavo.
 
+Madata works in the browser, as well as in NodeJS.
+In Node, it requires version 18.7 or higher.
+
 <div class="warning">
 
 **Here be dragons** Madata has not yet been officially released, we are trying a “soft launch” first.

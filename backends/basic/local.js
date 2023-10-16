@@ -3,6 +3,7 @@
  * @class Local
  */
 import Backend from "../../src/backend.js";
+import { localStorage } from "../../src/node-shims.js";
 
 export default class Local extends Backend {
 	constructor (url, o) {

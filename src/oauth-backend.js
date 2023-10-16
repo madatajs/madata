@@ -6,6 +6,7 @@
 import hooks from "./hooks.js";
 import AuthBackend from "./auth-backend.js";
 import {type} from "./util.js";
+import { localStorage } from "./node-shims.js";
 
 /**
  * @param {string} url - URL string describing the data location
