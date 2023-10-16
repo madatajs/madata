@@ -152,50 +152,65 @@ export default class OAuthBackend extends AuthBackend {
 			await this.ready;
 		}
 
+		// Programmatically providing an access token is ALWAYS passive
+		passive = passive || Boolean(accessToken);
+		let currentUser;
+
 		if (this.isAuthenticated()) {
-			return this.getUser();
+			currentUser = this.getUserIfValid();
+
+			if (currentUser) {
+				return currentUser;
+			}
 		}
 
-		if (accessToken) {
-			// Access token provided explicitly, no need to show any UI
-			this.storeLocalUserInfo({ accessToken });
+		if (passive) {
+			if (accessToken) {
+				// Access token provided explicitly, no need to show any UI
+				this.storeLocalUserInfo({ accessToken });
+			}
+			else {
+				await this.passiveLogin(rest);
+			}
 		}
 		else {
-			// We try passive login first even if this is an active login
-			// Or should we not? Perhaps we should treat an active log in as an implicit log out request?
-			await this.passiveLogin(rest);
+			await this.activeLogin(rest);
 		}
 
 		// Validate provided/stored access token before activeLogin()
 		// so that if it's invalid, we can show the login UI
-		this.validateUserCredentials();
+		currentUser = await this.getUserIfValid();
 
-		if (!passive && !accessToken) {
-			await this.activeLogin(rest);
-		}
-
-		if (this.isAuthenticated()) {
-			let user = await this.getUser();
+		if (currentUser) {
 			this.dispatchEvent(new CustomEvent("mv-login"));
 			this.updatePermissions({login: false, logout: true});
-			return user;
+			return currentUser;
+		}
+		else {
+			throw new Error(this.constructor.phrase("invalid_access_token"));
 		}
 	}
 
-	async validateUserCredentials () {
+	async getUserIfValid () {
 		if (this.isAuthenticated()) {
 			// We seem to have credentials already, but are they valid?
+			let user;
+
 			try {
-				await this.getUser();
+				user = await this.getUser();
 			}
 			catch (e) {
 				if (e.status == 401) {
 					// Unauthorized. Access token we have is invalid, discard it
 					this.deleteLocalUserInfo();
-					return false;
+					return null;
 				}
 			}
+
+			return user;
 		}
+
+		return null;
 	}
 
 	async activeLogin (o) {
@@ -299,5 +314,6 @@ export default class OAuthBackend extends AuthBackend {
 	static phrases = {
 		"popup_blocked": "Login popup was blocked! Please check your popup blocker settings.",
 		"something_went_wrong_while_connecting": name => "Something went wrong while connecting to " + name,
+		"invalid_access_token": "Invalid access token",
 	};
 }
