@@ -73,13 +73,13 @@ export default class GithubAPI extends Github {
 	}
 
 	static test (url) {
-		url = new URL(url, location);
+		url = new URL(url);
 		return url.host === "api.github.com";
 	}
 
 	static parseURL (source) {
 		let ret = {
-			url: new URL(source, location)
+			url: new URL(source)
 		};
 
 		if (ret.url.pathname == "/graphql") {

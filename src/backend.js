@@ -202,7 +202,7 @@ export default class Backend extends EventTarget {
 	}
 
 	static parseURL(source) {
-		let url = new URL(source, location);
+		let url = new URL(source);
 		return {url};
 	}
 

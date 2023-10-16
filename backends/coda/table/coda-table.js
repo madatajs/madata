@@ -78,7 +78,7 @@ export default class CodaTable extends Coda {
 	}
 
 	static parseURL (source) {
-		let url = new URL(source, location);
+		let url = new URL(source);
 
 		if (url.host === "coda.io") {
 			for (let pattern in patterns) {
