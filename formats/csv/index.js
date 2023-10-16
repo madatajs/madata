@@ -1,5 +1,5 @@
 import Format from "../../src/format.js";
-import { parse, stringify } from "/lib/csv/dist/esm/sync.js";
+import { parse, stringify } from "../../lib/csv/dist/esm/sync.js";
 
 export default class CSV extends Format {
 	static defaultOptions = {

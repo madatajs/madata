@@ -272,7 +272,8 @@ export default class Backend extends EventTarget {
 	}
 
 	/**
-	 * Auth Provider to use
+	 * Auth Provider to use.
+	 * This is only relevant for OAuthBackend, but specifying here as Backend is the only class users import.
 	 */
 	static authProvider = "https://auth.madata.dev"
 
