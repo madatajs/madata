@@ -112,6 +112,8 @@ export default class CodaTable extends Coda {
 						return value.name;
 					case "WebPage":
 						return value.url;
+					case "ImageObject":
+						return value.url;
 				}
 			});
 
