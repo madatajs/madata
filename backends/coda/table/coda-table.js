@@ -12,7 +12,7 @@ export default class CodaTable extends Coda {
 			await this.resolveFile(file);
 		}
 
-		let rows = (await this.request(`docs/${file.docId}/tables/${file.tableId}/rows/?valueFormat=rich&useColumnNames=true`))?.items;
+		let rows = (await this.request(`docs/${file.docId}/tables/${file.tableId}/rows/?valueFormat=rich&useColumnNames=true&sortBy=natural`))?.items;
 
 		// Transform rows to a more usable format
 		return rows.map(row => {
