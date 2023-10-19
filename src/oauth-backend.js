@@ -39,6 +39,10 @@ export default class OAuthBackend extends AuthBackend {
 	update (url, o) {
 		super.update(url, o);
 
+		if (o?.accessToken) {
+			this.login({accessToken: o.accessToken});
+		}
+
 		if (o?.apiKey) {
 			// Some backends (e.g. Firebase) require a separate API key per project
 			this.apiKey = o.apiKey;
