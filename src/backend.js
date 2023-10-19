@@ -217,15 +217,23 @@ export default class Backend extends EventTarget {
 
 		if (o.type) {
 			Class = Backend[o.type];
-		}
 
-		if (url && !Class) {
+			if (!Class) {
+				throw new Error(`No backend found for type "${o.type}"`);
+			}
+		}
+		else {
 			// Find a suitable backend
-			// If none found, fall back to basic read-only URL loading
-			Class = Backend.find(url, o) ?? Backend.Remote;
+			if (url && this.all.length > 0) {
+				Class = this.find(url, o) ?? Backend.Remote;
+			}
+			else {
+				// No registered backends under this, use this directly
+				Class = this;
+			}
 		}
 
-		// Can we re-use the existing object perhaps?
+		// Can we re-use an existing object perhaps?
 		if (o.existing) {
 			let existing = toArray(o.existing)
 			               .find(backend => backend.constructor === Class && backend.constructor.prototype.hasOwnProperty("update"));
@@ -239,16 +247,35 @@ export default class Backend extends EventTarget {
 	}
 
 	static async load (url, o) {
-		return this.from(url, o)?.load(url, o);
+		let backend = this.from(url, o);
+
+		if (backend) {
+			return backend.load(url, o);
+		}
+		else {
+			throw new Error(`No backend found for ${url}`);
+		}
+	}
+
+	static _all = [];
+
+	// Get all descendant backends
+	static get all () {
+		if (this === Backend) {
+			return Backend._all;
+		}
+
+		return Backend._all.filter(backend => backend.prototype instanceof this);
 	}
 
 	static find (url, o) {
 		if (url) {
-			for (let backend of Backend.all) {
+			let backends = this.all;
+			for (let backend of backends) {
 				// Check first if backend is a descendant class of this
 				// This allows calling create on child classes to narrow the scope of the search
 				// And then if the URL is one of the URLs handlded by it
-				if (backend.prototype instanceof this && backend.test?.(url, o)) {
+				if (backend.test?.(url, o)) {
 					return backend;
 				}
 			}
@@ -257,11 +284,9 @@ export default class Backend extends EventTarget {
 		return null;
 	}
 
-	static all = []
-
 	static register (Class) {
 		Backend[Class.name] = Class;
-		Backend.all.push(Class);
+		Backend._all.push(Class);
 		return Class;
 	}
 
