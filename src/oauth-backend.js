@@ -40,7 +40,9 @@ export default class OAuthBackend extends AuthBackend {
 		super.update(url, o);
 
 		if (o?.accessToken) {
-			this.login({accessToken: o.accessToken});
+			if (this.accessToken !== o.accessToken) {
+				this.deleteLocalUserInfo();
+			}
 		}
 
 		if (o?.apiKey) {
@@ -151,7 +153,7 @@ export default class OAuthBackend extends AuthBackend {
 	 * @param [options.passive] {boolean} - Do not trigger any login UI, just return the current user if already logged in
 	 * @return {Promise<UserObject | null>}
 	 */
-	async login ({passive = false, accessToken, ...rest} = {}) {
+	async login ({passive = false, accessToken = this.options.accessToken, ...rest} = {}) {
 		if (this.ready) {
 			await this.ready;
 		}
@@ -299,6 +301,7 @@ export default class OAuthBackend extends AuthBackend {
 	 */
 	deleteLocalUserInfo () {
 		localStorage.removeItem(this.constructor.tokenKey);
+		delete this.user;
 		delete this.accessToken;
 	}
 
