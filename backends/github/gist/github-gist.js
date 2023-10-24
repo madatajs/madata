@@ -48,7 +48,7 @@ export default class GithubGist extends Github {
 		}
 	}
 
-	async put (data, {file = this.file, path} = {}) {
+	async put (data, {file = this.file} = {}) {
 		let call = "gists";
 		let gistId = file.gistId;
 
@@ -66,7 +66,7 @@ export default class GithubGist extends Github {
 		let gistInfo = await this.request(call, {
 			files: {
 				[file.path]: {
-					content: await this.stringify(data)
+					content: await this.stringify(data, {file})
 				}
 			},
 			public: true

@@ -3,6 +3,7 @@
  * @claas Backend
  * @extends EventTarget
  */
+import Format from './format.js';
 import hooks from './hooks.js';
 import { toArray, phrase, type } from './util.js';
 
@@ -47,20 +48,63 @@ export default class Backend extends EventTarget {
 		}
 	}
 
-	async parse (data) {
+	async parse (data, { file } = {}) {
 		if (type(data) !== "string") {
+			// Already parsed
 			return data;
 		}
 
-		return this.options.format?.parse(data) ?? this.options.parse?.(data) ?? JSON.parse(data);
+		if (type(this.options.parse) === "function") {
+			// parse should take precedence over format
+			return this.options.parse(data);
+		}
+
+		return this.#getFormat(file).parse(data);
 	}
 
-	async stringify (data) {
+	async stringify (data, { file } = {}) {
 		if (type(data) === "string") {
+			// Already stringified
 			return data;
 		}
 
-		return this.options.format?.stringify(data) ?? this.options.stringify?.(data) ?? JSON.stringify(data, null, "\t");
+		if (type(this.options.stringify) === "function") {
+			// stringify should take precedence over format
+			return this.options.stringify(data);
+		}
+
+		return this.#getFormat(file).stringify(data);
+	}
+
+	#getFormat (file) {
+		let format = this.options.format;
+
+		if (!format && this.constructor.fileBased && file) {
+			// If file-based, try to match the filename first
+			let extension = (file.filename ?? file.path ?? file.url).match(/\.(\w+)$/)?.[1];
+			if (extension) {
+				format = Format.find({extension});
+			}
+		}
+
+		format ??= this.constructor.defaultFormat;
+
+		if (format && typeof format === "string") {
+			format = Format.find(format);
+
+			if (!format) {
+				throw new Error(`No format found for "${this.options.format}"`);
+			}
+
+			if (this.options.format) {
+				this.options.format = format;
+			}
+			else {
+				this.constructor.defaultFormat = format;
+			}
+		}
+
+		return format;
 	}
 
 	updatePermissions(o) {
@@ -145,7 +189,7 @@ export default class Backend extends EventTarget {
 			response = response.replace(/^\ufeff/, ""); // Remove Unicode BOM
 
 			this.rawData = response;
-			this.data = this.parse(response);
+			this.data = await this.parse(response, { file });
 		}
 
 		this.dispatchEvent(new CustomEvent("mv-load", {
@@ -290,7 +334,8 @@ export default class Backend extends EventTarget {
 		return Class;
 	}
 
-	static hooks = hooks
+	static hooks = hooks;
+	static defaultFormat = "JSON";
 
 	static phrase (id, ...args) {
 		return phrase(this, id, ...args);
@@ -300,7 +345,7 @@ export default class Backend extends EventTarget {
 	 * Auth Provider to use.
 	 * This is only relevant for OAuthBackend, but specifying here as Backend is the only class users import.
 	 */
-	static authProvider = "https://auth.madata.dev"
+	static authProvider = "https://auth.madata.dev";
 
 	/**
 	 * services.json from the auth provider will be cached here.
