@@ -55,13 +55,28 @@ export default class Format {
 	}
 
 	/**
-	 * Find a registered Format by its MIME type or extension
-	 * @param {object} criteria
+	 * Find a registered Format by its name, MIME type, or extension
+	 * @param {string | object} criteria If string, searches by name, MIME type, or extension, prioritizing name matches.
+	 * If object, searches by the specific criteria provided.
 	 * @param {string} [criteria.mimeType]
 	 * @param {string} [criteria.extension]
 	 * @returns
 	 */
-	static find ({ mimeType, extension }) {
+	static find (criteria) {
+		if (typeof criteria === "string") {
+			// Find format by either id, extension, or MIME type, prioritizing id
+			// Case insensitive, though name lookup is O(1) if you use the correct case
+			if (this[criteria]) {
+				return this[criteria];
+			}
+
+			return this.all.find(format => format.name.toLowerCase() === criteria.toLowerCase())
+				?? this.find({ extension: criteria })
+				?? this.find({ mimeType: criteria }) ?? null;
+		}
+
+		let { mimeType, extension } = criteria;
+
 		return this.all.find(format => {
 			return (mimeType && format.mimeTypes.includes(mimeType)) ||
 				(extension && format.extensions.includes(extension));
