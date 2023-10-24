@@ -5,6 +5,10 @@
 import Google from "../google.js";
 
 export default class GoogleDrive extends Google {
+	static apiDomain = "https://www.googleapis.com/";
+	static scopes = ["https://www.googleapis.com/auth/drive", "https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email"];
+	static fileBased = true;
+
 	update (url, o = {}) {
 		super.update(url, o);
 
@@ -262,9 +266,6 @@ export default class GoogleDrive extends Google {
 			return path[4];
 		}
 	}
-
-	static apiDomain = "https://www.googleapis.com/";
-	static scopes = ["https://www.googleapis.com/auth/drive", "https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email"];
 
 	static test (url) {
 		url = new URL(url);

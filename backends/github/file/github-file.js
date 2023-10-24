@@ -7,6 +7,8 @@ import hooks from "../../../src/hooks.js";
 import {readFile, delay} from "../../../src/util.js";
 
 export default class GithubFile extends Github {
+	static fileBased = true;
+
 	/**
 	 * Low-level method to fetch a file from GitHub
 	 * @param {Object} file

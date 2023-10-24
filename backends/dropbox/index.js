@@ -3,10 +3,12 @@
  * @extends OAuthBackend
  */
 import OAuthBackend from "../../src/oauth-backend.js";
-import hooks from "../../src/hooks.js";
-import {readFile} from "../../src/util.js";
 
 export default class Dropbox extends OAuthBackend {
+	static apiDomain = "https://api.dropboxapi.com/2/";
+	static oAuth = "https://www.dropbox.com/oauth2/authorize";
+	static fileBased = true;
+
 	constructor (url, o) {
 		super(url, o);
 
@@ -81,9 +83,6 @@ export default class Dropbox extends OAuthBackend {
 		return this.user;
 	}
 
-	static apiDomain = "https://api.dropboxapi.com/2/"
-	static oAuth = "https://www.dropbox.com/oauth2/authorize"
-
 	static test (url) {
 		url = new URL(url, location);
 		return /dropbox.com/.test(url.host);
@@ -93,7 +92,7 @@ export default class Dropbox extends OAuthBackend {
 		let { url } = super.parseURL(source);
 		url = Dropbox.#fixShareURL(url);
 
-		return {url}; 
+		return {url};
 	}
 
 	// Transform the dropbox shared URL into something raw and CORS-enabled
