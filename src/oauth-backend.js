@@ -247,7 +247,7 @@ export default class OAuthBackend extends AuthBackend {
 
 		accessToken = await new Promise((resolve, reject) => {
 			addEventListener("message", evt => {
-				if (evt.source === this.authPopup) {
+				if (evt.source === this.authPopup && evt.data.backend) {
 					if (evt.data.backend == oAuthBackend.name) {
 						resolve(evt.data.token);
 					}
