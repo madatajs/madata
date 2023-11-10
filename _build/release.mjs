@@ -32,6 +32,10 @@ if (/^\d|v/.test(args[0])) {
 
 const dryRun = args[0] !== "--publish";
 
+if (dryRun) {
+	info("Dry run. Use --publish to actually make the changes.");
+}
+
 if (!newVersion) {
 	// Version not provided. Increment last digit of currrent version.
 	newVersion = currentVersion.replace(/\d+$/, lastVersionComponent => {
@@ -46,10 +50,15 @@ if (currentVersion === newVersion) {
 packageJson = packageJson.replace(/(?<="version":\s*").+?(?=")/, newVersion);
 
 // Write package.json
-fs.writeFileSync("./package.json", packageJson);
+if (dryRun) {
+	console.log("[Dry run] Would have written to package.json:", packageJson);
+}
+else {
+	fs.writeFileSync("./package.json", packageJson);
+}
 
 // Commit change
-run(`git add package.json && git commit -m "Bump version to ${newVersion}"`, { verbose: true });
+run(`git add package.json && git commit -m "Bump version to ${newVersion}"`, { verbose: true, dryRun });
 
 // Tag commit
 run(`git tag -a v${newVersion} -m "Release v${newVersion}"`, { verbose: true, dryRun });
