@@ -12,7 +12,7 @@ export default class CodaTable extends Coda {
 			await this.resolveFile(file);
 		}
 
-		let rows = (await this.request(`docs/${file.docId}/tables/${file.tableId}/rows/?valueFormat=rich&useColumnNames=true&sortBy=natural`))?.items;
+		let rows = await this.getTableRows(file);
 
 		// Transform rows to a more usable format
 		return rows.map(row => {
@@ -75,6 +75,24 @@ export default class CodaTable extends Coda {
 	async getTableColumns (file = this.file) {
 		let ret = await this.request(`docs/${file.docId}/tables/${file.tableId}/columns`);
 		return ret?.items;
+	}
+
+	async getTableRows (file = this.file) {
+		let items = [];
+		let options = {valueFormat: "rich", useColumnNames: true, sortBy: "natural"};
+		let optionsString = Object.entries(options).map(([key, value]) => `${key}=${value}`).join("&");
+		let data;
+		let url = `docs/${file.docId}/tables/${file.tableId}/rows/?${optionsString}`;
+
+		do {
+			data = await this.request(url + (data?.nextPageToken ? `&pageToken=${data.nextPageToken}` : ""));
+			if (data) {
+				items.push(...data.items);
+				options.pageToken = data.nextPageToken;
+			}
+		} while (data?.nextPageToken);
+
+		return items;
 	}
 
 	static parseURL (source) {
