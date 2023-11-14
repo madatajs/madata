@@ -1,5 +1,5 @@
 /**
- * Google Firebase backend.
+ * Firebase backend.
  * @class Firebase
  * @extends OAuthBackend
  */

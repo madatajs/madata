@@ -1,4 +1,4 @@
-# Google Firebase
+# Firebase
 
 | ✅ Auth | ✅ Writes | ✅ Uploads |
 |---------|-----------|-----------|
