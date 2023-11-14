@@ -1,17 +1,17 @@
 /**
  * Google Firebase backend.
- * @class GoogleFirebase
+ * @class Firebase
  * @extends OAuthBackend
  */
-import OAuthBackend from "../../../src/oauth-backend.js";
-import { readFile, toArray } from "../../../src/util.js";
+import AuthBackend from "../../src/auth-backend.js";
+import { readFile, toArray } from "../../src/util.js";
 
-import { getApps, initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
-import { getAuth, onAuthStateChanged, signInWithPopup, signOut, GoogleAuthProvider, useDeviceLanguage } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-import { getFirestore, doc, collection, getDoc, getDocs, setDoc, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore-lite.js";
-import { getStorage, ref, uploadString, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-storage.js";
+import { getApps, initializeApp } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signInWithPopup, signOut, GoogleAuthProvider, useDeviceLanguage } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-auth.js";
+import { getFirestore, doc, collection, getDoc, getDocs, setDoc, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore-lite.js";
+import { getStorage, ref, uploadString, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-storage.js";
 
-export default class GoogleFirebase extends OAuthBackend {
+export default class Firebase extends AuthBackend {
 	constructor (url, o) {
 		super(url, o);
 
@@ -22,7 +22,7 @@ export default class GoogleFirebase extends OAuthBackend {
 		super.ready,
 		new Promise((resolve, reject) => {
 			const firebaseConfig = {
-				apiKey: this.apiKey,
+				apiKey: this.options.apiKey,
 				authDomain: this.file.authDomain,
 				databaseURL: this.source,
 				projectId: this.file.projectId,
@@ -42,15 +42,7 @@ export default class GoogleFirebase extends OAuthBackend {
 				const auth = getAuth(this.app);
 				onAuthStateChanged(auth, (user) => {
 					if (user) {
-						// User is signed in
-						this.user = {
-							username: user.email,
-							name: user.displayName,
-							avatar: user.photoURL,
-							...user
-						};
-
-						this.login({passive: true, accessToken: user.accessToken});
+						this.login({passive: true, user});
 					}
 				});
 
@@ -67,7 +59,7 @@ export default class GoogleFirebase extends OAuthBackend {
 
 		const firestore = getFirestore(this.app);
 
-		if (GoogleFirebase.#isCollection(file)) {
+		if (Firebase.#isCollection(file)) {
 			const collectionRef = collection(firestore, file.path);
 
 			try {
@@ -106,7 +98,7 @@ export default class GoogleFirebase extends OAuthBackend {
 
 		const firestore = getFirestore(this.app);
 
-		if (GoogleFirebase.#isCollection(file)) {
+		if (Firebase.#isCollection(file)) {
 			const documents = toArray(data);
 
 			const collectionRef = collection(firestore, file.path);
@@ -173,7 +165,7 @@ export default class GoogleFirebase extends OAuthBackend {
 		}
 		else {
 			// Delete from Firestore
-			if (GoogleFirebase.#isCollection(file)) {
+			if (Firebase.#isCollection(file)) {
 				// Collection deletion is not recommended since it has negative security and performance implications.
 				// See https://firebase.google.com/docs/firestore/manage-data/delete-data#collections
 				console.warn(this.constructor.phrase("delete_collection_warning"));
@@ -221,6 +213,17 @@ export default class GoogleFirebase extends OAuthBackend {
 		return user;
 	}
 
+	async passiveLogin ({user} = {}) {
+		if (user) {
+			this.user = {
+				username: user.email,
+				name: user.displayName,
+				avatar: user.photoURL,
+				...user
+			};
+		}
+	}
+
 	async activeLogin () {
 		try {
 			const auth = getAuth(this.app);
@@ -248,8 +251,8 @@ export default class GoogleFirebase extends OAuthBackend {
 	}
 
 	#applyDefaults (file = this.file) {
-		for (const part in GoogleFirebase.defaults) {
-			file[part] = this.options[part] ?? GoogleFirebase.defaults[part];
+		for (const part in Firebase.defaults) {
+			file[part] = this.options[part] ?? Firebase.defaults[part];
 		}
 
 		return file;
