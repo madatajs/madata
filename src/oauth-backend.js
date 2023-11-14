@@ -192,7 +192,7 @@ export default class OAuthBackend extends AuthBackend {
 			this.updatePermissions({login: false, logout: true});
 			return currentUser;
 		}
-		else {
+		else if (this.isAuthenticated()) {
 			throw new Error(this.constructor.phrase("invalid_access_token"));
 		}
 	}
