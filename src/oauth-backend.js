@@ -259,7 +259,7 @@ export default class OAuthBackend extends AuthBackend {
 			});
 		});
 
-		this.storeLocalUserInfo(accessToken);
+		this.storeLocalUserInfo({ accessToken });
 
 		hooks.run("oauth-login-success", this);
 
