@@ -3,6 +3,14 @@
 | ✅ Auth | ✅ Writes | ✅ Uploads |
 |---------|-----------|-----------|
 
+<div class=warning>
+
+Google has not yet verified the Google Drive backend for the official Madata auth provider,
+so the login experience works, but shows a warning about the app being unverified.
+If this is an issue for your use case, you can use an [alternative auth provider](/docs/authentication/) meanwhile.
+
+</div>
+
 ## URL format
 
 - Regular file URLs like `https://drive.google.com/file/d/1aV-SUER-bXvph4PH28ppAu6lxoIlnA4F/view?usp=sharing`
