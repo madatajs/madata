@@ -238,7 +238,7 @@ export default class GithubFile extends Github {
 		return this.request("user/repos", {name, private: this.options.private === true, ...options}, "POST");
 	}
 
-	async getRepoInfo(file = this.file) {
+	async getRepoInfo (file = this.file) {
 		let repoInfo;
 
 		// Is the repo the same as the main repo?
@@ -267,7 +267,7 @@ export default class GithubFile extends Github {
 	 * @param {Object} repoInfo
 	 * @returns {Object} repoInfo object about the fork or null
 	 */
-	async getMyFork(repoInfo = this.file.repoInfo) {
+	async getMyFork (repoInfo = this.file.repoInfo) {
 		let myRepoCount = this.user.public_repos + this.user.total_private_repos;
 
 		if (myRepoCount < repoInfo.forks) {
@@ -285,7 +285,7 @@ export default class GithubFile extends Github {
 					}
 				}
 			}`;
-			let data = await this.request("https://api.github.com/graphql", {query: query}, "POST")
+			let data = await this.request("https://api.github.com/graphql", {query: query}, "POST");
 
 			let repos = data.data.viewer.repositories.nodes;
 
@@ -336,7 +336,7 @@ export default class GithubFile extends Github {
 		// Ensure that fork is created (they take a while) by requesting commits every second up to 5 minutes
 		for (let i = 0; i < 300; i++) {
 			try {
-				await this.request(`repos/${forkInfo.full_name}/commits`, {until: "1970-01-01T00:00:00Z"}, "HEAD")
+				await this.request(`repos/${forkInfo.full_name}/commits`, {until: "1970-01-01T00:00:00Z"}, "HEAD");
 			}
 			catch (err) {
 				await delay(1000);
@@ -349,7 +349,7 @@ export default class GithubFile extends Github {
 	async publish (file = this.file, {https_enforced = true} = {}) {
 		let source = {
 			branch: file.branch || "main",
-		}
+		};
 
 		let pagesInfo = await this.request(`repos/${file.owner}/${file.repo}/pages`, {source}, "POST", {
 			headers: {
@@ -399,9 +399,9 @@ export default class GithubFile extends Github {
 				return pagesInfo.html_url;
 			}
 		}
-		catch(e) {}
+		catch (e) {}
 
-		return `https://cdn.jsdelivr.net/gh/${repoInfo.full_name}@${sha}/`
+		return `https://cdn.jsdelivr.net/gh/${repoInfo.full_name}@${sha}/`;
 	}
 
 	/**
@@ -420,14 +420,14 @@ export default class GithubFile extends Github {
 	static defaults = {
 		repo: "mv-data",
 		path: "data.json",
-	}
+	};
 
 	static phrases = {
 		"updated_file": (name = "file") => "Updated " + name,
 		"created_file": (name = "file") => "Created " + name,
 		"deleted_file": (name = "file") => "Deleted " + name,
 		"no_push_permission": (repo) => `You do not have permission to write to repository ${repo}`,
-	}
+	};
 
 	static test (url) {
 		url = new URL(url);

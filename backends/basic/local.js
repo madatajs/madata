@@ -27,15 +27,15 @@ export default class Local extends Backend {
 	async put (data) {
 		if (!data) {
 			delete localStorage[this.file.key];
-			return {type: "delete"}
+			return {type: "delete"};
 		}
 
 		let exists = this.file.key in localStorage;
 		localStorage[this.file.key] = await this.stringify(data);
-		return {type: exists? "update" : "create"}
+		return {type: exists? "update" : "create"};
 	}
 
-	static parseURL(source) {
+	static parseURL (source) {
 		const url = new URL(source);
 		let key = url.pathname;
 		return {key};

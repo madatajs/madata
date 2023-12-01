@@ -42,5 +42,5 @@ export default class Coda extends OAuthBackend {
 
 	static phrases = {
 		"login_prompt": "Enter your Coda API token. You can find it in your Coda account settings."
-	}
+	};
 }

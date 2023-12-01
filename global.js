@@ -5,7 +5,7 @@ import "https://prismjs.com/components/prism-typescript.js";
 
 const $$ = document.querySelectorAll.bind(document);
 
-function renderDemos() {
+function renderDemos () {
 	for (let code of $$("pre > code.language-html, pre.language-html > code")) {
 		let pre = code.parentNode;
 
@@ -17,7 +17,7 @@ function renderDemos() {
 
 			if (scripts.length > 0) {
 				for (let script of scripts) {
-					script.replaceWith( clone(script) )
+					script.replaceWith( clone(script) );
 				}
 			}
 		}

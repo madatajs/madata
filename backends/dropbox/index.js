@@ -101,5 +101,5 @@ export default class Dropbox extends OAuthBackend {
 		url.hostname = "dl.dropboxusercontent.com";
 		url.search = url.search.replace(/\bdl=0|^$/, "raw=1");
 		return url;
-	}
+	};
 }

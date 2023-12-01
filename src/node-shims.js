@@ -42,4 +42,4 @@ if (!localStorage) {
 	});
 }
 
-export {localStorage}
+export {localStorage};

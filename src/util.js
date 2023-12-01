@@ -32,7 +32,7 @@ export function readFile (file, format = "DataURL") {
 /**
  * Get the first element that matches a selector
  */
-export function $(selector, context = document) {
+export function $ (selector, context = document) {
 	return context.querySelector(selector);
 }
 
@@ -41,7 +41,7 @@ export function $(selector, context = document) {
  * @param {Number} ms Delay in milliseconds
  * @returns {Promise}
  */
-export function delay(ms) {
+export function delay (ms) {
 	return new Promise(resolve => setTimeout(resolve, ms));
 }
 
@@ -51,7 +51,7 @@ export function delay(ms) {
  * @param {*} value
  * @returns {Array}
  */
-export function toArray(value) {
+export function toArray (value) {
 	return Array.isArray(value)? value : [value];
 }
 
@@ -59,7 +59,7 @@ export function toArray(value) {
  * Low-level function to facilitate localization
  * @param {*} me - Class or object containing the phrases
  * @param {*} id - Phrase id
- * @param  {...any} args - Optional arguments to pass to the phrase
+ * @param {...any} args - Optional arguments to pass to the phrase
  * @returns {string}
  */
 export function phrase (me, id, ...args) {

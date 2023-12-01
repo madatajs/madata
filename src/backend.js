@@ -1,11 +1,11 @@
 /**
  * Base class for all backends
- * @claas Backend
+ * @class Backend
  * @extends EventTarget
  */
-import Format from './format.js';
-import hooks from './hooks.js';
-import { toArray, phrase, type } from './util.js';
+import Format from "./format.js";
+import hooks from "./hooks.js";
+import { toArray, phrase, type } from "./util.js";
 
 /**
  * @param {string} url - URL string describing the data location
@@ -107,7 +107,7 @@ export default class Backend extends EventTarget {
 		return format;
 	}
 
-	updatePermissions(o) {
+	updatePermissions (o) {
 		let changed = [];
 
 		for (let permission in o) {
@@ -170,7 +170,7 @@ export default class Backend extends EventTarget {
 	 * Higher-level method for reading data from the backend.
 	 * Subclasses should usually NOT override this method.
 	 * @param {string} url - URL to fetch, if different from that provided in the constructor
-	 * @param  {...any} args
+	 * @param {...any} args
 	 * @returns {object} - Data from the backend as a JSON object, `null` if not found
 	 */
 	async load (url, ...args) {
@@ -209,7 +209,7 @@ export default class Backend extends EventTarget {
 	 * Subclasses should usually NOT override this method.
 	 * @param {object} data - Data to write to the backend
 	 * @param {object} [o] - Options object
-	 * @returns {object} - If successsful, info about the file
+	 * @returns {object} - If successful, info about the file
 	 */
 	async store (data, o = {}) {
 		await this.ready;
@@ -245,7 +245,7 @@ export default class Backend extends EventTarget {
 		return backend === this || (backend && this.constructor == backend.constructor && this.source == backend.source);
 	}
 
-	static parseURL(source) {
+	static parseURL (source) {
 		let url = new URL(source);
 		return {url};
 	}
@@ -318,7 +318,7 @@ export default class Backend extends EventTarget {
 			for (let backend of backends) {
 				// Check first if backend is a descendant class of this
 				// This allows calling create on child classes to narrow the scope of the search
-				// And then if the URL is one of the URLs handlded by it
+				// And then if the URL is one of the URLs handled by it
 				if (backend.test?.(url, o)) {
 					return backend;
 				}
@@ -361,4 +361,4 @@ export default class Backend extends EventTarget {
 		delete Backend.authProviderServices;
 		return Backend.authProviderServices = fetch(new URL("/services.json", this.authProvider)).then(r => r.json());
 	}
-};
+}
