@@ -401,7 +401,7 @@ export default class GithubFile extends Github {
 		}
 		catch (e) {}
 
-		return `https://cdn.jsdelivr.net/gh/${repoInfo.full_name}@${sha}/`;
+		return `https://cdn.jsdelivr.net/gh/${file.repoInfo.full_name}@${sha}/`;
 	}
 
 	/**
