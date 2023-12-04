@@ -4,6 +4,7 @@
  * @extends EventTarget
  */
 import Format from "./format.js";
+import "../formats/index.js";
 import hooks from "./hooks.js";
 import { toArray, phrase, type } from "./util.js";
 
