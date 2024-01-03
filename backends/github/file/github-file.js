@@ -92,44 +92,37 @@ export default class GithubFile extends Github {
 		return this.#write("delete", file);
 	}
 
-	async #write (type, file, ...args) {
-		if (file.repoInfo === undefined) {
-			file.repoInfo = await this.getRepoInfo(file);
-		}
+	async #write (type, ref, ...args) {
+		await this.fetchRepoInfo(ref);
 
-		if (file.repoInfo === null) {
+		if (ref.repoInfo === null) {
 			// Create repo if it doesn’t exist
-			file.repoInfo = await this.createRepo(file.repo);
+			await this.createRepo(ref);
 		}
 
-		// Update this.file.repoInfo too
-		if (!this.file.repoInfo && GithubFile.sameRepo(file, this.file)) {
-			this.file.repoInfo = file.repoInfo;
-		}
-
-		if ((await this.canPush(file)) === false) {
+		if ((await this.canPush(ref)) === false) {
 			if (this.options.allowForking) {
 				// Does not have permission to commit, create a fork
-				let forkInfo = await this.fork(file);
+				let forkInfo = await this.fork(ref);
 
-				file.forked = true;
-				file.original = Object.assign({}, file);
-				file.owner = forkInfo.owner.login;
-				file.repo = forkInfo.name;
-				file.repoInfo = forkInfo;
+				ref.forked = true;
+				ref.original = Object.assign({}, ref);
+				ref.owner = forkInfo.owner.login;
+				ref.repo = forkInfo.name;
+				ref.repoInfo = forkInfo;
 			}
 			else {
-				throw new Error(this.constructor.phrase("no_push_permission", `${file.owner}/${file.repo}`));
+				throw new Error(this.constructor.phrase("no_push_permission", `${ref.owner}/${ref.repo}`));
 			}
 		}
 
 		let fileInfo;
-		let fileCall = `repos/${file.owner}/${file.repo}/contents/${file.path}`;
+		let fileCall = `repos/${ref.owner}/${ref.repo}/contents/${ref.path}`;
 		let commitPrefix = this.options.commitPrefix || "";
 
 		// Read file, so we can get a SHA
 		fileInfo = await this.request(fileCall, {
-			ref: file.branch
+			ref: ref.branch
 		});
 
 		if (type === "put") {
@@ -140,18 +133,18 @@ export default class GithubFile extends Github {
 			if (fileInfo !== null) {
 				// Write file
 				fileInfo = await this.request(fileCall, {
-					message: commitPrefix + this.constructor.phrase("updated_file", file.path),
+					message: commitPrefix + this.constructor.phrase("updated_file", ref.path),
 					content: serialized,
-					branch: file.branch,
+					branch: ref.branch,
 					sha: fileInfo.sha
 				}, "PUT");
 			}
 			else {
 				// File doesn't exist yet, create it
 				fileInfo = await this.request(fileCall, {
-					message: commitPrefix + this.constructor.phrase("created_file", file.path),
+					message: commitPrefix + this.constructor.phrase("created_file", ref.path),
 					content: serialized,
-					branch: file.branch
+					branch: ref.branch
 				}, "PUT");
 			}
 		}
@@ -159,8 +152,8 @@ export default class GithubFile extends Github {
 			if (fileInfo !== null) {
 				// Delete file
 				fileInfo = await this.request(fileCall, {
-					message: commitPrefix + this.constructor.phrase("deleted_file", file.path),
-					branch: file.branch,
+					message: commitPrefix + this.constructor.phrase("deleted_file", ref.path),
+					branch: ref.branch,
 					sha: fileInfo.sha
 				}, "DELETE");
 			}
@@ -194,7 +187,7 @@ export default class GithubFile extends Github {
 
 			if (this.file.repo) {
 				// TODO move to load()?
-				this.file.repoInfo = await this.getRepoInfo();
+				this.file.repoInfo = await this.fetchRepoInfo();
 			}
 		}
 
@@ -214,51 +207,58 @@ export default class GithubFile extends Github {
 		return this.getFileURL(path, {sha: fileInfo.commit.sha});
 	}
 
-	async canPush (file = this.file) {
-		if (typeof file === "string") {
-			file = this.constructor.parseURL(file);
-		}
+	async canPush (ref = this.file) {
+		ref = this._getFile(ref);
 
-		if (file.repoInfo === undefined) {
-			file.repoInfo = await this.getRepoInfo(file);
-		}
+		await this.fetchRepoInfo(ref);
 
-		if (file.repoInfo) {
-			return file.repoInfo.permissions?.push;
+		if (ref.repoInfo) {
+			return ref.repoInfo.permissions?.push;
 		}
 
 		// Repo does not exist yet so we can't check permissions
 		// Just check if authenticated user is the same as our URL username
 		// TODO if username is an org, check if user has repo creation permissions
-		return this.user?.username?.toLowerCase() == file.owner.toLowerCase();
+		return this.user?.username?.toLowerCase() == ref.owner.toLowerCase();
 	}
 
-	async createRepo (name, options = {}) {
-		// TODO what if the repo is in an organization?
-		return this.request("user/repos", {name, private: this.options.private === true, ...options}, "POST");
-	}
+	async createRepo (ref, options = {}) {
+		ref = this._getFile(ref);
+		let name = ref.repo;
 
-	async getRepoInfo (file = this.file) {
-		let repoInfo;
+		// FIXME this won't work for orgs
+		ref.repoInfo = await this.request("user/repos", {name, private: this.options.private === true, ...options}, "POST");
 
-		// Is the repo the same as the main repo?
-		if (file !== this.file && this.file.repoInfo && file.owner === this.file.owner && file.repo === this.file.repo) {
-			repoInfo = this.file.repoInfo;
+		// Update this.file.repoInfo too
+		if (!this.file.repoInfo && this.constructor.sameRepo(ref, this.file)) {
+			this.file.repoInfo = ref.repoInfo;
 		}
-		else {
-			if (file.owner && file.repo) {
-				repoInfo = await this.request(`repos/${file.owner}/${file.repo}`);
+
+		return ref;
+	}
+
+	async fetchRepoInfo (ref = this.file) {
+		ref = this._getFile(ref);
+
+		if (!ref.repoInfo) {
+			if (ref !== this.file && this.file.repoInfo && this.constructor.sameRepo(ref, this.file)) {
+				// Same repo as the main repo
+				ref.repoInfo = this.file.repoInfo;
+			}
+			else if (ref.owner && ref.repo) {
+				ref.repoInfo = await this.request(`repos/${ref.owner}/${ref.repo}`);
 			}
 			else {
-				throw new Error("Cannot get repo info, owner and/or repo name missing.", file);
+				throw new Error("Cannot get repo info, owner and/or repo name missing.", ref);
 			}
 		}
 
-		if (repoInfo && file.branch === undefined) {
-			file.branch = repoInfo.default_branch;
+		if (ref.repoInfo && ref.branch === undefined) {
+			// Update default branch since we didn't have it before
+			ref.branch = ref.repoInfo.default_branch;
 		}
 
-		return repoInfo;
+		return ref;
 	}
 
 	/**
@@ -292,7 +292,8 @@ export default class GithubFile extends Github {
 			for (let i in repos) {
 				if (repos[i].parent.nameWithOwner === repoInfo.full_name) {
 					let [owner, repo] = repos[i].nameWithOwner.split("/");
-					return this.getRepoInfo({owner, repo});
+					let ref = await this.fetchRepoInfo({owner, repo});
+					return ref.repoInfo;
 				}
 			}
 		}
@@ -368,16 +369,12 @@ export default class GithubFile extends Github {
 		return pagesInfo;
 	}
 
-	async getPagesInfo (file = this.file) {
-		if (typeof file === "string") {
-			file = GithubFile.parseURL(file);
-		}
+	async getPagesInfo (ref = this.file) {
+		ref = await this.fetchRepoInfo(ref);
 
-		let repoInfo = await this.getRepoInfo(file);
-
-		if (repoInfo) {
-			let repo = repoInfo.full_name;
-			return repoInfo.pagesInfo = repoInfo.pagesInfo || this.request(`repos/${repo}/pages`, {}, "GET", {
+		if (ref.repoInfo) {
+			let repo = ref.repoInfo.full_name;
+			return ref.repoInfo.pagesInfo ??= await this.request(`repos/${repo}/pages`, {}, "GET", {
 				headers: {
 					"Accept": "application/vnd.github+json",
 				}
