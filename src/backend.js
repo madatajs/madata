@@ -8,17 +8,20 @@ import hooks from "./hooks.js";
 import { toArray, phrase, type } from "./util.js";
 
 /**
- * @param {string} url - URL string describing the data location
- * @param {object} o - Options
+ * Base class for every backend, and default export.
  */
 export default class Backend extends EventTarget {
-	constructor (url, o = {}) {
+	/**
+	 * @param {string} source - URL string describing the data location
+	 * @param {object} o - Options
+	 */
+	constructor (source, o = {}) {
 		super();
 
 		// Permissions of this particular backend.
 		this.permissions = {};
 
-		this.update(url, o);
+		this.update(source, o);
 	}
 
 	static get title () {
@@ -27,13 +30,16 @@ export default class Backend extends EventTarget {
 
 	/**
 	 * Update an existing backend instance with new parameters
-	 * @param {string} url - Same as constructor
+	 * @param {string} source - Same as constructor
 	 * @param {object} o - Same as constructor
 	 */
-	update (url, o = {}) {
-		if (url) {
-			this.source = url;
-			this.file = this._getFile(url);
+	update (source, o = {}) {
+		if (source) {
+			this.source = source;
+		}
+
+		if (source || !this.file) {
+			this.file = this._getFile(source);
 		}
 
 		if (o) {
