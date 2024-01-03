@@ -33,7 +33,7 @@ export default class Backend extends EventTarget {
 	update (url, o = {}) {
 		if (url) {
 			this.source = url;
-			this.file = this.#getFile(url);
+			this.file = this._getFile(url);
 		}
 
 		if (o) {
@@ -150,7 +150,7 @@ export default class Backend extends EventTarget {
 		return null;
 	}
 
-	#getFile (ref) {
+	_getFile (ref) {
 		if (typeof ref === "string") {
 			// ref is a URL
 			if (/^\w+:/.test(ref)) {
@@ -176,7 +176,7 @@ export default class Backend extends EventTarget {
 	async load (url, ...args) {
 		await this.ready;
 
-		let file = this.#getFile(url);
+		let file = this._getFile(url);
 
 		let response = await this.get(file, ...args);
 
@@ -220,7 +220,7 @@ export default class Backend extends EventTarget {
 
 		let {file, url, ...options} = o;
 
-		file = this.#getFile(file ?? url);
+		file = this._getFile(file ?? url);
 
 		return this.put(data, {file, ...options});
 	}
@@ -232,7 +232,7 @@ export default class Backend extends EventTarget {
 			throw new Error("This backend does not support deleting files");
 		}
 
-		file = this.#getFile(file);
+		file = this._getFile(file);
 
 		return this.delete(file);
 	}
