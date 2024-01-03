@@ -168,8 +168,8 @@ export default class Backend extends EventTarget {
 			return Object.assign({}, this.file, {path: ref});
 		}
 
-		// Either file object, or empty value
-		return ref ?? this.file;
+		// Either (default) file object, or empty value
+		return ref ?? this.file ?? this.constructor.parseURL();
 	}
 
 	/**
