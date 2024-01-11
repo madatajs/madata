@@ -3,9 +3,13 @@
  * @class Backend
  * @extends EventTarget
  */
-import Format from "./format.js";
 import hooks from "./hooks.js";
 import { toArray, phrase, type } from "./util.js";
+import Format from "./format.js";
+import JSON from "../formats/json/index.js";
+
+// We need at least JSON for most cases
+Format.register(JSON);
 
 /**
  * Base class for every backend, and default export.
