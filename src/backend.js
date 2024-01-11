@@ -94,23 +94,22 @@ export default class Backend extends EventTarget {
 		}
 
 		format ??= this.constructor.defaultFormat;
+		let formatObj = format;
 
+		// Resolve format specifier (e.g. "json")
 		if (format && typeof format === "string") {
-			format = Format.find(format);
-
-			if (!format) {
-				throw new Error(`No format found for "${this.options.format}"`);
-			}
+			let formatObj = Format.find(format, {require: true});
 
 			if (this.options.format) {
-				this.options.format = format;
+				// If this backend specified a format option, replace it with the actual format object
+				this.options.format = formatObj;
 			}
 			else {
-				this.constructor.defaultFormat = format;
+				this.constructor.defaultFormat = formatObj;
 			}
 		}
 
-		return format;
+		return formatObj;
 	}
 
 	updatePermissions (o) {

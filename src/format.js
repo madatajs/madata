@@ -60,9 +60,11 @@ export default class Format {
 	 * If object, searches by the specific criteria provided.
 	 * @param {string} [criteria.mimeType]
 	 * @param {string} [criteria.extension]
+	 * @param {object} [o] Options
+	 * @param {boolean} [o.require] If true, throws an error if no format is found
 	 * @returns
 	 */
-	static find (criteria) {
+	static find (criteria, o) {
 		if (typeof criteria === "string") {
 			// Find format by either id, extension, or MIME type, prioritizing id
 			// Case insensitive, though name lookup is O(1) if you use the correct case
@@ -77,10 +79,20 @@ export default class Format {
 
 		let { mimeType, extension } = criteria;
 
-		return this.all.find(format => {
-			return (mimeType && format.mimeTypes.includes(mimeType)) ||
-				(extension && format.extensions.includes(extension));
-		});
+		let ret = this.all.find(format => (
+			   (mimeType && format.mimeTypes.includes(mimeType))
+			|| (extension && format.extensions.includes(extension))
+		));
+
+		if (ret) {
+			return ret;
+		}
+
+		if (o?.require) {
+			throw new Error(`No format found that matches ${JSON.stringify(criteria)}`);
+		}
+
+		return null;
 	}
 
 	static toBlob (str, options) {
