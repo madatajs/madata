@@ -1,10 +1,17 @@
-**/*.html
+node_modules
 
-_build
-_includes
+# GitHub Specific Files
 .github
+
+# Visual Studio Code User & Workspace Settings
 .vscode
+
+# Third-party Libraries
+lib
+
+# Website Pages
+_includes
+
+# Docs
 api
 docs
-lib
-node_modules
