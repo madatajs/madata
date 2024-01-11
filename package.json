@@ -14,7 +14,9 @@
     "watch:html": "npx @11ty/eleventy --config=_build/.eleventy.cjs --watch",
     "watch": "npx concurrently -n w: npm:watch:*",
     "docs": "npx documentation build src/** -f html --github -o api",
-    "dev": "http-server -p 58504 --cors & open http://localhost:58504"
+    "dev": "http-server -p 58504 --cors & open http://localhost:58504",
+    "eslint": "eslint . --ext .js --ext .cjs",
+		"lint": "npm run eslint -- --fix"
   },
   "repository": {
     "type": "git",
@@ -34,7 +36,10 @@
     "@11ty/eleventy": "^2.0.0",
     "concurrently": "^7.6.0",
     "documentation": "^14.0.1",
-    "eslint": "^8.38.0",
+    "eslint": "latest",
+    "@stylistic/eslint-plugin": "latest",
+    "@typescript-eslint/eslint-plugin": "latest",
+		"@typescript-eslint/parser": "latest",
     "markdown-it-anchor": "^8.6.7",
     "markdown-it-attrs": "^4.1.6",
     "postcss": "^8.3.9",

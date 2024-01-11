@@ -1,1 +1,10 @@
 **/*.html
+
+_build
+_includes
+.github
+.vscode
+api
+docs
+lib
+node_modules
