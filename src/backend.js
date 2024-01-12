@@ -4,7 +4,7 @@
  * @extends EventTarget
  */
 import hooks from "./hooks.js";
-import { toArray, phrase, type } from "./util.js";
+import { toArray, phrase, type, testURL } from "./util.js";
 import Format from "./format.js";
 import JSON from "../formats/json/index.js";
 
@@ -254,9 +254,45 @@ export default class Backend extends EventTarget {
 		return backend === this || (backend && this.constructor == backend.constructor && this.source == backend.source);
 	}
 
+	static test (source) {
+		let {protocol, host, path, urls} = this;
+
+		if (!protocol && !host && !urls) {
+			// No URL criteria specified, backend needs to override test() to match anything
+			return false;
+		}
+
+		let url;
+		try {
+			url = new URL(source);
+		}
+		catch (e) {}
+
+		return testURL(url, urls ?? {protocol, host, path});
+	}
+
 	static parseURL (source) {
-		let url = new URL(source);
-		return {url};
+		if (!source) {
+			return {};
+		}
+
+		let base = this.host ? "https://" + this.host.replace(/^(\*\.)+/, "") : null;
+
+		let ret = {
+			url: base ? new URL(source, base) : new URL(source)
+		};
+
+		if (this.patterns) {
+			for (let pattern in this.patterns) {
+				let match = ret.url.pathname.match(this.patterns[pattern]);
+
+				if (match) {
+					return Object.assign(ret, match.groups);
+				}
+			}
+		}
+
+		return ret;
 	}
 
 	/**

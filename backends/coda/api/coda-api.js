@@ -5,7 +5,5 @@ export default class CodaAPI extends Coda {
 		return this.request(file.url);
 	}
 
-	static test (url) {
-		return url.startsWith(this.apiDomain);
-	}
+	static path = "/apis/v1/";
 }

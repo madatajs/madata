@@ -36,13 +36,10 @@ export default class Local extends Backend {
 	}
 
 	static parseURL (source) {
-		const url = new URL(source);
-		let key = url.pathname;
-		return {key};
+		let ret = super.parseURL(source);
+		ret.key = ret.url.pathname;
+		return ret;
 	}
 
-	static test (source) {
-		let url = new URL(source);
-		return url.protocol == "local:";
-	}
+	static protocol = "local:";
 }

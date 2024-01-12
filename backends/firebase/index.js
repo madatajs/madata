@@ -272,10 +272,10 @@ export default class Firebase extends AuthBackend {
 		path: "madata/data"
 	};
 
-	static test (url) {
-		url = new URL(url);
-		return url.host.endsWith("firebaseio.com");
-	}
+	static urls = [
+		{ host: "*.firebaseio.com" },
+		{ host: "firebasestorage.googleapis.com" },
+	];
 
 	/**
 	 * Parse URL.
@@ -283,9 +283,7 @@ export default class Firebase extends AuthBackend {
 	 * @returns Project ID, auth domain, storage bucket | A flag whether a file is in Firebase Storage, file URL.
 	 */
 	static parseURL (source) {
-		const ret = {
-			url: new URL(source)
-		};
+		const ret = super.parseURL(source);
 
 		if (ret.url.host === "firebasestorage.googleapis.com" || ret.url.protocol === "gs:") {
 			ret.inStorage = true;

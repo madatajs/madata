@@ -83,16 +83,13 @@ export default class Dropbox extends OAuthBackend {
 		return this.user;
 	}
 
-	static test (url) {
-		url = new URL(url, location);
-		return /dropbox.com/.test(url.host);
-	}
+	static host = "*.dropbox.com";
 
 	static parseURL (source) {
-		let { url } = super.parseURL(source);
-		url = Dropbox.#fixShareURL(url);
-
-		return {url};
+		let ret = super.parseURL(source);
+		ret.originalURL = ret.url;
+		ret.url = Dropbox.#fixShareURL(ret.url);
+		return ret;
 	}
 
 	// Transform the dropbox shared URL into something raw and CORS-enabled

@@ -426,28 +426,27 @@ export default class GithubFile extends Github {
 		"no_push_permission": (repo) => `You do not have permission to write to repository ${repo}`,
 	};
 
-	static test (url) {
-		url = new URL(url);
-		return ["github.com", "raw.githubusercontent.com"].includes(url.host);
-	}
+	static urls = [
+		{ host: "github.com" },
+		{ host: "raw.githubusercontent.com" }
+	];
 
 	/**
 	 * Parse Github URLs, return username, repo, branch, path
 	 */
 	static parseURL (source) {
-		const ret = {
+		let ret = Object.assign(super.parseURL(source), {
 			owner: undefined,
 			repo: undefined,
 			branch: undefined,
 			path: undefined,
-		};
+		});
 
 		if (!source) {
 			return ret;
 		}
 
-		const url = new URL(source);
-
+		const url = ret.url;
 		let path = url.pathname.slice(1).split("/");
 
 		ret.owner = path.shift();

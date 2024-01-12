@@ -449,9 +449,8 @@ export default class GoogleSheets extends Google {
 	static apiDomain = "https://sheets.googleapis.com/v4/spreadsheets/";
 	static scopes = ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email"];
 
-	static test (url) {
-		return url.startsWith("https://docs.google.com/spreadsheets/");
-	}
+	static host = "docs.google.com";
+	static path = "/spreadsheets/";
 
 	/**
 	 * Parse spreadsheets URLs.
@@ -459,12 +458,12 @@ export default class GoogleSheets extends Google {
 	 * @returns Spreadsheet ID, sheet ID, sheet title, range.
 	 */
 	static parseURL (source) {
-		const ret = {
-			url: new URL(source),
+		let ret = Object.assign(super.parseURL(source), {
 			sheetId: undefined,
 			sheet: undefined,
-			range: undefined
-		};
+			range: undefined,
+		});
+
 		const path = ret.url.pathname.slice(1).split("/");
 		const hash = ret.url.hash;
 
