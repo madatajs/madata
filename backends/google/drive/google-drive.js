@@ -267,10 +267,7 @@ export default class GoogleDrive extends Google {
 		}
 	}
 
-	static test (url) {
-		url = new URL(url);
-		return url.host === "drive.google.com";
-	}
+	static host = "drive.google.com";
 
 	static defaults = {
 		filename: "data.json",
@@ -288,12 +285,11 @@ export default class GoogleDrive extends Google {
 	 * @returns URL, filename, [folder URL], [folder id], fields.
 	 */
 	static parseURL (source) {
-		const ret = {
-			url: new URL(source),
+		let ret = Object.assign(super.parseURL(source), {
 			filename: undefined,
 			folder: undefined,
 			fields: undefined
-		};
+		});
 
 		const path = ret.url.pathname.slice(1).split("/");
 		const type = path[0];

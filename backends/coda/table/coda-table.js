@@ -1,9 +1,4 @@
 import Coda from "../coda.js";
-// https://coda.io/d/State-of-HTML-Planning_dTGBFYq175J/All-considered-features_suY7G#In-Part-1_tuBsZ/r1
-const patterns = {
-	api: /\/apis\/v1\/docs\/(?<docId>[\w-]+)\/tables\/(?<tableId>[\w-]+)\//,
-	browserLink: /\/d\/[a-zA-Z\d-]*?_d(?<docId>[\w-]+)(\/[a-zA-Z\d-]*?(?<tentativePageId>_s[\w-]+))?/
-};
 
 export default class CodaTable extends Coda {
 	async get (file = this.file) {
@@ -95,21 +90,13 @@ export default class CodaTable extends Coda {
 		return items;
 	}
 
-	static parseURL (source) {
-		let url = new URL(source);
+	static path = "/d/";
 
-		if (url.host === "coda.io") {
-			for (let pattern in patterns) {
-				let match = url.pathname.match(patterns[pattern]);
-
-				if (match) {
-					return Object.assign({}, match.groups);
-				}
-			}
-		}
-
-		return {};
-	}
+	// Example URL: https://coda.io/d/State-of-HTML-Planning_dTGBFYq175J/All-considered-features_suY7G#In-Part-1_tuBsZ/r1
+	static patterns = {
+		api: /\/apis\/v1\/docs\/(?<docId>[\w-]+)\/tables\/(?<tableId>[\w-]+)\//,
+		browserLink: /\/d\/[a-zA-Z\d-]*?_d(?<docId>[\w-]+)(\/[a-zA-Z\d-]*?(?<tentativePageId>_s[\w-]+))?/
+	};
 
 	/**
 	 * Convert JSON-LD structured objects to plain strings whenever possible

@@ -83,3 +83,45 @@ export function phrase (me, id, ...args) {
 	// Fall back to just displaying the id and all the args right after it
 	return id + " " + args.join(" ");
 }
+
+/**
+ * Test whether a URL matches a set of criteria
+ * @param {string | URL} url
+ * @param {{protocol, host, urls} | {protocol, host, urls}[]} criteria
+ * @returns {boolean}
+ */
+export function testURL (url, criteria) {
+	if (typeof url === "string") {
+		url = new URL(url);
+	}
+
+	if (Array.isArray(criteria)) {
+		return criteria.some(pattern => testURL(url, pattern));
+	}
+
+	let {protocol, host, path} = criteria;
+
+	if (protocol && url.protocol !== protocol) {
+		return false;
+	}
+
+	if (host) {
+		if (host.startsWith("*.")) {
+			// Wildcard subdomain
+			host = host.replace(/^(\*\.)+/, "");
+
+			if (url.host !== host && !url.host.endsWith("." + host)) {
+				return false;
+			}
+		}
+		else if (url.host !== host) {
+			return false;
+		}
+	}
+
+	if (path && !url.pathname.startsWith(path)) {
+		return false;
+	}
+
+	return true;
+}

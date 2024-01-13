@@ -94,22 +94,18 @@ export default class GithubGist extends Github {
 		return this.request(`gists/${file.gistId}/forks`, {}, "POST");
 	}
 
+	static host = "gist.github.com";
+
 	static defaults = {
 		path: "data.json",
-	}
-
-	static test (url) {
-		url = new URL(url);
-		return url.host === "gist.github.com";
 	}
 
 	/**
 	 * Parse Gist URLs, return username, gist id, filename
 	 */
 	static parseURL (source) {
-		let ret = {};
-		let url = new URL(source);
-		let path = url.pathname.slice(1).split("/");
+		let ret = super.parseURL(source);
+		let path = ret.url.pathname.slice(1).split("/");
 
 		ret.owner = path.shift();
 		ret.gistId = path.shift();
