@@ -95,7 +95,7 @@ export function testURL (url, criteria) {
 		url = new URL(url);
 	}
 
-	if (Array.isArray(criteria.urls)) {
+	if (Array.isArray(criteria)) {
 		return criteria.urls.some(pattern => testURL(url, pattern));
 	}
 
