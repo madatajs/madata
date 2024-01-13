@@ -114,7 +114,7 @@ export function testURL (url, criteria) {
 				return false;
 			}
 		}
-		else if (url.host != host) {
+		else if (url.host !== host) {
 			return false;
 		}
 	}
