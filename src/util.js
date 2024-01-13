@@ -101,7 +101,7 @@ export function testURL (url, criteria) {
 
 	let {protocol, host, path} = criteria;
 
-	if (protocol && url.protocol != protocol) {
+	if (protocol && url.protocol !== protocol) {
 		return false;
 	}
 
