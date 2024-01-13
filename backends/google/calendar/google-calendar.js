@@ -54,7 +54,7 @@ export default class GoogleCalendar extends Google {
 	static supportedOptions = ["iCalUID", "maxAttendees", "maxResults", "orderBy", "pageToken", "privateExtendedProperty", "q", "sharedExtendedProperty", "showDeleted", "showHiddenInvitations", "singleEvents", "syncToken", "timeMax", "timeMin", "timeZone", "updatedMin"];
 	static apiDomain = "https://www.googleapis.com/calendar/v3/calendars/";
 	static scopes = ["https://www.googleapis.com/auth/calendar.events", "https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email"];
-	static host = "calendar.google.com"
+	static host = "calendar.google.com";
 
 	/**
 	 * Parse Calendars URLs.
