@@ -96,7 +96,7 @@ export function testURL (url, criteria) {
 	}
 
 	if (Array.isArray(criteria)) {
-		return criteria.urls.some(pattern => testURL(url, pattern));
+		return criteria.some(pattern => testURL(url, pattern));
 	}
 
 	let {protocol, host, path} = criteria;
