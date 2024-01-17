@@ -128,7 +128,7 @@ export default class GithubFile extends Github {
 		if (type === "put") {
 			let [serialized, {isEncoded} = {}] = args;
 
-			serialized = isEncoded? serialized : toBase64(serialized);
+			serialized = isEncoded ? serialized : toBase64(serialized);
 
 			if (fileInfo !== null) {
 				// Write file

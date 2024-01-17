@@ -22,7 +22,7 @@ export default class MadataAuth extends HTMLElement {
 	#progress;
 	#dom = {};
 
-	constructor() {
+	constructor () {
 		super();
 
 		this.attachShadow({ mode: "open" });
@@ -63,7 +63,7 @@ export default class MadataAuth extends HTMLElement {
 		`;
 	}
 
-	get backend() {
+	get backend () {
 		return this.#backend;
 	}
 
@@ -113,7 +113,7 @@ export default class MadataAuth extends HTMLElement {
 		"logging_in": "Logging in",
 		"log_in": "Log in",
 		"log_out": "Log out",
-	}
+	};
 
 	static phrase (id, ...args) {
 		return phrase(this, id, ...args);

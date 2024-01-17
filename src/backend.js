@@ -332,7 +332,7 @@ export default class Backend extends EventTarget {
 			}
 		}
 
-		return Class? new Class(url, o) : null;
+		return Class ? new Class(url, o) : null;
 	}
 
 	static async load (url, o) {

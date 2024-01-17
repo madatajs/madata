@@ -32,7 +32,7 @@ export default class Local extends Backend {
 
 		let exists = this.file.key in localStorage;
 		localStorage[this.file.key] = await this.stringify(data);
-		return {type: exists? "update" : "create"};
+		return {type: exists ? "update" : "create"};
 	}
 
 	static parseURL (source) {

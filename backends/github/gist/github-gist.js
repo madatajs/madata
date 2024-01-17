@@ -98,7 +98,7 @@ export default class GithubGist extends Github {
 
 	static defaults = {
 		path: "data.json",
-	}
+	};
 
 	/**
 	 * Parse Gist URLs, return username, gist id, filename

@@ -152,7 +152,7 @@ export default class GoogleDrive extends Google {
 	async upload (file, {filename = file.name, folder} = {}) {
 		const metadata = {
 			name: filename
-		}
+		};
 
 		if (folder) {
 			const folderId = GoogleDrive.#getFolderId(folder);
@@ -272,12 +272,12 @@ export default class GoogleDrive extends Google {
 	static defaults = {
 		filename: "data.json",
 		fields: "name, id, webViewLink"
-	}
+	};
 
 	static phrases = {
 		"no_write_permission": (file) => `You do not have permission to write to file ${file}. Try enabling the allowCreatingFiles option to create a copy of it in your “My Drive” folder.`,
 		"no_upload_permission": "You do not have permission to upload files."
-	}
+	};
 
 	/**
 	 * Parse Files URLs.
@@ -300,7 +300,7 @@ export default class GoogleDrive extends Google {
 		else if (type === "drive") {
 			if (path[1] === "folders" || path[3] === "folders") {
 				ret.folder = source;
-				ret.folderId = path[1] === "folders"? path[2] : path[4];
+				ret.folderId = path[1] === "folders" ? path[2] : path[4];
 			}
 		}
 

@@ -52,7 +52,7 @@ export function delay (ms) {
  * @returns {Array}
  */
 export function toArray (value) {
-	return Array.isArray(value)? value : [value];
+	return Array.isArray(value) ? value : [value];
 }
 
 /**

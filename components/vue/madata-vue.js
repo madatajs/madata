@@ -37,12 +37,12 @@ const MaData = {
 		"logout",
 	],
 
-	data() {
+	data () {
 		return {
 			inProgress: "",
 			unsavedChanges: false,
 			user: null
-		}
+		};
 	},
 
 	mounted () {
@@ -155,7 +155,7 @@ const MaData = {
 		},
 
 		user: {
-			handler() {
+			handler () {
 				let state = this.stateObject;
 				let user = state.user = this.user;
 
@@ -242,9 +242,9 @@ const MaData = {
 	},
 
 	template: " "
-}
+};
 
-function setPreservingReferences(object, data) {
+function setPreservingReferences (object, data) {
 	if (Array.isArray(object)) {
 		if (data && !Array.isArray(data)) {
 			throw new TypeError("Array expected, but provided data is not an array");
@@ -284,7 +284,7 @@ function parseTime (time) {
 		let match = time.trim().match(/^(?<number>\d+(\.\d+)?)\s*(?<unit>ms|s)?$/);
 
 		if (match) {
-			return match.groups.number * (match.groups.unit === "s" ? 1000 : 1)
+			return match.groups.number * (match.groups.unit === "s" ? 1000 : 1);
 		}
 	}
 

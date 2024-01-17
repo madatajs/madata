@@ -95,7 +95,7 @@ export default class OAuthBackend extends AuthBackend {
 		if (type(req.body) === "object") {
 			if (req.method === "GET" || req.method === "HEAD") {
 				for (let p in req.body) {
-					let action = req.body[p] === undefined? "delete" : "set";
+					let action = req.body[p] === undefined ? "delete" : "set";
 					call.searchParams[action](p, req.body[p]);
 				}
 
@@ -128,7 +128,7 @@ export default class OAuthBackend extends AuthBackend {
 		}
 		else {
 			let isJSON = response.headers.get("content-type")?.includes("application/json");
-			let error = isJSON? await response.json() : await response.text();
+			let error = isJSON ? await response.json() : await response.text();
 			throw error;
 		}
 	}
@@ -230,8 +230,8 @@ export default class OAuthBackend extends AuthBackend {
 			height: Math.min(800, innerHeight - 100)
 		};
 
-		popup.top = (screen.height - popup.height)/2;
-		popup.left = (screen.width - popup.width)/2;
+		popup.top = (screen.height - popup.height) / 2;
+		popup.left = (screen.width - popup.width) / 2;
 
 		let state = {
 			url: globalThis.location?.href,

@@ -58,7 +58,7 @@ for (let el of $$("[data-alternates]")) {
 
 renderDemos();
 
-function clone (node){
+function clone (node) {
 	let ret = document.createElement(node.tagName);
 
 	ret.innerHTML = node.innerHTML;

@@ -7,7 +7,7 @@ if (!localStorage) {
 			return this._data[id] = String(val);
 		},
 		getItem (id) {
-			return this._data.hasOwnProperty(id)? this._data[id] : undefined;
+			return this._data.hasOwnProperty(id) ? this._data[id] : undefined;
 		},
 		removeItem (id) {
 			return delete this._data[id];

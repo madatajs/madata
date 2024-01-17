@@ -43,7 +43,7 @@ export default class GoogleSheets extends Google {
 		}
 
 		const rangeReference = GoogleSheets.#getRangeReference(file);
-		let call = `${file.id}/values/${rangeReference}/?key=${this.apiKey}&majorDimension=${this.options.transpose? "columns" : "rows"}&valueRenderOption=unformatted_value`;
+		let call = `${file.id}/values/${rangeReference}/?key=${this.apiKey}&majorDimension=${this.options.transpose ? "columns" : "rows"}&valueRenderOption=unformatted_value`;
 		if (this.options.serializeDates) {
 			call += "&dateTimeRenderOption=formatted_string";
 		}
@@ -158,7 +158,7 @@ export default class GoogleSheets extends Google {
 		}
 
 		const rangeReference = GoogleSheets.#getRangeReference(file);
-		let call = `${file.id}/values/${rangeReference}?key=${this.apiKey}&valueInputOption=${this.options.smartValues? "user_entered" : "raw"}&responseValueRenderOption=unformatted_value&includeValuesInResponse=true`;
+		let call = `${file.id}/values/${rangeReference}?key=${this.apiKey}&valueInputOption=${this.options.smartValues ? "user_entered" : "raw"}&responseValueRenderOption=unformatted_value&includeValuesInResponse=true`;
 		if (this.options.serializeDates) {
 			call += "&responseDateTimeRenderOption=formatted_string";
 		}
@@ -325,7 +325,7 @@ export default class GoogleSheets extends Google {
 			}
 		}
 
-		return count === 0? header : header + (count + 1);
+		return count === 0 ? header : header + (count + 1);
 	};
 
 	/**
