@@ -16,11 +16,11 @@ export default class GoogleDrive extends Google {
 			const folderId = GoogleDrive.#getFolderId(o.folder);
 
 			if (!folderId) {
-				delete this.file.folder;
+				delete this.ref.folder;
 				return;
 			}
 
-			this.file.folderId = folderId;
+			this.ref.folderId = folderId;
 		}
 
 		if (o.fields) {
@@ -29,11 +29,11 @@ export default class GoogleDrive extends Google {
 			const customFields = o.fields.split(/,\s*/);
 			const fields = [...defaultFields, ...customFields];
 
-			this.file.fields = [...new Set(fields)].join(","); // Drop duplicates.
+			this.ref.fields = [...new Set(fields)].join(","); // Drop duplicates.
 		}
 	}
 
-	async get (file = this.file) {
+	async get (file = this.ref) {
 		if (!file.id) {
 			// There is no file to work with.
 			// We might have a URL of a folder (instead of a file) in which the file will be stored.
@@ -63,7 +63,7 @@ export default class GoogleDrive extends Google {
 		}
 	}
 
-	async put (data, {file} = {}) {
+	async put (data, {file = this.ref} = {}) {
 		const serialized = await this.stringify(data, {file});
 		let fileInfo;
 

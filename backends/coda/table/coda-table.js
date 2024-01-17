@@ -1,13 +1,13 @@
 import Coda from "../coda.js";
 
 export default class CodaTable extends Coda {
-	async get (file = this.file) {
-		if (!file.tableId) {
+	async get (ref = this.ref) {
+		if (!ref.tableId) {
 			// Resolve table id
-			await this.resolveFile(file);
+			await this.resolveRef(ref);
 		}
 
-		let rows = await this.getTableRows(file);
+		let rows = await this.getTableRows(ref);
 
 		// Transform rows to a more usable format
 		return rows.map(row => {
@@ -23,7 +23,7 @@ export default class CodaTable extends Coda {
 	}
 
 	// // WIP. Does not work.
-	// async put (data, {file = this.file} = {}) {
+	// async put (data, {ref = this.ref} = {}) {
 	// 	data = {
 	// 		rows: data.map(item => {
 	// 			return {
@@ -33,22 +33,22 @@ export default class CodaTable extends Coda {
 	// 	};
 
 	// 	let serialized = await this.stringify(data);
-	// 	return this.request(`docs/${file.docId}/tables/${file.tableId}/rows`, serialized, "POST");
+	// 	return this.request(`docs/${ref.docId}/tables/${ref.tableId}/rows`, serialized, "POST");
 	// }
 
-	async resolveFile (file = this.file) {
-		if (!file.docId) {
+	async resolveRef (ref = this.ref) {
+		if (!ref.docId) {
 			throw new Error("Missing doc id");
 		}
 
-		let tables = await this.getDocTables(file);
+		let tables = await this.getDocTables(ref);
 		let table;
 
-		if (file.pageId || file.tentativePageId) {
+		if (ref.pageId || ref.tentativePageId) {
 			for (let t of tables) {
 				let page = t.parent;
 
-				if (page.id === file.pageId || page.browserLink.endsWith(file.tentativePageId)) {
+				if (page.id === ref.pageId || page.browserLink.endsWith(ref.tentativePageId)) {
 					table = t;
 					break;
 				}
@@ -58,26 +58,26 @@ export default class CodaTable extends Coda {
 		// If we still have no table either we have no page info, or the page info is wrong
 		// Just return the first table in the doc
 		table ??= tables[0];
-		file.tableId = table.id;
-		file.tableInfo = table;
+		ref.tableId = table.id;
+		ref.tableInfo = table;
 	}
 
-	async getDocTables (file = this.file) {
-		let ret = await this.request(`docs/${file.docId}/tables/?tableTypes=table`);
+	async getDocTables (ref = this.ref) {
+		let ret = await this.request(`docs/${ref.docId}/tables/?tableTypes=table`);
 		return ret?.items;
 	}
 
-	async getTableColumns (file = this.file) {
-		let ret = await this.request(`docs/${file.docId}/tables/${file.tableId}/columns`);
+	async getTableColumns (ref = this.ref) {
+		let ret = await this.request(`docs/${ref.docId}/tables/${ref.tableId}/columns`);
 		return ret?.items;
 	}
 
-	async getTableRows (file = this.file) {
+	async getTableRows (ref = this.ref) {
 		let items = [];
 		let options = {valueFormat: "rich", useColumnNames: true, sortBy: "natural"};
 		let optionsString = Object.entries(options).map(([key, value]) => `${key}=${value}`).join("&");
 		let data;
-		let url = `docs/${file.docId}/tables/${file.tableId}/rows/?${optionsString}`;
+		let url = `docs/${ref.docId}/tables/${ref.tableId}/rows/?${optionsString}`;
 
 		do {
 			data = await this.request(url + (data?.nextPageToken ? `&pageToken=${data.nextPageToken}` : ""));
