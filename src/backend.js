@@ -138,7 +138,7 @@ export default class Backend extends EventTarget {
 	/**
 	 * Low-level method to fetch data from the backend. Subclasses should override this method.
 	 * Clients should not call this method directly, but use `load()` instead.
-	 * @param {object} ref - reference to the object to fetch, if different from that provided in the constructor
+	 * @param {object} ref - reference to data to fetch, if different from that provided in the constructor
 	 * @returns {string} - Data from the backend as a string, `null` if not found
 	 */
 	async get (ref = this.ref) {
