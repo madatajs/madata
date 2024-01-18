@@ -1,0 +1,14 @@
+{
+	"compilerOptions": {
+		"allowJs": true,
+		"skipLibCheck": true,
+	},
+	"plugin": [
+		"typedoc-plugin-rename-defaults",
+	],
+	"entryPoints": [
+		"{src,backends,formats}/**/*.js",
+	],
+	"excludeReferences": true,
+	"out": "api",
+}
