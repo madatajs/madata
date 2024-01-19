@@ -1,9 +1,9 @@
+import OAuthBackend from "../../src/oauth-backend.js";
+
 /**
  * @class Coda
  * @extends OAuthBackend
  */
-import OAuthBackend from "../../src/oauth-backend.js";
-
 export default class Coda extends OAuthBackend {
 	constructor (url, o) {
 		super(url, o);

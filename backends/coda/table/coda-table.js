@@ -1,5 +1,9 @@
 import Coda from "../coda.js";
 
+/**
+ * @class CodaTable
+ * @extends Coda
+ */
 export default class CodaTable extends Coda {
 	async get (file = this.file) {
 		if (!file.tableId) {

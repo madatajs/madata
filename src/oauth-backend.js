@@ -1,18 +1,18 @@
-/**
- * OAuth 2.0 backends
- * @class OAuthBackend
- * @extends AuthBackend
- */
 import hooks from "./hooks.js";
 import AuthBackend from "./auth-backend.js";
 import {type} from "./util.js";
 import { localStorage } from "./node-shims.js";
 
 /**
- * @param {string} url - URL string describing the data location
- * @param {object} o - Options
+ * OAuth 2.0 backends.
+ * @class OAuthBackend
+ * @extends AuthBackend
  */
 export default class OAuthBackend extends AuthBackend {
+	/**
+	 * @param {string} url - URL string describing the data location
+	 * @param {object} o - Options
+	 */
 	constructor (url, o = {}) {
 		super(url, o);
 

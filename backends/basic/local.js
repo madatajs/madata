@@ -1,10 +1,11 @@
-/**
- * Store data in localStorage
- * @class Local
- */
 import Backend from "../../src/backend.js";
 import { localStorage } from "../../src/node-shims.js";
 
+/**
+ * Store data in the browser's localStorage.
+ * @class Local
+ * @extends Backend
+ */
 export default class Local extends Backend {
 	constructor (url, o) {
 		super(url, o);

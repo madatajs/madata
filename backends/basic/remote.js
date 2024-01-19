@@ -1,9 +1,10 @@
-/**
- * @class Remote
- * Load from a remote URL, no save
- */
 import Backend from "../../src/backend.js";
 
+/**
+ * Load the URL as a remote resource. No save.
+ * @class Remote
+ * @extends Backend
+ */
 export default class Remote extends Backend {
 	constructor (url, o) {
 		super(url, o);

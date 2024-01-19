@@ -1,6 +1,6 @@
 /**
  * @module formats/index-fn
- * Export all formats without side effects
+ * Export all formats without side effects.
  */
 
 export {default as JSON} from "./json/index.js";

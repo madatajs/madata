@@ -1,7 +1,8 @@
 import Backend from "./backend.js";
+
 /**
+ * Backend that supports authentication.
  * @abstract
- * Backend that supports authentication
  */
 export default class AuthBackend extends Backend {
 	constructor (url, o = {}) {

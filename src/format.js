@@ -1,3 +1,6 @@
+/**
+ * @class Format
+ */
 export default class Format {
 	static defaultOptions = {};
 	static extensions = [];

@@ -15,7 +15,7 @@ export function type (o) {
 }
 
 /**
- * Read a file object
+ * Read a file object.
  * @param {File | Blob} file - File or Blob object to read
  * @param {"DataURL" | "Text" | "ArrayBuffer" | "BinaryString"} [format="DataURL"] - Read as what? Must correspond to a `readAs` method on FileReader
  */
@@ -30,14 +30,14 @@ export function readFile (file, format = "DataURL") {
 }
 
 /**
- * Get the first element that matches a selector
+ * Get the first element that matches a selector.
  */
 export function $ (selector, context = document) {
 	return context.querySelector(selector);
 }
 
 /**
- * Get a promise that resolves after a delay
+ * Get a promise that resolves after a delay.
  * @param {Number} ms Delay in milliseconds
  * @returns {Promise}
  */
@@ -46,8 +46,8 @@ export function delay (ms) {
 }
 
 /**
- * Wrap a value in an array, if it's not always an array
- * Useful for allowing function signatures to accept both single values and arrays
+ * Wrap a value in an array, if it's not always an array.
+ * Useful for allowing function signatures to accept both single values and arrays.
  * @param {*} value
  * @returns {Array}
  */
@@ -56,7 +56,7 @@ export function toArray (value) {
 }
 
 /**
- * Low-level function to facilitate localization
+ * Low-level function to facilitate localization.
  * @param {*} me - Class or object containing the phrases
  * @param {*} id - Phrase id
  * @param {...any} args - Optional arguments to pass to the phrase
@@ -85,7 +85,7 @@ export function phrase (me, id, ...args) {
 }
 
 /**
- * Test whether a URL matches a set of criteria
+ * Test whether a URL matches a set of criteria.
  * @param {string | URL} url
  * @param {{protocol, host, urls} | {protocol, host, urls}[]} criteria
  * @returns {boolean}

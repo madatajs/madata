@@ -1,6 +1,11 @@
 import Github from "../github.js";
 // import hooks from "../../../src/hooks.js";
 
+/**
+ * Backend for performing raw API calls with the REST or GraphQL API to GitHub repositories.
+ * @class GithubAPI
+ * @extends Github
+ */
 export default class GithubAPI extends Github {
 	update (url, o) {
 		super.update(url, o);
