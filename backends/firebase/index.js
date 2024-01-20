@@ -23,10 +23,10 @@ export default class Firebase extends AuthBackend {
 		new Promise((resolve, reject) => {
 			const firebaseConfig = {
 				apiKey: this.options.apiKey,
-				authDomain: this.file.authDomain,
+				authDomain: this.ref.authDomain,
 				databaseURL: this.source,
-				projectId: this.file.projectId,
-				storageBucket: this.file.storageBucket
+				projectId: this.ref.projectId,
+				storageBucket: this.ref.storageBucket
 			};
 
 			if (!getApps().length) {
@@ -54,13 +54,13 @@ export default class Firebase extends AuthBackend {
 		})
 	]);
 
-	async get (file = this.file) {
-		file = this.#applyDefaults(file);
+	async get (ref = this.ref) {
+		ref = this.#applyDefaults(ref);
 
 		const firestore = getFirestore(this.app);
 
-		if (Firebase.#isCollection(file)) {
-			const collectionRef = collection(firestore, file.path);
+		if (Firebase.#isCollection(ref)) {
+			const collectionRef = collection(firestore, ref.path);
 
 			try {
 				const documents = [];
@@ -74,7 +74,7 @@ export default class Firebase extends AuthBackend {
 			}
 		}
 		else {
-			const docRef = doc(firestore, file.path);
+			const docRef = doc(firestore, ref.path);
 
 			try {
 				const document = await getDoc(docRef);
@@ -91,17 +91,17 @@ export default class Firebase extends AuthBackend {
 		}
 	}
 
-	async put (data, {file = this.file, path, ...options} = {}) {
+	async put (data, {ref = this.ref, path, ...options} = {}) {
 		if (path) {
-			file = Object.assign({}, file, {path});
+			ref = Object.assign({}, ref, {path});
 		}
 
 		const firestore = getFirestore(this.app);
 
-		if (Firebase.#isCollection(file)) {
+		if (Firebase.#isCollection(ref)) {
 			const documents = toArray(data);
 
-			const collectionRef = collection(firestore, file.path);
+			const collectionRef = collection(firestore, ref.path);
 			const ids = [];
 			for (const document of documents) {
 				let { id, data } = document;
@@ -122,7 +122,7 @@ export default class Firebase extends AuthBackend {
 					}
 
 					try {
-						const docRef = doc(firestore, file.path + "/" + id);
+						const docRef = doc(firestore, ref.path + "/" + id);
 						await setDoc(docRef, data);
 						ids.push(id);
 					}
@@ -135,11 +135,11 @@ export default class Firebase extends AuthBackend {
 		}
 		else {
 			try {
-				const docRef = doc(firestore, file.path);
+				const docRef = doc(firestore, ref.path);
 				await setDoc(docRef, data);
 
 				// Return document ID.
-				return {id: file.path.split("/").pop()};
+				return {id: ref.path.split("/").pop()};
 			}
 			catch (e) {
 				throw new Error(e.message);
@@ -148,16 +148,16 @@ export default class Firebase extends AuthBackend {
 
 	}
 
-	async delete (file) {
-		if (file.inStorage) {
+	async delete (ref) {
+		if (ref.inStorage) {
 			// Delete from Storage
 			const storage = getStorage(this.app);
 			try {
-				const fileRef = ref(storage, file.path);
+				const fileRef = ref(storage, ref.path);
 				await deleteObject(fileRef);
 
 				// Return URL of successfully deleted file.
-				return file.path;
+				return ref.path;
 			}
 			catch (e) {
 				throw new Error(e.message);
@@ -165,7 +165,7 @@ export default class Firebase extends AuthBackend {
 		}
 		else {
 			// Delete from Firestore
-			if (Firebase.#isCollection(file)) {
+			if (Firebase.#isCollection(ref)) {
 				// Collection deletion is not recommended since it has negative security and performance implications.
 				// See https://firebase.google.com/docs/firestore/manage-data/delete-data#collections
 				console.warn(this.constructor.phrase("delete_collection_warning"));
@@ -174,11 +174,11 @@ export default class Firebase extends AuthBackend {
 
 			const firestore = getFirestore(this.app);
 			try {
-				const docRef = doc(firestore, file.path);
+				const docRef = doc(firestore, ref.path);
 				await deleteDoc(docRef);
 
 				// Return the ID of the successfully deleted document.
-				return file.path.split("/").pop();
+				return ref.path.split("/").pop();
 			}
 			catch (e) {
 				throw new Error(e.message);
@@ -250,19 +250,19 @@ export default class Firebase extends AuthBackend {
 		}
 	}
 
-	#applyDefaults (file = this.file) {
+	#applyDefaults (ref = this.ref) {
 		for (const part in Firebase.defaults) {
-			file[part] = this.options[part] ?? Firebase.defaults[part];
+			ref[part] = this.options[part] ?? Firebase.defaults[part];
 		}
 
-		return file;
+		return ref;
 	}
 
 	stringify = data => data;
 	parse = data => data;
 
-	static #isCollection (file) {
-		const path = file.path.split("/");
+	static #isCollection (ref) {
+		const path = ref.path.split("/");
 
 		// The collection path has an odd number of segments
 		return path.length % 2 === 1;

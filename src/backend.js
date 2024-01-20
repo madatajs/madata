@@ -42,17 +42,17 @@ export default class Backend extends EventTarget {
 			this.source = source;
 		}
 
-		if (source || !this.file) {
-			this.file = this._getFile(source);
+		if (source || !this.ref) {
+			this.ref = this._getRef(source);
 		}
 
 		if (o) {
 			this.options = Object.assign(this.options ?? {}, o);
 
 			// Options object has higher priority than url
-			for (let prop in this.file) {
+			for (let prop in this.ref) {
 				if (prop in o) {
-					this.file[prop] = o[prop];
+					this.ref[prop] = o[prop];
 				}
 			}
 		}
@@ -138,11 +138,11 @@ export default class Backend extends EventTarget {
 	/**
 	 * Low-level method to fetch data from the backend. Subclasses should override this method.
 	 * Clients should not call this method directly, but use `load()` instead.
-	 * @param {Object} file - file to fetch, if different from that provided in the constructor
+	 * @param {object} ref - reference to data to fetch, if different from that provided in the constructor
 	 * @returns {string} - Data from the backend as a string, `null` if not found
 	 */
-	async get (file = this.file) {
-		let url = new URL(file.url);
+	async get (ref = this.ref) {
+		let url = new URL(ref.url);
 		if (url.protocol != "data:" && this.constructor.useCache !== false) {
 			url.searchParams.set("timestamp", Date.now()); // ensure fresh copy
 		}
@@ -159,7 +159,7 @@ export default class Backend extends EventTarget {
 		return null;
 	}
 
-	_getFile (ref) {
+	_getRef (ref) {
 		if (typeof ref === "string") {
 			// ref is a URL
 			if (/^\w+:/.test(ref)) {
@@ -168,11 +168,11 @@ export default class Backend extends EventTarget {
 			}
 
 			// Relative path
-			return Object.assign({}, this.file, {path: ref});
+			return Object.assign({}, this.ref, {path: ref});
 		}
 
-		// Either (default) file object, or empty value
-		return ref ?? this.file ?? this.constructor.parseURL();
+		// Either (default) ref object, or empty value
+		return ref ?? this.ref ?? this.constructor.parseURL();
 	}
 
 	/**
@@ -185,9 +185,9 @@ export default class Backend extends EventTarget {
 	async load (url, ...args) {
 		await this.ready;
 
-		let file = this._getFile(url);
+		let ref = this._getRef(url);
 
-		let response = await this.get(file, ...args);
+		let response = await this.get(ref, ...args);
 
 		if (typeof response !== "string") {
 			// Backend did the parsing, we're done here
@@ -198,12 +198,12 @@ export default class Backend extends EventTarget {
 			response = response.replace(/^\ufeff/, ""); // Remove Unicode BOM
 
 			this.rawData = response;
-			this.data = await this.parse(response, { file });
+			this.data = await this.parse(response, { ref });
 		}
 
 		this.dispatchEvent(new CustomEvent("mv-load", {
 			detail: {
-				url, file, response,
+				url, ref, response,
 				data: this.data,
 				rawData: this.rawData,
 				backend: this
@@ -218,7 +218,7 @@ export default class Backend extends EventTarget {
 	 * Subclasses should usually NOT override this method.
 	 * @param {object} data - Data to write to the backend
 	 * @param {object} [o] - Options object
-	 * @returns {object} - If successful, info about the file
+	 * @returns {object} - If successful, info about the stored data
 	 */
 	async store (data, o = {}) {
 		await this.ready;
@@ -227,23 +227,23 @@ export default class Backend extends EventTarget {
 			o = {url: o};
 		}
 
-		let {file, url, ...options} = o;
+		let {ref, url, ...options} = o;
 
-		file = this._getFile(file ?? url);
+		ref = this._getRef(ref ?? url);
 
-		return this.put(data, {file, ...options});
+		return this.put(data, {ref, ...options});
 	}
 
-	async remove (file = this.file) {
+	async remove (ref = this.ref) {
 		await this.ready;
 
 		if (!this.delete) {
 			throw new Error("This backend does not support deleting files");
 		}
 
-		file = this._getFile(file);
+		ref = this._getRef(ref);
 
-		return this.delete(file);
+		return this.delete(ref);
 	}
 
 	toString () {

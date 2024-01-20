@@ -8,21 +8,21 @@ import Google from "../google.js";
 export default class GoogleSheets extends Google {
 	/**
 	 * Read data from the spreadsheet.
-	 * @param {string} url Spreadsheet URL.
+	 * @param {string} ref Spreadsheet to work with.
 	 * @returns Spreadsheet data.
 	 */
-	async get (file = this.file) {
-		if (file.sheetId !== undefined && !file.sheet || GoogleSheets.#getRangeReference(file) === "") {
+	async get (ref = this.ref) {
+		if (ref.sheetId !== undefined && !ref.sheet || GoogleSheets.#getRangeReference(ref) === "") {
 			// Sheet title has priority over sheet id
 			try {
-				const sheetTitle = await this.#getSheetTitle(file);
+				const sheetTitle = await this.#getSheetTitle(ref);
 				if (!sheetTitle) {
 					// No (visible) sheet to work with
 					console.warn(this.constructor.phrase("get_no_sheet"));
 					return null;
 				}
 
-				file.sheet = sheetTitle;
+				ref.sheet = sheetTitle;
 			}
 			catch (e) {
 				if (e.status === 401) {
@@ -42,8 +42,8 @@ export default class GoogleSheets extends Google {
 			}
 		}
 
-		const rangeReference = GoogleSheets.#getRangeReference(file);
-		let call = `${file.id}/values/${rangeReference}/?key=${this.apiKey}&majorDimension=${this.options.transpose ? "columns" : "rows"}&valueRenderOption=unformatted_value`;
+		const rangeReference = GoogleSheets.#getRangeReference(ref);
+		let call = `${ref.id}/values/${rangeReference}/?key=${this.apiKey}&majorDimension=${this.options.transpose ? "columns" : "rows"}&valueRenderOption=unformatted_value`;
 		if (this.options.serializeDates) {
 			call += "&dateTimeRenderOption=formatted_string";
 		}
@@ -57,12 +57,12 @@ export default class GoogleSheets extends Google {
 				return values;
 			}
 
-			file.objectKeys = new Map(); // "string" => "string"
+			ref.objectKeys = new Map(); // "string" => "string"
 			if (this.options.headerRow) {
 				// The sheet has a header row. Use the headers from the sheet (from the first row) as object keys.
 				// We don't want headers to become a part of the data.
-				file.headers = values.shift();
-				file.objectKeys = new Map(Object.entries(file.headers));
+				ref.headers = values.shift();
+				ref.objectKeys = new Map(Object.entries(ref.headers));
 			}
 
 			if (this.options.keys) {
@@ -70,28 +70,28 @@ export default class GoogleSheets extends Google {
 				const keys = this.options.keys;
 				if (Array.isArray(keys)) {
 					// Keys are in an array
-					file.objectKeys = new Map(Object.entries(keys));
+					ref.objectKeys = new Map(Object.entries(keys));
 				}
 				else if (typeof keys === "function") {
 					// We have a mapping function. The function should return an object key
 					// and take header text, column index, and array of headers as arguments.
-					if (file.headers) {
-						const headerRow = file.headers;
+					if (ref.headers) {
+						const headerRow = ref.headers;
 						for (let columnIndex = 0; columnIndex < headerRow.length; columnIndex++) {
-							file.objectKeys.set(columnIndex + "", keys(headerRow[columnIndex], columnIndex, headerRow));
+							ref.objectKeys.set(columnIndex + "", keys(headerRow[columnIndex], columnIndex, headerRow));
 						}
 					}
 					else {
 						// No header row. We need as many object keys as there are cells in the longest row.
 						const maxIndex = Math.max(...values.map(row => row.length));
 						for (let columnIndex = 0; columnIndex < maxIndex; columnIndex++) {
-							file.objectKeys.set(columnIndex + "", keys(undefined, columnIndex));
+							ref.objectKeys.set(columnIndex + "", keys(undefined, columnIndex));
 						}
 					}
 				}
 			}
 
-			return GoogleSheets.#toObjects(file.objectKeys, values);
+			return GoogleSheets.#toObjects(ref.objectKeys, values);
 		}
 		catch (e) {
 			if (e.status === 401) {
@@ -103,7 +103,7 @@ export default class GoogleSheets extends Google {
 
 				if (message.startsWith("Unable to parse range:")) {
 					// Invalid sheet name and/or data range
-					console.warn(this.constructor.phrase("get_no_sheet_or_invalid_range", file.sheet, file.range));
+					console.warn(this.constructor.phrase("get_no_sheet_or_invalid_range", ref.sheet, ref.range));
 				}
 				else {
 					// No spreadsheet (e.g., invalid URL)
@@ -128,16 +128,16 @@ export default class GoogleSheets extends Google {
 	/**
 	 * Save data to the spreadsheet.
 	 * @param {*} data Data to save.
-	 * @param {Object} file Spreadsheet to work with.
+	 * @param {Object} ref Spreadsheet to work with.
 	 * @param {Object} options Options: sheet, range.
 	 */
-	async put (data, {file = this.file, ...options} = {}) {
-		file = Object.assign({}, file, {...options});
+	async put (data, {ref = this.ref, ...options} = {}) {
+		ref = Object.assign({}, ref, {...options});
 
-		if (file.sheetId !== undefined && !file.sheet || GoogleSheets.#getRangeReference(file) === "") {
+		if (ref.sheetId !== undefined && !ref.sheet || GoogleSheets.#getRangeReference(ref) === "") {
 			// We need to know the name of a worksheet where to store data.
 			try {
-				file.sheet = await this.#getSheetTitle(file);
+				ref.sheet = await this.#getSheetTitle(ref);
 			}
 			catch (e) {
 				if (e.status === 401) {
@@ -157,24 +157,24 @@ export default class GoogleSheets extends Google {
 			}
 		}
 
-		const rangeReference = GoogleSheets.#getRangeReference(file);
-		let call = `${file.id}/values/${rangeReference}?key=${this.apiKey}&valueInputOption=${this.options.smartValues ? "user_entered" : "raw"}&responseValueRenderOption=unformatted_value&includeValuesInResponse=true`;
+		const rangeReference = GoogleSheets.#getRangeReference(ref);
+		let call = `${ref.id}/values/${rangeReference}?key=${this.apiKey}&valueInputOption=${this.options.smartValues ? "user_entered" : "raw"}&responseValueRenderOption=unformatted_value&includeValuesInResponse=true`;
 		if (this.options.serializeDates) {
 			call += "&responseDateTimeRenderOption=formatted_string";
 		}
 
-		if (!file.objectKeys && data.some(el => !Array.isArray(el))) {
-			file.objectKeys = new Map();
+		if (!ref.objectKeys && data.some(el => !Array.isArray(el))) {
+			ref.objectKeys = new Map();
 		}
 
-		if (file.objectKeys) {
+		if (ref.objectKeys) {
 			// We have an array of objects and must transform it into an array of arrays as Google API demands.
-			data = GoogleSheets.#fromObjects(file.objectKeys, data);
+			data = GoogleSheets.#fromObjects(ref.objectKeys, data);
 
-			if (file.headers) {
+			if (ref.headers) {
 				// We have a header row. This row is not a part of the data, so we need to add it.
 				// Cells of this row must stay untouched to not mess up the version history.
-				const headerRow = Array(file.headers.length).fill(null); // [null, null, ..., null]
+				const headerRow = Array(ref.headers.length).fill(null); // [null, null, ..., null]
 				data = [headerRow, ...data];
 			}
 		}
@@ -191,13 +191,13 @@ export default class GoogleSheets extends Google {
 		}
 		catch (e) {
 			if (e.status === 400) {
-				if (file.sheet) {
+				if (ref.sheet) {
 					// It might be there is no sheet with the specified title.
 					// Let's check it.
 					let spreadsheet;
 					if (!this.spreadsheet) {
 						try {
-							this.spreadsheet = spreadsheet = await this.request(file.id);
+							this.spreadsheet = spreadsheet = await this.request(ref.id);
 						}
 						catch (e) {
 							if (e.status === 401) {
@@ -217,7 +217,7 @@ export default class GoogleSheets extends Google {
 						}
 					}
 
-					const sheet = spreadsheet.sheets?.find?.(sheet => sheet.properties?.title === file.sheet);
+					const sheet = spreadsheet.sheets?.find?.(sheet => sheet.properties?.title === ref.sheet);
 
 					if (!sheet && this.options.allowAddingSheets) {
 						// There is no. Let's try to create one.
@@ -226,7 +226,7 @@ export default class GoogleSheets extends Google {
 								{
 									addSheet: {
 										properties: {
-											title: file.sheet
+											title: ref.sheet
 										}
 									}
 								}
@@ -234,10 +234,10 @@ export default class GoogleSheets extends Google {
 						};
 
 						try {
-							await this.request(`${file.id}:batchUpdate`, req, "POST");
+							await this.request(`${ref.id}:batchUpdate`, req, "POST");
 
 							// Warn about the newly created sheet.
-							console.warn(this.constructor.phrase("store_sheet_added", file.sheet));
+							console.warn(this.constructor.phrase("store_sheet_added", ref.sheet));
 
 							// Let's try to write data one more time.
 							response = await this.request(call, body, "PUT");
@@ -260,7 +260,7 @@ export default class GoogleSheets extends Google {
 						}
 					}
 					else {
-						throw new Error(this.constructor.phrase("store_no_sheet", file.sheet));
+						throw new Error(this.constructor.phrase("store_no_sheet", ref.sheet));
 					}
 				}
 			}
@@ -283,14 +283,14 @@ export default class GoogleSheets extends Google {
 		}
 
 		// Updated (stored) data should have the format as the one in the get() method.
-		if (response.updatedData?.values && file.objectKeys) {
+		if (response.updatedData?.values && ref.objectKeys) {
 			const values = response.updatedData.values;
 			if (this.options.headerRow === true) {
 				// The header row shouldn't be a part of the data.
 				values.shift();
 			}
 
-			response.updatedData.values = GoogleSheets.#toObjects(file.objectKeys, values);
+			response.updatedData.values = GoogleSheets.#toObjects(ref.objectKeys, values);
 		}
 
 		return response;
@@ -343,11 +343,11 @@ export default class GoogleSheets extends Google {
 	/**
 	 * Get title of the sheet in the spreadsheet.
 	 * @private
-	 * @param {Object} file Spreadsheet to work with.
+	 * @param {Object} ref Spreadsheet to work with.
 	 * @returns Sheet title or title of the first visible sheet, or null if there are no (visible) sheets to work with.
 	 */
-	async #getSheetTitle (file = this.file) {
-		const call = `${file.id}/?key=${this.apiKey}`;
+	async #getSheetTitle (ref = this.ref) {
+		const call = `${ref.id}/?key=${this.apiKey}`;
 
 		let spreadsheet;
 		try {
@@ -372,9 +372,9 @@ export default class GoogleSheets extends Google {
 		}
 
 		let sheet;
-		if (file.sheetId) {
+		if (ref.sheetId) {
 			// Get sheet title by its id.
-			sheet = spreadsheet.sheets?.find?.(sheet => sheet.properties?.sheetId === file.sheetId);
+			sheet = spreadsheet.sheets?.find?.(sheet => sheet.properties?.sheetId === ref.sheetId);
 		}
 		else {
 			// Get the first visible sheet (if any).

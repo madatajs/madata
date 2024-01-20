@@ -8,10 +8,10 @@ export default class GithubAPI extends Github {
 		Object.assign(this, GithubAPI.parseURL(this.source));
 	}
 
-	async get (file = this.file) {
-		if (file.query) {
+	async get (ref = this.ref) {
+		if (ref.query) {
 			// GraphQL
-			let response = await this.request(file.url, { query: file.query }, "POST");
+			let response = await this.request(ref.url, { query: ref.query }, "POST");
 			if (response.errors?.length) {
 				throw new Error(response.errors.map(x => x.message).join("\n"));
 			}
@@ -25,7 +25,7 @@ export default class GithubAPI extends Github {
 				"Accept": "application/vnd.github.squirrel-girl-preview"
 			}
 		};
-		let response = await this.request(file.apiCall, {}, "GET", req);
+		let response = await this.request(ref.apiCall, {}, "GET", req);
 
 		if (!response || !response.ok) {
 			return null;
@@ -34,7 +34,7 @@ export default class GithubAPI extends Github {
 		// Raw API call
 		let json = await response.json();
 
-		let params = new URL(file.apiCall, this.constructor.apiDomain).searchParams;
+		let params = new URL(ref.apiCall, this.constructor.apiDomain).searchParams;
 		let maxPages = params.get("max_pages") - 1; /* subtract 1 because we already fetched a page */
 
 		if (maxPages > 0 && params.get("page") === null && Array.isArray(json)) {

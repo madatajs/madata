@@ -14,7 +14,7 @@ export default class GithubFile extends Github {
 	 * @param {Object} file
 	 * @returns {string} File contents as a string, or `null` if not found
 	 */
-	async get (file = this.file) {
+	async get (file = this.ref) {
 		if (this.isAuthenticated()) {
 			let call = `repos/${file.owner}/${file.repo}/contents/${file.path}`;
 
@@ -88,7 +88,7 @@ export default class GithubFile extends Github {
 		return this.#write("put", file, serialized, {isEncoded});
 	}
 
-	async delete (file = this.file) {
+	async delete (file = this.ref) {
 		return this.#write("delete", file);
 	}
 
@@ -172,22 +172,22 @@ export default class GithubFile extends Github {
 		if (user) {
 			this.updatePermissions({edit: true, save: true});
 
-			if (!this.file.owner) {
-				Object.defineProperty(this.file, "owner", {
+			if (!this.ref.owner) {
+				Object.defineProperty(this.ref, "owner", {
 					get: () => this.user.username,
 					set: (value) => {
 						console.log(`setting owner from ${this.user.username} to ${value}`);
-						delete this.file.owner;
-						this.file.owner = value;
+						delete this.ref.owner;
+						this.ref.owner = value;
 					},
 					configurable: true,
 					enumerable: true,
 				});
 			}
 
-			if (this.file.repo) {
+			if (this.ref.repo) {
 				// TODO move to load()?
-				this.file.repoInfo = await this.fetchRepoInfo();
+				this.ref.repoInfo = await this.fetchRepoInfo();
 			}
 		}
 
@@ -207,8 +207,8 @@ export default class GithubFile extends Github {
 		return this.getFileURL(path, {sha: fileInfo.commit.sha});
 	}
 
-	async canPush (ref = this.file) {
-		ref = this._getFile(ref);
+	async canPush (ref = this.ref) {
+		ref = this._getRef(ref);
 
 		await this.fetchRepoInfo(ref);
 
@@ -223,27 +223,27 @@ export default class GithubFile extends Github {
 	}
 
 	async createRepo (ref, options = {}) {
-		ref = this._getFile(ref);
+		ref = this._getRef(ref);
 		let name = ref.repo;
 
 		// FIXME this won't work for orgs
 		ref.repoInfo = await this.request("user/repos", {name, private: this.options.private === true, ...options}, "POST");
 
-		// Update this.file.repoInfo too
-		if (!this.file.repoInfo && this.constructor.sameRepo(ref, this.file)) {
-			this.file.repoInfo = ref.repoInfo;
+		// Update this.ref.repoInfo too
+		if (!this.ref.repoInfo && this.constructor.sameRepo(ref, this.ref)) {
+			this.ref.repoInfo = ref.repoInfo;
 		}
 
 		return ref;
 	}
 
-	async fetchRepoInfo (ref = this.file) {
-		ref = this._getFile(ref);
+	async fetchRepoInfo (ref = this.ref) {
+		ref = this._getRef(ref);
 
 		if (!ref.repoInfo) {
-			if (ref !== this.file && this.file.repoInfo && this.constructor.sameRepo(ref, this.file)) {
+			if (ref !== this.ref && this.ref.repoInfo && this.constructor.sameRepo(ref, this.ref)) {
 				// Same repo as the main repo
-				ref.repoInfo = this.file.repoInfo;
+				ref.repoInfo = this.ref.repoInfo;
 			}
 			else if (ref.owner && ref.repo) {
 				ref.repoInfo = await this.request(`repos/${ref.owner}/${ref.repo}`);
@@ -267,7 +267,7 @@ export default class GithubFile extends Github {
 	 * @param {Object} repoInfo
 	 * @returns {Object} repoInfo object about the fork or null
 	 */
-	async getMyFork (repoInfo = this.file.repoInfo) {
+	async getMyFork (repoInfo = this.ref.repoInfo) {
 		let myRepoCount = this.user.public_repos + this.user.total_private_repos;
 
 		if (myRepoCount < repoInfo.forks) {
@@ -318,7 +318,7 @@ export default class GithubFile extends Github {
 	 * @param [options.force=false] {Boolean} Force a new repo to be created. If false, will try to find an existing fork of the repo.
 	 * @returns
 	 */
-	async fork (file = this.file, {force = false} = {}) {
+	async fork (file = this.ref, {force = false} = {}) {
 		let repoCall = `repos/${file.repoInfo.full_name}`;
 
 		if (!force) {
@@ -347,7 +347,7 @@ export default class GithubFile extends Github {
 		return forkInfo;
 	}
 
-	async publish (file = this.file, {https_enforced = true} = {}) {
+	async publish (file = this.ref, {https_enforced = true} = {}) {
 		let source = {
 			branch: file.branch || "main",
 		};
@@ -369,7 +369,7 @@ export default class GithubFile extends Github {
 		return pagesInfo;
 	}
 
-	async getPagesInfo (ref = this.file) {
+	async getPagesInfo (ref = this.ref) {
 		ref = await this.fetchRepoInfo(ref);
 
 		if (ref.repoInfo) {
@@ -382,7 +382,7 @@ export default class GithubFile extends Github {
 		}
 	}
 
-	async getRepoURL (file = this.file, {
+	async getRepoURL (file = this.ref, {
 		sha = file.branch || "latest",
 	} = {}) {
 		if (this.options.repoURL) {
@@ -404,7 +404,7 @@ export default class GithubFile extends Github {
 	/**
 	 * Get a public URL for a file in a repo
 	 */
-	async getFileURL (path = this.path, {repoInfo = this.file.repoInfo, ...options} = {}) {
+	async getFileURL (path = this.path, {repoInfo = this.ref.repoInfo, ...options} = {}) {
 		let repoURL = this.getRepoURL(repoInfo, options);
 
 		if (!repoURL.endsWith("/")) {

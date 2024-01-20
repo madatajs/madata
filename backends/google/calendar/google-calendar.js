@@ -6,20 +6,20 @@
 import Google from "../google.js";
 
 export default class GoogleCalendar extends Google {
-	async get (file = this.file) {
-		let call = `${file.calendarId}/events?key=${this.apiKey}`;
+	async get (ref = this.ref) {
+		let call = `${ref.calendarId}/events?key=${this.apiKey}`;
 
 		if (this.options) {
-			file.params = Object.assign({}, this.options);
+			ref.params = Object.assign({}, this.options);
 			for (const o of Object.keys(this.options)) {
 				// Do not include in the request options not supported by the Google Calendar API
 				// to avoid getting the “Bad Request” error if possible.
 				if (!GoogleCalendar.supportedOptions.includes(o)) {
-					delete file.params[o];
+					delete ref.params[o];
 				}
 			}
 
-			const params = new URLSearchParams(file.params);
+			const params = new URLSearchParams(ref.params);
 			call = call + "&" + params.toString();
 		}
 
@@ -34,7 +34,7 @@ export default class GoogleCalendar extends Google {
 			}
 
 			if (e.status === 400) {
-				throw new Error(this.constructor.phrase("bad_options", file.params));
+				throw new Error(this.constructor.phrase("bad_options", ref.params));
 			}
 
 			let error;
