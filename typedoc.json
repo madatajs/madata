@@ -10,6 +10,7 @@
 		"{src,backends,formats}/**/*.js",
 	],
 	"excludeReferences": true,
+	"readme": "API.md",
 	"out": "api",
 	"customCss": "api.css",
 }
