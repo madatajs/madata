@@ -11,4 +11,5 @@
 	],
 	"excludeReferences": true,
 	"out": "api",
+	"customCss": "api.css",
 }
