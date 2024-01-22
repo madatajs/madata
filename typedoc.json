@@ -1,4 +1,5 @@
 {
+	"name": "Madata API",
 	"compilerOptions": {
 		"allowJs": true,
 		"skipLibCheck": true,
