@@ -1,3 +1,5 @@
+/** @module Base */
+
 /**
  * @class Format
  */

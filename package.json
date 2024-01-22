@@ -47,7 +47,7 @@
     "postcss-nesting": "^12.0.1",
     "release-it": "^16.2.1",
     "typedoc": "latest",
-    "typedoc-plugin-rename-defaults": "latest"
+    "typedoc-plugin-merge-modules": "latest"
   },
   "dependencies": {
     "csv": "^6.3.1",

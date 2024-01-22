@@ -1,3 +1,5 @@
+/** @module Base */
+
 import Backend from "./backend.js";
 import "../backends/index.js";
 export default Backend;

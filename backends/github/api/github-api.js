@@ -5,6 +5,7 @@ import Github from "../github.js";
  * Backend for performing raw API calls with the REST or GraphQL API to GitHub repositories.
  * @class GithubAPI
  * @extends Github
+ * @category GitHub
  */
 export default class GithubAPI extends Github {
 	update (url, o) {

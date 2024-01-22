@@ -1,3 +1,5 @@
+/** @module Base */
+
 import hooks from "./hooks.js";
 import { toArray, phrase, type, testURL } from "./util.js";
 import Format from "./format.js";

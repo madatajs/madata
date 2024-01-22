@@ -1,3 +1,5 @@
+/** @module Base */
+
 import hooks from "./hooks.js";
 import AuthBackend from "./auth-backend.js";
 import {type} from "./util.js";

@@ -5,12 +5,23 @@
 		"skipLibCheck": true,
 	},
 	"plugin": [
-		"typedoc-plugin-rename-defaults",
+		"typedoc-plugin-merge-modules",
 	],
+	"mergeModulesRenameDefaults": true,
+	"mergeModulesMergeMode": "module",
 	"entryPoints": [
-		"{src,backends,formats}/**/*.js",
+		"src/*.js",
+		"backends/index.js",
+		"formats/index.js",
+	],
+	"exclude": [
+		"src/node-shims.js",
 	],
 	"excludeReferences": true,
+	"navigation": {
+		"includeCategories": true,
+		"includeFolders": false,
+	},
 	"readme": "API.md",
 	"out": "api",
 	"customCss": "api.css",

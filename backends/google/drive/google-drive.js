@@ -4,6 +4,7 @@ import Google from "../google.js";
  * Google Drive backend.
  * @class GoogleDrive
  * @extends Google
+ * @category Google
  */
 export default class GoogleDrive extends Google {
 	static apiDomain = "https://www.googleapis.com/";

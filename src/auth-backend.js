@@ -1,7 +1,11 @@
+/** @module Base */
+
 import Backend from "./backend.js";
 
 /**
  * Backend that supports authentication.
+ * @class AuthBackend
+ * @extends Backend
  * @abstract
  */
 export default class AuthBackend extends Backend {

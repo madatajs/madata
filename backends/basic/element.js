@@ -5,6 +5,7 @@ import {$} from "../../src/util.js";
  * Read and write data into an HTML element.
  * @class Element
  * @extends Backend
+ * @category Basic
  */
 export default class Element extends Backend {
 	constructor (url, o) {

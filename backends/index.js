@@ -1,6 +1,6 @@
 /**
  * Export all backends and register them.
- * @module index
+ * @module Backends
  */
 import Backend from "../src/backend.js";
 import * as backends from "./index-fn.js";
