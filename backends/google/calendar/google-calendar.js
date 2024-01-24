@@ -27,25 +27,17 @@ export default class GoogleCalendar extends Google {
 		try {
 			calendar = await this.request(call);
 		}
-		catch (e) {
-			if (e.status === 401) {
+		catch ({ error }) {
+			if (error.code === 401) {
 				await this.logout(); // Access token we have is invalid. Discard it.
 				throw new Error(this.constructor.phrase("access_token_invalid"));
 			}
 
-			if (e.status === 400) {
+			if (error.code === 400) {
 				throw new Error(this.constructor.phrase("bad_options", ref.params));
 			}
 
-			let error;
-			if (e instanceof Response) {
-				error = (await e.json()).error.message;
-			}
-			else {
-				error = e.message;
-			}
-
-			throw new Error(error);
+			throw new Error(error.message);
 		}
 
 		return calendar?.items;

@@ -50,13 +50,13 @@ export default class GoogleDrive extends Google {
 			const call = `drive/v3/files/${file.id}?key=${this.apiKey}&alt=media`;
 			return this.request(call);
 		}
-		catch (e) {
-			if (e.status === 401) {
+		catch ({ error }) {
+			if (error.code === 401) {
 				await this.logout(); // Access token we have is invalid. Discard it.
 				throw new Error(this.constructor.phrase("access_token_invalid"));
 			}
 
-			if (e.status === 404) {
+			if (error.code === 404) {
 				// File might be private, but if the user is the file owner, the authenticated request will return it.
 				return null;
 			}
@@ -76,33 +76,25 @@ export default class GoogleDrive extends Google {
 				file.id = fileInfo.id;
 				file.info = fileInfo;
 			}
-			catch (e) {
-				if (e.status === 401) {
+			catch ({ error }) {
+				if (error.code === 401) {
 					await this.logout(); // Access token we have is invalid. Discard it.
 					throw new Error(this.constructor.phrase("access_token_invalid"));
 				}
 
-				let error;
-				if (e instanceof Response) {
-					error = (await e.json()).error.message;
-				}
-				else {
-					error = e.message;
-				}
-
-				throw new Error(error);
+				throw new Error(error.message);
 			}
 		}
 
 		try {
 			return this.#updateFile(file, serialized);
 		}
-		catch (e) {
-			if (e.status === 401) {
+		catch ({ error }) {
+			if (error.code === 401) {
 				await this.logout(); // Access token we have is invalid. Discard it.
 				throw new Error(this.constructor.phrase("access_token_invalid"));
 			}
-			else if (e.status === 403) {
+			else if (error.code === 403) {
 				// No write permissions
 				if (this.options.allowCreatingFiles) {
 					// Create file in the specified folder or in the user's “My Drive” folder.
@@ -115,21 +107,13 @@ export default class GoogleDrive extends Google {
 
 						return this.#updateFile(file, serialized);
 					}
-					catch (e) {
-						if (e.status === 401) {
+					catch ({ error }) {
+						if (error.code === 401) {
 							await this.logout(); // Access token we have is invalid. Discard it.
 							throw new Error(this.constructor.phrase("access_token_invalid"));
 						}
 
-						let error;
-						if (e instanceof Response) {
-							error = (await e.json()).error.message;
-						}
-						else {
-							error = e.message;
-						}
-
-						throw new Error(error);
+						throw new Error(error.message);
 					}
 				}
 				else {
@@ -137,15 +121,7 @@ export default class GoogleDrive extends Google {
 				}
 			}
 
-			let error;
-			if (e instanceof Response) {
-				error = (await e.json()).error.message;
-			}
-			else {
-				error = e.message;
-			}
-
-			throw new Error(error);
+			throw new Error(error.message);
 		}
 	}
 
@@ -169,24 +145,16 @@ export default class GoogleDrive extends Google {
 			const fileInfo = await this.request(call, file, "PATCH");
 			return fileInfo.webViewLink;
 		}
-		catch (e) {
-			if (e.status === 401) {
+		catch ({ error }) {
+			if (error.code === 401) {
 				await this.logout(); // Access token we have is invalid. Discard it.
 				throw new Error(this.constructor.phrase("access_token_invalid"));
 			}
-			else if (e.status === 403) {
+			else if (error.code === 403) {
 				throw new Error(this.constructor.phrase("no_upload_permission"));
 			}
 
-			let error;
-			if (e instanceof Response) {
-				error = (await e.json()).error.message;
-			}
-			else {
-				error = e.message;
-			}
-
-			throw new Error(error);
+			throw new Error(error.message);
 		}
 	}
 
@@ -198,21 +166,13 @@ export default class GoogleDrive extends Google {
 		try {
 			return this.request(`drive/v3/files/${file.id}?key=${this.apiKey}`, {trashed: true}, "PATCH");
 		}
-		catch (e) {
-			if (e.status === 401) {
+		catch ({ error }) {
+			if (error.code === 401) {
 				await this.logout(); // Access token we have is invalid. Discard it.
 				throw new Error(this.constructor.phrase("access_token_invalid"));
 			}
 
-			let error;
-			if (e instanceof Response) {
-				error = (await e.json()).error.message;
-			}
-			else {
-				error = e.message;
-			}
-
-			throw new Error(error);
+			throw new Error(error.message);
 		}
 	}
 
