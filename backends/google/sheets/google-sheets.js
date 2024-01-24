@@ -12,7 +12,7 @@ export default class GoogleSheets extends Google {
 	 * @returns Spreadsheet data.
 	 */
 	async get (ref = this.ref) {
-		if (ref.sheetId !== undefined && !ref.sheet || GoogleSheets.#getRangeReference(ref) === "") {
+		if ((ref.sheetId !== undefined || this.options.sheetIndex !== undefined) && !ref.sheet || GoogleSheets.#getRangeReference(ref) === "") {
 			// Sheet title has priority over sheet id
 			try {
 				const sheetTitle = await this.#getSheetTitle(ref);
@@ -134,7 +134,7 @@ export default class GoogleSheets extends Google {
 	async put (data, {ref = this.ref, ...options} = {}) {
 		ref = Object.assign({}, ref, {...options});
 
-		if (ref.sheetId !== undefined && !ref.sheet || GoogleSheets.#getRangeReference(ref) === "") {
+		if ((ref.sheetId !== undefined || this.options.sheetIndex !== undefined) && !ref.sheet || GoogleSheets.#getRangeReference(ref) === "") {
 			// We need to know the name of a worksheet where to store data.
 			try {
 				ref.sheet = await this.#getSheetTitle(ref);
@@ -372,7 +372,17 @@ export default class GoogleSheets extends Google {
 		}
 
 		let sheet;
-		if (ref.sheetId) {
+		if (this.options.sheetIndex !== undefined) {
+			const sheetIndex = this.options.sheetIndex;
+			const sheetsCount = spreadsheet.sheets?.length;
+
+			if (sheetsCount && sheetIndex >= 0 && sheetIndex < sheetsCount) {
+				// Get sheet title by its index.
+				sheet = spreadsheet.sheets[sheetIndex];
+				ref.sheetIndex = sheetIndex;
+			}
+		}
+		else if (ref.sheetId) {
 			// Get sheet title by its id.
 			sheet = spreadsheet.sheets?.find?.(sheet => sheet.properties?.sheetId === ref.sheetId);
 		}
