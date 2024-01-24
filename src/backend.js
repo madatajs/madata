@@ -339,7 +339,7 @@ export default class Backend extends EventTarget {
 		let backend = this.from(url, o);
 
 		if (backend) {
-			return backend.load(url, o);
+			return backend.load();
 		}
 		else {
 			throw new Error(`No backend found for ${url}`);
