@@ -9,10 +9,12 @@ export default class GoogleSheets extends Google {
 	/**
 	 * Read data from the spreadsheet.
 	 * @param {string} ref Spreadsheet to work with.
+	 * @param {object} o Arbitrary options.
 	 * @returns Spreadsheet data.
 	 */
-	async get (ref = this.ref) {
-		if ((ref.sheetId !== undefined || this.options.sheetIndex !== undefined) && !ref.sheet || GoogleSheets.#getRangeReference(ref) === "") {
+	async get (ref = this.ref, o = {}) {
+		if ((ref.sheetId !== undefined || this.options.sheetIndex !== undefined) && (!ref.sheet || o.ignoreSheetTitle)
+		     || GoogleSheets.#getRangeReference(ref) === "") {
 			// Sheet title has priority over sheet id
 			try {
 				const sheetTitle = await this.#getSheetTitle(ref);
@@ -95,7 +97,13 @@ export default class GoogleSheets extends Google {
 
 				if (message.startsWith("Unable to parse range:")) {
 					// Invalid sheet name and/or data range
-					console.warn(this.constructor.phrase("get_no_sheet_or_invalid_range", ref.sheet, ref.range));
+					console.warn(this.constructor.phrase("get_no_sheet_or_invalid_range", ref.sheet, ref.range, this.options.sheetIndex));
+
+					if (ref.sheet && this.options.sheetIndex !== undefined) {
+						// There is no sheet with the specified title. However the author provided a sheet index, too.
+						// Let's try to get data from the sheet with the specified index.
+						return this.get(this.ref, { ignoreSheetTitle: true });
+					}
 				}
 				else {
 					// No spreadsheet (e.g., invalid URL)
@@ -317,7 +325,7 @@ export default class GoogleSheets extends Google {
 
 		let sheet;
 		if (this.options.sheetIndex !== undefined) {
-			const sheetIndex = this.options.sheetIndex;
+			const sheetIndex = Number(this.options.sheetIndex);
 			const sheetsCount = spreadsheet.sheets?.length;
 
 			if (sheetsCount && sheetIndex >= 0 && sheetIndex < sheetsCount) {
@@ -434,7 +442,7 @@ export default class GoogleSheets extends Google {
 		get_no_spreadsheet: url => `We could not find the spreadsheet with URL: ${url}. Check whether the spreadsheet URL is correct.`,
 		store_no_sheet: sheet => `We could not find the “${sheet}” sheet in the spreadsheet. Try enabling the “allowAddingSheets” option to create it.`,
 		store_sheet_added: sheet => `We could not find the “${sheet}” sheet in the spreadsheet and created it.`,
-		get_no_sheet_or_invalid_range: (sheet, range) => {
+		get_no_sheet_or_invalid_range: (sheet, range, sheetIndex) => {
 			let message;
 
 			if (sheet) {
@@ -445,6 +453,10 @@ export default class GoogleSheets extends Google {
 				}
 				else {
 					message += ".";
+				}
+
+				if (sheetIndex !== undefined) {
+					message += ` We will try to get data from the sheet with index “${sheetIndex}”.`;
 				}
 			}
 			else if (range) {
