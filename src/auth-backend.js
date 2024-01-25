@@ -82,16 +82,16 @@ export default class AuthBackend extends Backend {
 	}
 
 	/**
+	 * Show authentication UI to the user. Must be implemented by subclasses.
 	 * @abstract
-	 * Show authentication UI to the user. Must be implemented by subclasses
 	 */
 	async activeLogin () {
 		throw new TypeError("Not implemented");
 	}
 
 	/**
+	 * Try to authenticate a previously authenticated user (i.e. without showing any login UI).
 	 * @abstract
-	 * Try to authenticate a previously authenticated user (i.e. without showing any login UI)
 	 */
 	async passiveLogin () {
 		throw new TypeError("Not implemented");
@@ -120,7 +120,7 @@ export default class AuthBackend extends Backend {
 	}
 
 	/**
-	 * Store info that can be used to log users in passively
+	 * Store info that can be used to log users in passively.
 	 * @abstract
 	 * @param {object} [options]
 	 * @returns
@@ -130,8 +130,8 @@ export default class AuthBackend extends Backend {
 	}
 
 	/**
+	 * Delete any info used to log users in passively.
 	 * @abstract
-	 * Delete any info used to log users in passively
 	 */
 	deleteLocalUserInfo () {
 		throw new TypeError("Not implemented");

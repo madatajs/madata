@@ -1,9 +1,6 @@
 {
+	"$schema": "https://typedoc.org/schema.json",
 	"name": "Madata API",
-	"compilerOptions": {
-		"allowJs": true,
-		"skipLibCheck": true,
-	},
 	"plugin": [
 		"typedoc-plugin-merge-modules",
 	],
