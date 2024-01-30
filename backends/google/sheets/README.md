@@ -17,7 +17,8 @@ To read data from and write them back to a *private spreadsheet*, you *must* be 
 
 ## Constructor options
 
-- `sheet`: A sheet to read/write data from/to. If not provided, Madata will try to use the sheet specified in the URL or the first visible one.
+- `sheet`: A sheet to read/write data from/to. If not provided, Madata will try to use the sheet specified via the `sheetIndex` option or in the URL. If everything fails, Madata will try to use the first visible sheet.
+- `sheetIndex`: An index (starting from `0`) of the sheet in the spreadsheet to read/write data from/to.
 - `range`: A range with data in *A1 notation*. If not provided, Madata will try to use all data on the sheet.
 - `headerRow`: Whether the first row of data is a row with column headings. If so, Madata will return an array of objects where each object corresponds to one row of data. Column headings will become objects keys and the cells values will become keys values. In this case, the header row won't be a part of the returned data. Defaults to `false`.
 - `transpose`: Whether to transpose data before returning it. This option might be useful, e.g., when your data has headings *not in the first row*, but *in the first column*. Simply transpose the data, so that the first column becomes the first row, the second column becomes the second row, and so on. Defaults to `false`.

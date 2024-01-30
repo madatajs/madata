@@ -19,8 +19,8 @@ export default class Local extends Backend {
 	}
 
 	async get () {
-		if (this.file.key in localStorage) {
-			return localStorage[this.file.key];
+		if (this.ref.key in localStorage) {
+			return localStorage[this.ref.key];
 		}
 
 		return null;
@@ -28,12 +28,12 @@ export default class Local extends Backend {
 
 	async put (data) {
 		if (!data) {
-			delete localStorage[this.file.key];
+			delete localStorage[this.ref.key];
 			return {type: "delete"};
 		}
 
-		let exists = this.file.key in localStorage;
-		localStorage[this.file.key] = await this.stringify(data);
+		let exists = this.ref.key in localStorage;
+		localStorage[this.ref.key] = await this.stringify(data);
 		return {type: exists ? "update" : "create"};
 	}
 

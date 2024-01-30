@@ -7,20 +7,20 @@ import Google from "../google.js";
  * @category Google
  */
 export default class GoogleCalendar extends Google {
-	async get (file = this.file) {
-		let call = `${file.calendarId}/events?key=${this.apiKey}`;
+	async get (ref = this.ref) {
+		let call = `${ref.calendarId}/events?key=${this.apiKey}`;
 
 		if (this.options) {
-			file.params = Object.assign({}, this.options);
+			ref.params = Object.assign({}, this.options);
 			for (const o of Object.keys(this.options)) {
 				// Do not include in the request options not supported by the Google Calendar API
 				// to avoid getting the “Bad Request” error if possible.
 				if (!GoogleCalendar.supportedOptions.includes(o)) {
-					delete file.params[o];
+					delete ref.params[o];
 				}
 			}
 
-			const params = new URLSearchParams(file.params);
+			const params = new URLSearchParams(ref.params);
 			call = call + "&" + params.toString();
 		}
 
@@ -28,25 +28,17 @@ export default class GoogleCalendar extends Google {
 		try {
 			calendar = await this.request(call);
 		}
-		catch (e) {
-			if (e.status === 401) {
+		catch ({ error }) {
+			if (error.code === 401) {
 				await this.logout(); // Access token we have is invalid. Discard it.
 				throw new Error(this.constructor.phrase("access_token_invalid"));
 			}
 
-			if (e.status === 400) {
-				throw new Error(this.constructor.phrase("bad_options", file.params));
+			if (error.code === 400) {
+				throw new Error(this.constructor.phrase("bad_options", ref.params));
 			}
 
-			let error;
-			if (e instanceof Response) {
-				error = (await e.json()).error.message;
-			}
-			else {
-				error = e.message;
-			}
-
-			throw new Error(error);
+			throw new Error(error.message);
 		}
 
 		return calendar?.items;

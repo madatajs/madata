@@ -8,7 +8,7 @@ import hooks from "../../../src/hooks.js";
  * @category GitHub
  */
 export default class GithubGist extends Github {
-	async get (file = this.file) {
+	async get (file = this.ref) {
 		if (this.isAuthenticated()) {
 			// Authenticated API call
 			if (file.gistId) {
@@ -49,7 +49,7 @@ export default class GithubGist extends Github {
 		}
 	}
 
-	async put (data, {file = this.file} = {}) {
+	async put (data, {file = this.ref} = {}) {
 		let call = "gists";
 		let gistId = file.gistId;
 
@@ -85,13 +85,13 @@ export default class GithubGist extends Github {
 		return gistInfo;
 	}
 
-	async canPush (file = this.file) {
+	async canPush (file = this.ref) {
 		// Just check if authenticated user is the same as our URL username
 		// A gist can't have multiple collaborators
 		return this.user && this.user.username.toLowerCase() == file.owner.toLowerCase();
 	}
 
-	async fork (file = this.file) {
+	async fork (file = this.ref) {
 		return this.request(`gists/${file.gistId}/forks`, {}, "POST");
 	}
 
