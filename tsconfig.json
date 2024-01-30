@@ -3,10 +3,12 @@
 		"allowJs": true,
 		"skipLibCheck": true,
 		"lib": ["ESNext"],
+		"outDir": "./dist",
 	},
 	"include": [
 		"src",
 		"backends",
 		"formats",
 	],
+	"exclude": ["./dist"],
 }
