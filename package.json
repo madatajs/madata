@@ -12,6 +12,7 @@
     "build": "npm run build:lib && npm run build:html && npm run build:css && npm run docs",
     "watch:css": "npx postcss \"**/*.postcss\" --base . --dir . --ext .css --config _build/postcss.config.cjs --watch",
     "watch:html": "npx @11ty/eleventy --config=_build/.eleventy.cjs --watch",
+    "watch:docs": "npx typedoc --watch --preserveWatchOutput",
     "watch": "npx concurrently -n w: npm:watch:*",
     "docs": "npx typedoc",
     "dev": "http-server -p 58504 --cors & open http://localhost:58504",
