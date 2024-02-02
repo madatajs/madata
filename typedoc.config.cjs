@@ -20,6 +20,10 @@ module.exports = {
 		includeCategories: true,
 		includeFolders: false,
 	},
+	visibilityFilters: {
+		inherited: true,
+		private: false,
+	},
 	readme: "API.md",
 	out: "api",
 	// "lightHighlightTheme": "solarized-light", // See https://shiki.matsu.io/themes#bundled-themes
