@@ -1,10 +1,11 @@
+import Google from "../google.js";
+
 /**
  * Google Calendar backend. Read-only for now.
  * @class GoogleCalendar
  * @extends Google
+ * @category Google
  */
-import Google from "../google.js";
-
 export default class GoogleCalendar extends Google {
 	async get (ref = this.ref) {
 		let call = `${ref.calendarId}/events?key=${this.apiKey}`;

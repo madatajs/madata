@@ -1,11 +1,12 @@
-/**
- * Github Gist backend
- * @class GithubGist
- * @extends Github
- */
 import Github from "../github.js";
 import hooks from "../../../src/hooks.js";
 
+/**
+ * Github Gist backend.
+ * @class GithubGist
+ * @extends Github
+ * @category GitHub
+ */
 export default class GithubGist extends Github {
 	async get (file = this.ref) {
 		if (this.isAuthenticated()) {

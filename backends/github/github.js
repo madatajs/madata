@@ -1,9 +1,11 @@
-/**
- * @class Github
- * @extends OAuthBackend
- */
 import OAuthBackend from "../../src/oauth-backend.js";
 
+/**
+ * Base class for all Github backends, containing auth methods.
+ * @class Github
+ * @extends OAuthBackend
+ * @category GitHub
+ */
 export default class Github extends OAuthBackend {
 	constructor (url, o) {
 		super(url, o);

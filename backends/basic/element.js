@@ -1,11 +1,12 @@
-/**
- * Save in an HTML element
- * @class Element
- */
-
 import Backend from "../../src/backend.js";
 import {$} from "../../src/util.js";
 
+/**
+ * Read and write data into an HTML element.
+ * @class Element
+ * @extends Backend
+ * @category Basic
+ */
 export default class Element extends Backend {
 	constructor (url, o) {
 		super(url, o);

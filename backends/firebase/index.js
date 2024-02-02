@@ -1,8 +1,3 @@
-/**
- * Firebase backend.
- * @class Firebase
- * @extends OAuthBackend
- */
 import AuthBackend from "../../src/auth-backend.js";
 import { readFile, toArray } from "../../src/util.js";
 
@@ -11,6 +6,11 @@ import { getAuth, onAuthStateChanged, signInWithPopup, signOut, GoogleAuthProvid
 import { getFirestore, doc, collection, getDoc, getDocs, setDoc, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore-lite.js";
 import { getStorage, ref, uploadString, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-storage.js";
 
+/**
+ * Firebase backend.
+ * @class Firebase
+ * @extends OAuthBackend
+ */
 export default class Firebase extends AuthBackend {
 	constructor (url, o) {
 		super(url, o);

@@ -1,8 +1,5 @@
-/**
- * Base class for all backends
- * @class Backend
- * @extends EventTarget
- */
+/** @module Base */
+
 import hooks from "./hooks.js";
 import { toArray, phrase, type, testURL } from "./util.js";
 import Format from "./format.js";
@@ -11,8 +8,11 @@ import JSON from "../formats/json/index.js";
 // We need at least JSON for most cases
 Format.register(JSON);
 
+
 /**
- * Base class for every backend, and default export.
+ * Base class for all backends.
+ * @class Backend
+ * @extends EventTarget
  */
 export default class Backend extends EventTarget {
 	/**

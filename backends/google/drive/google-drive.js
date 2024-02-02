@@ -1,9 +1,11 @@
-/**
- * @class GoogleDrive
- * @extends Google
- */
 import Google from "../google.js";
 
+/**
+ * Google Drive backend.
+ * @class GoogleDrive
+ * @extends Google
+ * @category Google
+ */
 export default class GoogleDrive extends Google {
 	static apiDomain = "https://www.googleapis.com/";
 	static scopes = ["https://www.googleapis.com/auth/drive", "https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email"];

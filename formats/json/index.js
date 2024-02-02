@@ -1,5 +1,9 @@
 import Format from "../../src/format.js";
 
+/**
+ * @class JSON
+ * @extends Format
+ */
 export default class JSON extends Format {
 	static defaultOptions = {
 		stringify: {

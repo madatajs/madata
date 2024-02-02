@@ -1,6 +1,6 @@
 /**
+ * Export all backends without side effects.
  * @module index-fn
- * Export all backends without side effects
  */
 
 export * from "./basic/index.js";

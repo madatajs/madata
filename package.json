@@ -9,14 +9,15 @@
     "build:css": "npx postcss \"**/*.postcss\" --base . --dir . --ext .css --config _build/postcss.config.cjs",
     "build:html": "npx @11ty/eleventy --config=_build/.eleventy.cjs",
     "build:lib": "node _build/lib.mjs",
-    "build": "npm run build:lib && npm run build:html && npm run build:css",
+    "build": "npm run build:lib && npm run build:html && npm run build:css && npm run docs",
     "watch:css": "npx postcss \"**/*.postcss\" --base . --dir . --ext .css --config _build/postcss.config.cjs --watch",
     "watch:html": "npx @11ty/eleventy --config=_build/.eleventy.cjs --watch",
+    "watch:docs": "npx typedoc --watch --preserveWatchOutput",
     "watch": "npx concurrently -n w: npm:watch:*",
-    "docs": "npx documentation build src/** -f html --github -o api",
+    "docs": "npx typedoc",
     "dev": "http-server -p 58504 --cors & open http://localhost:58504",
     "eslint": "eslint . --ext .js --ext .cjs",
-		"lint": "npm run eslint -- --fix"
+    "lint": "npm run eslint -- --fix"
   },
   "repository": {
     "type": "git",
@@ -39,13 +40,15 @@
     "eslint": "latest",
     "@stylistic/eslint-plugin": "latest",
     "@typescript-eslint/eslint-plugin": "latest",
-		"@typescript-eslint/parser": "latest",
+    "@typescript-eslint/parser": "latest",
     "markdown-it-anchor": "^8.6.7",
     "markdown-it-attrs": "^4.1.6",
     "postcss": "^8.3.9",
     "postcss-cli": "^9.0.1",
     "postcss-nesting": "^12.0.1",
-    "release-it": "^16.2.1"
+    "release-it": "^16.2.1",
+    "typedoc": "latest",
+    "typedoc-plugin-merge-modules": "latest"
   },
   "dependencies": {
     "csv": "^6.3.1",

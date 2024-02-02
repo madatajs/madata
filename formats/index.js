@@ -1,6 +1,6 @@
 /**
- * @module formats/index
- * Export all formats and register them
+ * Export all formats and register them.
+ * @module Formats
  */
 import Format from "../src/format.js";
 import * as formats from "./index-fn.js";
