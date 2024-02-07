@@ -17,21 +17,11 @@ export default class Github extends OAuthBackend {
 		return "&scope=user%20repo";
 	}
 
-	async getUser () {
-		if (this.user) {
-			return this.user;
-		}
-
-		let info = await this.request("user");
-
-		return this.user = {
-			username: info.login,
-			name: info.name || info.login,
-			avatar: info.avatar_url,
-			url: "https://github.com/" + info.login,
-			...info
-		};
-	}
+	static userSchema = {
+		username: "login",
+		name: "name",
+		avatar: "avatar_url"
+	};
 
 	static apiDomain = "https://api.github.com/";
 	static oAuth = "https://github.com/login/oauth/authorize";

@@ -12,22 +12,16 @@ export default class Coda extends OAuthBackend {
 		this.updatePermissions({ });
 	}
 
-	async getUser () {
-		if (this.user) {
-			return this.user;
-		}
-
-		let info = await this.request("whoami");
-
-		return this.user = {
-			username: info.name,
-			name: info.name,
-			avatar: info.pictureLink,
-			url: "https://github.com/" + info.login,
-			email: info.loginId,
-			raw: info
-		};
-	}
+	static userCall = "whoami";
+	static userSchema = {
+		username: "name",
+		name: "name",
+		avatar: "pictureLink",
+		email: "loginId",
+		url: function () {
+			return "https://coda.io/@" + this.username
+		},
+	};
 
 	async activeLogin () {
 		open("https://coda.io/account/#apiSettings", "_blank");
