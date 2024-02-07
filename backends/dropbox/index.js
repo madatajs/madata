@@ -56,7 +56,7 @@ export default class Dropbox extends OAuthBackend {
 	static userSchema = {
 		username: "email",
 		name: "name.display_name",
-		avatar: "profile_photo_url"
+		avatar: "profile_photo_url",
 	};
 
 	async login ({passive = false} = {}) {
