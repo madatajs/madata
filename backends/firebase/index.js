@@ -219,7 +219,7 @@ export default class Firebase extends AuthBackend {
 				username: user.email,
 				name: user.displayName,
 				avatar: user.photoURL,
-				...user
+				raw: user,
 			};
 		}
 	}
