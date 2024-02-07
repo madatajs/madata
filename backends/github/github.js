@@ -20,7 +20,10 @@ export default class Github extends OAuthBackend {
 	static userSchema = {
 		username: "login",
 		name: ["name", "login"],
-		avatar: "avatar_url"
+		avatar: "avatar_url",
+		url: function () {
+			return "https://github.com/" + this.username;
+		},
 	};
 
 	static apiDomain = "https://api.github.com/";
