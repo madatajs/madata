@@ -72,7 +72,7 @@ export default class AuthBackend extends Backend {
 
 		ret.raw = info
 
-		return ret;
+		return this.user = ret;
 	}
 
 	/**
