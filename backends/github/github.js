@@ -19,7 +19,7 @@ export default class Github extends OAuthBackend {
 
 	static userSchema = {
 		username: "login",
-		name: "name",
+		name: ["name", "login"],
 		avatar: "avatar_url"
 	};
 
