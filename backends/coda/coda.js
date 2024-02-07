@@ -19,7 +19,7 @@ export default class Coda extends OAuthBackend {
 		avatar: "pictureLink",
 		email: "loginId",
 		url: function () {
-			return "https://coda.io/@" + this.username
+			return "https://coda.io/@" + this.username;
 		},
 	};
 
