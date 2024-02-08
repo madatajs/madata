@@ -58,7 +58,9 @@ export default class AuthBackend extends Backend {
 			for (let sourceKey of sourceKeys) {
 				if (sourceKey in info) {
 					ret[destKey] = info[sourceKey];
-					break;
+					if (ret[destKey]) {
+						break;
+					}
 				}
 			}
 		}
