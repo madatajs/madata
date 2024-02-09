@@ -52,20 +52,12 @@ export default class Dropbox extends OAuthBackend {
 		return `&redirect_uri=${encodeURIComponent(this.constructor.authProvider)}&response_type=code`;
 	}
 
-	async getUser () {
-		if (this.user) {
-			return this.user;
-		}
-
-		let info = await this.request("users/get_current_account", "null", "POST");
-
-		this.user = {
-			username: info.email,
-			name: info.name.display_name,
-			avatar: info.profile_photo_url,
-			info
-		};
-	}
+	static userCall = ["users/get_current_account", "null", "POST"];
+	static userSchema = {
+		username: "email",
+		name: "name.display_name",
+		avatar: "profile_photo_url",
+	};
 
 	async login ({passive = false} = {}) {
 		await super.login({passive});

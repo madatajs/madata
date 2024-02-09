@@ -13,20 +13,12 @@ export default class Google extends OAuthBackend {
 		this.updatePermissions({ read: true });
 	}
 
-	async getUser () {
-		if (this.user) {
-			return this.user;
-		}
-
-		const info = await this.request("https://www.googleapis.com/oauth2/v2/userinfo");
-
-		return this.user = {
-			username: info.email,
-			name: info.name || info.displayName,
-			avatar: info.picture || info.photoURL,
-			...info
-		};
-	}
+	static userCall = "https://www.googleapis.com/oauth2/v2/userinfo";
+	static userSchema = {
+		username: "email",
+		name: ["name", "displayName"],
+		avatar: ["picture", "photoURL"],
+	};
 
 	oAuthParams () {
 		return `&redirect_uri=${this.constructor.authProvider}&response_type=code&scope=${encodeURIComponent(this.constructor.scopes.join(" "))}`;

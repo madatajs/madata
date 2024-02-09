@@ -1,6 +1,7 @@
 /** @module Base */
 
 import Backend from "./backend.js";
+import { toArray } from "./util.js";
 
 /**
  * Backend that supports authentication.
@@ -32,13 +33,48 @@ export default class AuthBackend extends Backend {
 		return !!this.user;
 	}
 
+	static userCall = "user";
+
 	/**
 	 * Get info about the current user, if logged in.
 	 * Subclasses are generally expected to override this.
 	 * @returns {Promise<object>} - User info
 	 */
 	async getUser () {
-		return this.user ?? null;
+		if (this.user) {
+			return this.user;
+		}
+
+		let Class = this.constructor;
+		const info = await this.request(...toArray(Class.userCall));
+
+		// Use userSchema to map the user info to a standard format
+		let ret = {};
+
+		for (let destKey in Class.userSchema) {
+			let sourceKeys = Class.userSchema[destKey];
+			sourceKeys = toArray(sourceKeys);
+
+			for (let sourceKey of sourceKeys) {
+				if (sourceKey in info) {
+					ret[destKey] = info[sourceKey];
+					if (ret[destKey]) {
+						break;
+					}
+				}
+			}
+		}
+
+		// Resolve functions
+		for (let key in ret) {
+			if (typeof ret[key] == "function") {
+				ret[key] = ret[key]();
+			}
+		}
+
+		ret.raw = info;
+
+		return this.user = ret;
 	}
 
 	/**
