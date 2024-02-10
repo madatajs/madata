@@ -40,9 +40,9 @@ export default class Firebase extends AuthBackend {
 
 			if (this.app) {
 				const auth = getAuth(this.app);
-				onAuthStateChanged(auth, (user) => {
+				onAuthStateChanged(auth, async (user) => {
 					if (user) {
-						this.login({passive: true, user});
+						await this.login({passive: true});
 					}
 				});
 
@@ -202,6 +202,32 @@ export default class Firebase extends AuthBackend {
 		}
 	}
 
+	/**
+	 * Get info about the current user, if logged in.
+	 * @returns {Promise<object>} - User info
+	 */
+	async getUser () {
+		if (this.user) {
+			return this.user;
+		}
+
+		if (this.app) {
+			const auth = getAuth(this.app);
+			const info = auth.currentUser;
+
+			if (info) {
+				return this.user = {
+					username: info.email,
+					name: info.displayName,
+					avatar: info.photoURL,
+					raw: info,
+				};
+			}
+		}
+
+		return {};
+	}
+
 	async login (options) {
 		let user = await super.login(options);
 
@@ -213,15 +239,8 @@ export default class Firebase extends AuthBackend {
 		return user;
 	}
 
-	async passiveLogin ({user} = {}) {
-		if (user) {
-			this.user = {
-				username: user.email,
-				name: user.displayName,
-				avatar: user.photoURL,
-				raw: user,
-			};
-		}
+	async passiveLogin () {
+		await this.getUser();
 	}
 
 	async activeLogin () {
