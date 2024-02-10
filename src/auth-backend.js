@@ -5,8 +5,6 @@ import { toArray } from "./util.js";
 
 /**
  * Backend that supports authentication.
- * @class AuthBackend
- * @extends Backend
  * @abstract
  */
 export default class AuthBackend extends Backend {

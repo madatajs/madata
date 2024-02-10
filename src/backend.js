@@ -11,8 +11,6 @@ Format.register(JSON);
 
 /**
  * Base class for all backends.
- * @class Backend
- * @extends EventTarget
  */
 export default class Backend extends EventTarget {
 	/**

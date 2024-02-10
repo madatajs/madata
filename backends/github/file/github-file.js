@@ -4,8 +4,6 @@ import {readFile, delay} from "../../../src/util.js";
 
 /**
  * Backend for reading and writing data and uploading files in GitHub repositories.
- * @class GithubFile
- * @extends Github
  * @category GitHub
  */
 export default class GithubFile extends Github {
