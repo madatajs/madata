@@ -291,8 +291,6 @@ export default class GoogleSheets extends Google {
 
 	/**
 	 * Get the range reference.
-	 * @static
-	 * @private
 	 * @param {string} sheet Sheet title.
 	 * @param {string} range Range in the A1 notation.
 	 * @returns The range reference in one of the supported formats: 'Sheet title'!Range, 'Sheet title', or Range.
@@ -303,7 +301,6 @@ export default class GoogleSheets extends Google {
 
 	/**
 	 * Get title of the sheet in the spreadsheet.
-	 * @private
 	 * @param {Object} ref Spreadsheet to work with.
 	 * @returns Sheet title or title of the first visible sheet, or null if there are no (visible) sheets to work with.
 	 */
@@ -349,8 +346,6 @@ export default class GoogleSheets extends Google {
 
 	/**
 	 * Transform an array of objects to an array of arrays.
-	 * @static
-	 * @private
 	 * @param {Map<string, string>} keys A map between column indices and object keys.
 	 * @param {Array<Object>} values An array of objects. Each object corresponds to an individual spreadsheet row.
 	 * @returns {Array<Array<any>>} An array of arrays. Each nested array corresponds to an individual spreadsheet row.
@@ -386,8 +381,6 @@ export default class GoogleSheets extends Google {
 
 	/**
 	 * Transform an array of arrays to an array of objects.
-	 * @static
-	 * @private
 	 * @param {Map<string, string>} keys A map between column indices and object keys.
 	 * @param {Array<Array<any>>} values An array of values from a spreadsheet. Each nested array corresponds to an individual spreadsheet row.
 	 * @returns {Array<Object>} An array of objects. Each object corresponds to an individual spreadsheet row.
