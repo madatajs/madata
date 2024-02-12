@@ -1,8 +1,6 @@
 import Coda from "../coda.js";
 
 /**
- * @class CodaTable
- * @extends Coda
  * @category Coda
  */
 export default class CodaTable extends Coda {

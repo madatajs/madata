@@ -8,8 +8,6 @@ import { getStorage, ref, uploadString, getDownloadURL, deleteObject } from "htt
 
 /**
  * Firebase backend.
- * @class Firebase
- * @extends OAuthBackend
  */
 export default class Firebase extends AuthBackend {
 	constructor (url, o) {

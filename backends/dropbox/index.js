@@ -2,8 +2,6 @@ import OAuthBackend from "../../src/oauth-backend.js";
 
 /**
  * Dropbox backend.
- * @class Dropbox
- * @extends OAuthBackend
  */
 export default class Dropbox extends OAuthBackend {
 	static apiDomain = "https://api.dropboxapi.com/2/";

@@ -2,8 +2,6 @@ import Google from "../google.js";
 
 /**
  * Google Calendar backend. Read-only for now.
- * @class GoogleCalendar
- * @extends Google
  * @category Google
  */
 export default class GoogleCalendar extends Google {

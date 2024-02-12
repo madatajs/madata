@@ -7,8 +7,6 @@ import { localStorage } from "./node-shims.js";
 
 /**
  * OAuth 2.0 backends.
- * @class OAuthBackend
- * @extends AuthBackend
  */
 export default class OAuthBackend extends AuthBackend {
 	/**

@@ -3,8 +3,6 @@ import hooks from "../../../src/hooks.js";
 
 /**
  * Github Gist backend.
- * @class GithubGist
- * @extends Github
  * @category GitHub
  */
 export default class GithubGist extends Github {

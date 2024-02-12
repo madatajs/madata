@@ -2,8 +2,6 @@ import Google from "../google.js";
 
 /**
  * Google Sheets backend.
- * @class GoogleSheets
- * @extends Google
  * @category Google
  */
 export default class GoogleSheets extends Google {

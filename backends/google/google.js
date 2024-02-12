@@ -2,8 +2,6 @@ import OAuthBackend from "../../src/oauth-backend.js";
 
 /**
  * Base class for all Google backends, containing auth methods.
- * @class Google
- * @extends OAuthBackend
  * @category Google
  */
 export default class Google extends OAuthBackend {
