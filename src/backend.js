@@ -56,7 +56,7 @@ export default class Backend extends EventTarget {
 		}
 	}
 
-	async parse (data, { file } = {}) {
+	async parse (data, { ref } = {}) {
 		if (type(data) !== "string") {
 			// Already parsed
 			return data;
@@ -67,10 +67,10 @@ export default class Backend extends EventTarget {
 			return this.options.parse(data);
 		}
 
-		return this.#getFormat(file).parse(data);
+		return this.#getFormat(ref).parse(data);
 	}
 
-	async stringify (data, { file } = {}) {
+	async stringify (data, { ref } = {}) {
 		if (type(data) === "string") {
 			// Already stringified
 			return data;
@@ -81,7 +81,7 @@ export default class Backend extends EventTarget {
 			return this.options.stringify(data);
 		}
 
-		return this.#getFormat(file).stringify(data);
+		return this.#getFormat(ref).stringify(data);
 	}
 
 	#getFormat (file) {
