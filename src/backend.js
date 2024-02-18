@@ -100,7 +100,7 @@ export default class Backend extends EventTarget {
 
 		// Resolve format specifier (e.g. "json")
 		if (format && typeof format === "string") {
-			let formatObj = Format.find(format, {require: true});
+			formatObj = Format.find(format, {require: true});
 
 			if (this.options.format) {
 				// If this backend specified a format option, replace it with the actual format object
