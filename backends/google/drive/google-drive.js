@@ -228,7 +228,8 @@ export default class GoogleDrive extends Google {
 	}
 
 	static urls = [
-		{hostname: "drive.google.com", pathname: "/file/d/:id"},
+		{hostname: "drive.google.com", pathname: "/file/d/:id/*"},
+		{hostname: "drive.google.com", pathname: "/drive/*/my-drive"},
 		{hostname: "drive.google.com", pathname: "/drive/folders/:folderId"},
 		{hostname: "drive.google.com", pathname: "/drive/*/folders/:folderId"},
 	];
