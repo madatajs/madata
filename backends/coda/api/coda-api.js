@@ -9,6 +9,6 @@ export default class CodaAPI extends Coda {
 	}
 
 	static urls = [
-		"https://coda.io/apis/v1/*"
-	]
+		"https://coda.io/apis/v1/*",
+	];
 }
