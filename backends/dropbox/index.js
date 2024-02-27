@@ -8,7 +8,7 @@ export default class Dropbox extends OAuthBackend {
 	static oAuth = "https://www.dropbox.com/oauth2/authorize";
 	static fileBased = true;
 	static urls = [
-		{"hostname": "{*.}?dropbox.com"}
+		{hostname: "{*.}?dropbox.com"},
 	];
 
 	constructor (url, o) {
