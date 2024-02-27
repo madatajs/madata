@@ -76,7 +76,9 @@ export default class GithubAPI extends Github {
 		return json;
 	}
 
-	static host = "api.github.com";
+	static urls = [
+		{hostname: "api.github.com"},
+	];
 
 	static parseURL (source) {
 		let ret = super.parseURL(source);
