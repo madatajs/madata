@@ -88,7 +88,7 @@ export function testURLs (source, urls) {
 		return false;
 	}
 
-	for (let i=0; i<urls.length; i++) {
+	for (let i = 0; i < urls.length; i++) {
 		let url = urls[i];
 
 		if (!(url instanceof URLPattern)) {
@@ -108,7 +108,7 @@ export function matchURLs (source, urls) {
 		return null;
 	}
 
-	for (let i=0; i<urls.length; i++) {
+	for (let i = 0; i < urls.length; i++) {
 		let url = urls[i];
 
 		if (!(url instanceof URLPattern)) {
