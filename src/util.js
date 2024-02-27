@@ -81,44 +81,69 @@ export function phrase (me, id, ...args) {
 	return id + " " + args.join(" ");
 }
 
-/**
- * Test whether a URL matches a set of criteria.
- * @param {string | URL} url
- * @param {{protocol, host, urls} | {protocol, host, urls}[]} criteria
- * @returns {boolean}
- */
-export function testURL (url, criteria) {
-	if (typeof url === "string") {
-		url = new URL(url);
-	}
+export const URLPattern = globalThis.URLPattern ?? import("../lib/urlpattern-polyfill/index.js");
 
-	if (Array.isArray(criteria)) {
-		return criteria.some(pattern => testURL(url, pattern));
-	}
-
-	let {protocol, host, path} = criteria;
-
-	if (protocol && url.protocol !== protocol) {
+export function testURLs (source, urls) {
+	if (!urls) {
 		return false;
 	}
 
-	if (host) {
-		if (host.startsWith("*.")) {
-			// Wildcard subdomain
-			host = host.replace(/^(\*\.)+/, "");
+	for (let i=0; i<urls.length; i++) {
+		let url = urls[i];
 
-			if (url.host !== host && !url.host.endsWith("." + host)) {
-				return false;
+		if (!(url instanceof URLPattern)) {
+			url = urls[i] = new URLPattern(url);
+		}
+
+		if (url.test(source)) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+export function matchURLs (source, urls) {
+	if (!urls) {
+		return null;
+	}
+
+	for (let i=0; i<urls.length; i++) {
+		let url = urls[i];
+
+		if (!(url instanceof URLPattern)) {
+			url = urls[i] = new URLPattern(url);
+		}
+
+		let match = matchURL(source, url);
+
+		if (match) {
+			return match;
+		}
+	}
+
+	return null;
+}
+
+export function matchURL (source, urlPattern) {
+	let match = urlPattern.exec(source);
+
+	if (!match) {
+		return null;
+	}
+
+	// Go through all possible URL parts and extract matched groups
+	let ret = {};
+
+	for (let part in match) {
+		let partGroups = match[part].groups;
+
+		for (let group in partGroups) {
+			if (isNaN(group)) { // Skip numeric groups
+				ret[group] = partGroups[group];
 			}
 		}
-		else if (url.host !== host) {
-			return false;
-		}
 	}
 
-	if (path && !url.pathname.startsWith(path)) {
-		return false;
-	}
-
-	return true;
+	return ret;
 }

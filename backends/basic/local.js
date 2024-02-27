@@ -35,11 +35,7 @@ export default class Local extends Backend {
 		return {type: exists ? "update" : "create"};
 	}
 
-	static parseURL (source) {
-		let ret = super.parseURL(source);
-		ret.key = ret.url.pathname;
-		return ret;
-	}
-
-	static protocol = "local:";
+	static urls = [
+		{protocol: "local:", pathname: ":key(.+)"}
+	];
 }

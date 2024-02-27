@@ -8,5 +8,7 @@ export default class CodaAPI extends Coda {
 		return this.request(ref.url);
 	}
 
-	static path = "/apis/v1/";
+	static urls = [
+		"https://coda.io/apis/v1/*"
+	]
 }
