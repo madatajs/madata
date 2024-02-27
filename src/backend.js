@@ -290,7 +290,7 @@ export default class Backend extends EventTarget {
 			url: base ? new URL(source, base) : new URL(source)
 		};
 
-		Object.assign(ret, matchURLs(source, this.constructor.urls) ?? matchURLs(source, this.constructor.urlsRecognized));
+		Object.assign(ret, matchURLs(source, this.urls) ?? matchURLs(source, this.urlsRecognized));
 
 		return ret;
 	}
