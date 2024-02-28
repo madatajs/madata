@@ -106,7 +106,7 @@ export default class GithubGist extends Github {
 	 * Parse Gist URLs, return username, gist id, filename
 	 */
 	static parseURL (source) {
-		let ret = Object.assign({}, super.parseURL(source));
+		let ret = super.parseURL(source);
 
 		if (ret.gistId === "NEW") {
 			ret.gistId = undefined;
