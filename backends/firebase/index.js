@@ -294,6 +294,10 @@ export default class Firebase extends AuthBackend {
 		{ hostname: "firebasestorage.googleapis.com" },
 	];
 
+	static urlsKnown = [
+		{ protocol: "gs", pathname: "//*.appspot.com/*" },
+	];
+
 	/**
 	 * Parse URL.
 	 * @param {string} source Database URL | URL of a file in Firebase Storage.
