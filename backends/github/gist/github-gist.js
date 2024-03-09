@@ -94,8 +94,12 @@ export default class GithubGist extends Github {
 	}
 
 	static urls = [
-		{hostname: "gist.github.com", pathname: "/:owner/:gistId"},
+		{hostname: "gist.github.com", pathname: "/:owner/:gistId{/raw}?"},
 		{hostname: "gist.github.com", pathname: "/:owner/:gistId/*/:path"},
+	];
+
+	static urlsKnown = [
+		{hostname: "gist.githubusercontent.com", pathname: "/:owner/:gistId/raw{/:revision}?/:path"},
 	];
 
 	static defaults = {
