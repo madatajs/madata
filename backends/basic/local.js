@@ -36,6 +36,6 @@ export default class Local extends Backend {
 	}
 
 	static urls = [
-		{protocol: "local:", pathname: ":key(.+)"},
+		{protocol: "local", pathname: ":key(.+)"},
 	];
 }
