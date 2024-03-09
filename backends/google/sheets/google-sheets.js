@@ -419,6 +419,10 @@ export default class GoogleSheets extends Google {
 			range: undefined,
 		}, super.parseURL(source));
 
+		if (ret.sheetId) {
+			ret.sheetId = Number(ret.sheetId);
+		}
+
 		return ret;
 	}
 
