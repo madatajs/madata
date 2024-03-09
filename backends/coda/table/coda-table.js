@@ -99,7 +99,7 @@ export default class CodaTable extends Coda {
 		"https://coda.io/d/*_d:docId/*:tentativePageId(_s[^\/]+)/*?",
 
 		// API call
-		"https://coda.io/apis/v1/docs/:docId/tables/:tableId/"
+		"https://coda.io/apis/v1/docs/:docId/tables/:tableId/*?",
 	];
 
 	/**
