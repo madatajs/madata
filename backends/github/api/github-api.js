@@ -77,25 +77,21 @@ export default class GithubAPI extends Github {
 	}
 
 	static urls = [
-		{hostname: "api.github.com"},
+		{hostname: "api.github.com", pathname: "/graphql", hash:":query?"},
+		{hostname: "api.github.com", pathname: "/:apiCall(.+)"}, // Order matters: all API calls that are not GraphQL will be raw API calls
 	];
 
 	static parseURL (source) {
 		let ret = super.parseURL(source);
 
-		if (ret.url.pathname == "/graphql") {
-			if (ret.url.hash) {
-				// https://api.github.com/graphql#query{...}
-				ret.query = source.match(/#([\S\s]+)/)?.[1]; // url.hash drops line breaks
-				ret.url.hash = "";
-			}
-			else {
-				ret.query = "";
-			}
-		}
-		else {
+		if (ret.apiCall) {
 			// Raw API call
-			ret.apiCall = ret.url.pathname.slice(1) + ret.url.search;
+			ret.apiCall += ret.url.search;
+		}
+		else if (ret.query) {
+			// GraphQL
+			ret.query = source.match(/#([\S\s]+)/)?.[1]; // Why? url.hash drops line breaks
+			ret.url.hash = "";
 		}
 
 		return ret;
