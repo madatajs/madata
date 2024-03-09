@@ -404,7 +404,7 @@ export default class GoogleSheets extends Google {
 	static scopes = ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email"];
 
 	static urls = [
-		{hostname: "docs.google.com", pathname: "/spreadsheets/d/:id/*", hash: "{gid=}?:sheetId?"},
+		{hostname: "docs.google.com", pathname: "/spreadsheets/d/:id/*", hash: "{gid=:sheetId}?"},
 	];
 
 	/**
