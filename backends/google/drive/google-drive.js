@@ -33,8 +33,8 @@ export default class GoogleDrive extends Google {
 		}
 	}
 
-	async get (file = this.ref) {
-		if (!file.id) {
+	async get (ref = this.ref) {
+		if (!ref.id) {
 			// There is no file to work with.
 			// We might have a URL of a folder (instead of a file) in which the file will be stored.
 			// If not, the file will be stored directly in the user's “My Drive” folder.
@@ -42,12 +42,12 @@ export default class GoogleDrive extends Google {
 		}
 
 		try {
-			if (!file.info) {
-				file.info = await this.#getFileInfo(file);
-				file.filename = file.info.name;
+			if (!ref.info) {
+				ref.info = await this.#getFileInfo(ref);
+				ref.filename = ref.info.name;
 			}
 
-			const call = `drive/v3/files/${file.id}?key=${this.apiKey}&alt=media`;
+			const call = `drive/v3/files/${ref.id}?key=${this.apiKey}&alt=media`;
 			return this.request(call);
 		}
 		catch ({ error }) {
@@ -63,18 +63,18 @@ export default class GoogleDrive extends Google {
 		}
 	}
 
-	async put (data, {file = this.ref} = {}) {
-		const serialized = await this.stringify(data, {file});
+	async put (data, {ref = this.ref} = {}) {
+		const serialized = await this.stringify(data, {ref});
 		let fileInfo;
 
-		if (!file.id) {
+		if (!ref.id) {
 			// There is no file on the user's drive. We need to create it.
 			try {
-				fileInfo = await this.#createFile(file);
+				fileInfo = await this.#createFile(ref);
 
-				file.url = new URL(fileInfo.webViewLink);
-				file.id = fileInfo.id;
-				file.info = fileInfo;
+				ref.url = new URL(fileInfo.webViewLink);
+				ref.id = fileInfo.id;
+				ref.info = fileInfo;
 			}
 			catch ({ error }) {
 				if (error.code === 401) {
@@ -87,7 +87,7 @@ export default class GoogleDrive extends Google {
 		}
 
 		try {
-			return this.#updateFile(file, serialized);
+			return this.#updateFile(ref, serialized);
 		}
 		catch ({ error }) {
 			if (error.code === 401) {
@@ -99,13 +99,13 @@ export default class GoogleDrive extends Google {
 				if (this.options.allowCreatingFiles) {
 					// Create file in the specified folder or in the user's “My Drive” folder.
 					try {
-						fileInfo = await this.#createFile(file);
+						fileInfo = await this.#createFile(ref);
 
-						file.url = new URL(fileInfo.webViewLink);
-						file.id = fileInfo.id;
-						file.info = fileInfo;
+						ref.url = new URL(fileInfo.webViewLink);
+						ref.id = fileInfo.id;
+						ref.info = fileInfo;
 
-						return this.#updateFile(file, serialized);
+						return this.#updateFile(ref, serialized);
 					}
 					catch ({ error }) {
 						if (error.code === 401) {
@@ -117,7 +117,7 @@ export default class GoogleDrive extends Google {
 					}
 				}
 				else {
-					throw new Error(this.constructor.phrase("no_write_permission", file.url.href));
+					throw new Error(this.constructor.phrase("no_write_permission", ref.url.href));
 				}
 			}
 
@@ -158,13 +158,13 @@ export default class GoogleDrive extends Google {
 		}
 	}
 
-	async delete (file) {
-		if (!file.id) {
+	async delete (ref) {
+		if (!ref.id) {
 			return;
 		}
 
 		try {
-			return this.request(`drive/v3/files/${file.id}?key=${this.apiKey}`, {trashed: true}, "PATCH");
+			return this.request(`drive/v3/files/${ref.id}?key=${this.apiKey}`, {trashed: true}, "PATCH");
 		}
 		catch ({ error }) {
 			if (error.code === 401) {
@@ -186,26 +186,26 @@ export default class GoogleDrive extends Google {
 		return user;
 	}
 
-	async #createFile (file) {
+	async #createFile (ref) {
 		const metadata = {
 			mimeType: "application/json",
-			name: file.filename
+			name: ref.filename
 		};
 
-		if (file.folderId) {
-			metadata.parents = [file.folderId];
+		if (ref.folderId) {
+			metadata.parents = [ref.folderId];
 		}
 
-		return this.request(`drive/v3/files?key=${this.apiKey}&fields=${file.fields}`, metadata, "POST");
+		return this.request(`drive/v3/files?key=${this.apiKey}&fields=${ref.fields}`, metadata, "POST");
 	}
 
-	async #updateFile (file, data) {
-		const call = `upload/drive/v3/files/${file.id}?key=${this.apiKey}&fields=${file.fields}&uploadType=multipart`;
+	async #updateFile (ref, data) {
+		const call = `upload/drive/v3/files/${ref.id}?key=${this.apiKey}&fields=${ref.fields}&uploadType=multipart`;
 		return this.request(call, data, "PATCH");
 	}
 
-	async #getFileInfo (file) {
-		const call = `drive/v3/files/${file.id}?key=${this.apiKey}&fields=${file.fields}`;
+	async #getFileInfo (ref) {
+		const call = `drive/v3/files/${ref.id}?key=${this.apiKey}&fields=${ref.fields}`;
 		return this.request(call);
 	}
 

@@ -11,17 +11,17 @@ export default class GithubFile extends Github {
 
 	/**
 	 * Low-level method to fetch a file from GitHub
-	 * @param {Object} file
+	 * @param {Object} ref
 	 * @returns {string} File contents as a string, or `null` if not found
 	 */
-	async get (file = this.ref) {
+	async get (ref = this.ref) {
 		if (this.isAuthenticated()) {
-			let call = `repos/${file.owner}/${file.repo}/contents/${file.path}`;
+			let call = `repos/${ref.owner}/${ref.repo}/contents/${ref.path}`;
 
 			let response;
 
 			try {
-				response = await this.request(call, {ref: file.branch}, "GET", {
+				response = await this.request(call, {ref: ref.branch}, "GET", {
 					headers: {
 						"Accept": "application/vnd.github.squirrel-girl-preview"
 					}
@@ -33,7 +33,7 @@ export default class GithubFile extends Github {
 				}
 			}
 
-			if (file.repo && response?.content) {
+			if (ref.repo && response?.content) {
 				// Fetching file contents
 				return fromBase64(response.content);
 			}
@@ -43,23 +43,23 @@ export default class GithubFile extends Github {
 		}
 		else {
 			// Unauthenticated, use simple GET request to avoid rate limit
-			let url = new URL(`https://raw.githubusercontent.com/${file.owner}/${file.repo}/${file.branch || "main"}/${file.path}`);
+			let url = new URL(`https://raw.githubusercontent.com/${ref.owner}/${ref.repo}/${ref.branch || "main"}/${ref.path}`);
 			url.searchParams.set("timestamp", Date.now()); // ensure fresh copy
 
 			let response = await fetch(url.href);
 
 			if (response.ok) {
-				file.branch = file.branch || "main";
+				ref.branch = ref.branch || "main";
 				return response.text();
 			}
 			else {
-				if (response.status === 404 && !file.branch) {
+				if (response.status === 404 && !ref.branch) {
 					// Possibly using older default branch "master", try again and store branch name
-					url.pathname = `/${file.owner}/${file.repo}/master/${file.path}`;
+					url.pathname = `/${ref.owner}/${ref.repo}/master/${ref.path}`;
 					response = await fetch(url.href);
 
 					if (response.ok) {
-						file.branch = "master";
+						ref.branch = "master";
 						return response.text();
 					}
 				}
@@ -83,13 +83,13 @@ export default class GithubFile extends Github {
 	 * @param {String} path - Optional file path
 	 * @return {Promise} A promise that resolves when the file is saved.
 	 */
-	async put (data, {file, isEncoded} = {}) {
-		const serialized = await this.stringify(data, {file});
-		return this.#write("put", file, serialized, {isEncoded});
+	async put (data, {ref, isEncoded} = {}) {
+		const serialized = await this.stringify(data, {ref});
+		return this.#write("put", ref, serialized, {isEncoded});
 	}
 
-	async delete (file = this.ref) {
-		return this.#write("delete", file);
+	async delete (ref = this.ref) {
+		return this.#write("delete", ref);
 	}
 
 	async #write (type, ref, ...args) {
@@ -313,17 +313,17 @@ export default class GithubFile extends Github {
 
 	/**
 	 * Fork a repo, or return a fork if one already exists
-	 * @param [file]
+	 * @param [ref]
 	 * @param {options} [options]
 	 * @param [options.force=false] {Boolean} Force a new repo to be created. If false, will try to find an existing fork of the repo.
 	 * @returns
 	 */
-	async fork (file = this.ref, {force = false} = {}) {
-		let repoCall = `repos/${file.repoInfo.full_name}`;
+	async fork (ref = this.ref, {force = false} = {}) {
+		let repoCall = `repos/${ref.repoInfo.full_name}`;
 
 		if (!force) {
 			// Check if we have an existing fork
-			let forkInfo = await this.getMyFork(file.repoInfo);
+			let forkInfo = await this.getMyFork(ref.repoInfo);
 
 			if (forkInfo) {
 				return forkInfo;
@@ -332,7 +332,7 @@ export default class GithubFile extends Github {
 
 		// Does not have permission to commit, create a fork
 		// FIXME what if I already have a repo with that name?
-		let forkInfo = await this.request(`${repoCall}/forks`, {name: file.repo}, "POST");
+		let forkInfo = await this.request(`${repoCall}/forks`, {name: ref.repo}, "POST");
 
 		// Ensure that fork is created (they take a while) by requesting commits every second up to 5 minutes
 		for (let i = 0; i < 300; i++) {
@@ -347,19 +347,19 @@ export default class GithubFile extends Github {
 		return forkInfo;
 	}
 
-	async publish (file = this.ref, {https_enforced = true} = {}) {
+	async publish (ref = this.ref, {https_enforced = true} = {}) {
 		let source = {
-			branch: file.branch || "main",
+			branch: ref.branch || "main",
 		};
 
-		let pagesInfo = await this.request(`repos/${file.owner}/${file.repo}/pages`, {source}, "POST", {
+		let pagesInfo = await this.request(`repos/${ref.owner}/${ref.repo}/pages`, {source}, "POST", {
 			headers: {
 				"Accept": "application/vnd.github+json",
 			}
 		});
 
 		if (https_enforced) {
-			await this.request(`repos/${file.owner}/${file.repo}/pages`, {https_enforced: true}, "PUT", {
+			await this.request(`repos/${ref.owner}/${ref.repo}/pages`, {https_enforced: true}, "PUT", {
 				headers: {
 					"Accept": "application/vnd.github.v3+json",
 				}
@@ -382,15 +382,15 @@ export default class GithubFile extends Github {
 		}
 	}
 
-	async getRepoURL (file = this.ref, {
-		sha = file.branch || "latest",
+	async getRepoURL (ref = this.ref, {
+		sha = ref.branch || "latest",
 	} = {}) {
 		if (this.options.repoURL) {
 			return this.options.repoURL;
 		}
 
 		try {
-			let pagesInfo = await this.getPagesInfo(file);
+			let pagesInfo = await this.getPagesInfo(ref);
 
 			if (pagesInfo) {
 				return pagesInfo.html_url;
@@ -398,7 +398,7 @@ export default class GithubFile extends Github {
 		}
 		catch (e) {}
 
-		return `https://cdn.jsdelivr.net/gh/${file.repoInfo.full_name}@${sha}/`;
+		return `https://cdn.jsdelivr.net/gh/${ref.repoInfo.full_name}@${sha}/`;
 	}
 
 	/**

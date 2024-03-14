@@ -6,20 +6,20 @@ import hooks from "../../../src/hooks.js";
  * @category GitHub
  */
 export default class GithubGist extends Github {
-	async get (file = this.ref) {
+	async get (ref = this.ref) {
 		if (this.isAuthenticated()) {
 			// Authenticated API call
-			if (file.gistId) {
-				let data = await this.request(`gists/${file.gistId}`, {}, "GET");
+			if (ref.gistId) {
+				let data = await this.request(`gists/${ref.gistId}`, {}, "GET");
 				let files = data.files;
 
-				if (file.path && (file.path in files)) {
-					return files[file.path].content;
+				if (ref.path && (ref.path in files)) {
+					return files[ref.path].content;
 				}
 				else {
 					// Requested filename not found, just return the first file
 					let gistFile = Object.values(files)[0];
-					file.path = gistFile.path;
+					ref.path = gistFile.path;
 					return gistFile.content;
 				}
 			}
@@ -30,10 +30,10 @@ export default class GithubGist extends Github {
 		else {
 			// Unauthenticated, use simple GET request to avoid rate limit
 			let path = "";
-			if (file.path) {
-				path = file.path === GithubGist.defaults.path ? "" : file.path + "/";
+			if (ref.path) {
+				path = ref.path === GithubGist.defaults.path ? "" : ref.path + "/";
 			}
-			let url = new URL(`https://gist.githubusercontent.com/${file.owner}/${file.gistId}/raw/${path}`);
+			let url = new URL(`https://gist.githubusercontent.com/${ref.owner}/${ref.gistId}/raw/${path}`);
 			url.searchParams.set("timestamp", Date.now()); // ensure fresh copy
 
 			let response = await fetch(url);
@@ -47,16 +47,16 @@ export default class GithubGist extends Github {
 		}
 	}
 
-	async put (data, {file = this.ref} = {}) {
+	async put (data, {ref = this.ref} = {}) {
 		let call = "gists";
-		let gistId = file.gistId;
+		let gistId = ref.gistId;
 
 		if (gistId) {
-			if (!this.canPush(file)) {
+			if (!this.canPush(ref)) {
 				// Fork gist
-				let gistInfo = await this.fork(file);
-				file.owner = gistInfo.owner.login; // isn't this always this.username?
-				file.gistId = gistInfo.id;
+				let gistInfo = await this.fork(ref);
+				ref.owner = gistInfo.owner.login; // isn't this always this.username?
+				ref.gistId = gistInfo.id;
 			}
 
 			call += "/" + this.info.gistId;
@@ -64,33 +64,33 @@ export default class GithubGist extends Github {
 
 		let gistInfo = await this.request(call, {
 			files: {
-				[file.path]: {
-					content: await this.stringify(data, {file})
+				[ref.path]: {
+					content: await this.stringify(data, {ref})
 				}
 			},
 			public: true
 		}, "POST");
 
-		file.gistId = gistInfo.id;
-		file.owner = gistInfo.owner.login;
+		ref.gistId = gistInfo.id;
+		ref.owner = gistInfo.owner.login;
 
-		if (file.gistId !== gistId) {
+		if (ref.gistId !== gistId) {
 			// New gist created (or forked)
-			let env = {context: this, file};
+			let env = {context: this, ref};
 			hooks.run("gh-new-gist", env);
 		}
 
 		return gistInfo;
 	}
 
-	async canPush (file = this.ref) {
+	async canPush (ref = this.ref) {
 		// Just check if authenticated user is the same as our URL username
 		// A gist can't have multiple collaborators
-		return this.user && this.user.username.toLowerCase() == file.owner.toLowerCase();
+		return this.user && this.user.username.toLowerCase() == ref.owner.toLowerCase();
 	}
 
-	async fork (file = this.ref) {
-		return this.request(`gists/${file.gistId}/forks`, {}, "POST");
+	async fork (ref = this.ref) {
+		return this.request(`gists/${ref.gistId}/forks`, {}, "POST");
 	}
 
 	static host = "gist.github.com";
