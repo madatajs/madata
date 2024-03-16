@@ -81,7 +81,7 @@ export function phrase (me, id, ...args) {
 	return id + " " + args.join(" ");
 }
 
-export const URLPattern = globalThis.URLPattern ?? await import("../lib/urlpattern-polyfill/index.js");
+export const URLPattern = globalThis.URLPattern ?? (await import("../lib/urlpattern-polyfill/index.js")).URLPattern;
 
 export function testURLs (source, urls) {
 	if (!urls) {
