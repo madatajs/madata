@@ -296,6 +296,7 @@ export default class Firebase extends AuthBackend {
 
 	static urlsKnown = [
 		{ protocol: "gs", pathname: "//*.appspot.com/*" },
+		{ protocol: "gs", hostname: "*.appspot.com" }, // works correctly in Node with the polyfill
 	];
 
 	/**
