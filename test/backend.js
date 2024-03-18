@@ -47,7 +47,7 @@ const backends = {
 		"https://gist.githubusercontent.com/foo/eed121799a4118cdc2f139136cf7dbe8/raw/bar.json",
 		"https://gist.github.com/foo/NEW",
 	],
-	"GoogleCalendar": [
+	"Google Calendar": [
 		"https://calendar.google.com/calendar",
 		"https://calendar.google.com/calendar/u/0/r/day",
 		"https://calendar.google.com/calendar/embed?src=fr.french%23holiday%40group.v.calendar.google.com",
