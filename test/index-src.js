@@ -1,4 +1,5 @@
 let tests = await Promise.all([
+	"backend",
 	"util",
 ].map(name => import(`./${name}.js`).then(module => module.default)));
 
