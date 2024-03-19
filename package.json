@@ -5,7 +5,7 @@
   "main": "js/index.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "npx htest test/index.js",
     "build:css": "npx postcss \"**/*.postcss\" --base . --dir . --ext .css --config _build/postcss.config.cjs",
     "build:html": "npx @11ty/eleventy --config=_build/.eleventy.cjs",
     "build:lib": "node _build/lib.mjs",
@@ -47,7 +47,8 @@
     "postcss-nesting": "^12.0.1",
     "release-it": "^16.2.1",
     "typedoc": "latest",
-    "typedoc-plugin-merge-modules": "latest"
+    "typedoc-plugin-merge-modules": "latest",
+    "htest.dev": "latest"
   },
   "dependencies": {
     "csv": "^6.3.1",
