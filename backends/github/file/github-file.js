@@ -414,11 +414,6 @@ export default class GithubFile extends Github {
 		return repoURL + path;
 	}
 
-	static defaults = {
-		repo: "mv-data",
-		path: "data.json",
-	};
-
 	static phrases = {
 		"updated_file": (name = "file") => "Updated " + name,
 		"created_file": (name = "file") => "Created " + name,
@@ -427,44 +422,32 @@ export default class GithubFile extends Github {
 	};
 
 	static urls = [
-		{ host: "github.com" },
-		{ host: "raw.githubusercontent.com" }
+		"http{s}?://github.com/:owner/:repo/blob/:branch/:path(.+)",
+		"http{s}?://github.com/:owner/:repo/:path(.+)",
+		"http{s}?://raw.githubusercontent.com/:owner/:repo/:branch/:path(.+)",
 	];
+
+	static defaults = {
+		repo: "mv-data",
+		path: "data.json",
+	};
 
 	/**
 	 * Parse Github URLs, return username, repo, branch, path
 	 */
 	static parseURL (source) {
-		let ret = Object.assign(super.parseURL(source), {
+		let ret = {
 			owner: undefined,
 			repo: undefined,
 			branch: undefined,
 			path: undefined,
-		});
+		};
 
 		if (!source) {
 			return ret;
 		}
 
-		const url = ret.url;
-		let path = url.pathname.slice(1).split("/");
-
-		ret.owner = path.shift();
-		ret.repo = path.shift();
-
-		if (ret.repo) { // If we don't have a repo, we won't have a branch or a file path either
-			let hasBranch = url.host === "raw.githubusercontent.com" || path[0] === "blob";
-
-			if (url.host !== "raw.githubusercontent.com" && path[0] === "blob") {
-				path.shift(); // drop "blob"
-			}
-
-			if (hasBranch) {
-				ret.branch = path.shift();
-			}
-
-			ret.path = path.join("/");
-		}
+		Object.assign(ret, super.parseURL(source));
 
 		// Apply defaults
 		for (let part in ret) {

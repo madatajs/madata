@@ -93,13 +93,16 @@ export default class CodaTable extends Coda {
 		return items;
 	}
 
-	static path = "/d/";
+	static urls = [
+		// Browser link to a page
+		// Example URL: https://coda.io/d/State-of-HTML-Planning_dTGBFYq175J/All-considered-features_suY7G#In-Part-1_tuBsZ/r1
+		"https://coda.io/d/*_d:docId/*:tentativePageId(_s[^\/]+)/*?",
+	];
 
-	// Example URL: https://coda.io/d/State-of-HTML-Planning_dTGBFYq175J/All-considered-features_suY7G#In-Part-1_tuBsZ/r1
-	static patterns = {
-		api: /\/apis\/v1\/docs\/(?<docId>[\w-]+)\/tables\/(?<tableId>[\w-]+)\//,
-		browserLink: /\/d\/[a-zA-Z\d-]*?_d(?<docId>[\w-]+)(\/[a-zA-Z\d-]*?(?<tentativePageId>_s[\w-]+))?/
-	};
+	static urlsKnown = [
+		// API call
+		"https://coda.io/apis/v1/docs/:docId/tables/:tableId/*?",
+	];
 
 	/**
 	 * Convert JSON-LD structured objects to plain strings whenever possible

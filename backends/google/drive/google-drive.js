@@ -227,7 +227,11 @@ export default class GoogleDrive extends Google {
 		}
 	}
 
-	static host = "drive.google.com";
+	static urls = [
+		{hostname: "drive.google.com", pathname: "/file/d/:id/*"},
+		{hostname: "drive.google.com", pathname: "/drive/*/my-drive"},
+		{hostname: "drive.google.com", pathname: "*/folders/:folderId"},
+	];
 
 	static defaults = {
 		filename: "data.json",
@@ -245,23 +249,14 @@ export default class GoogleDrive extends Google {
 	 * @returns URL, filename, [folder URL], [folder id], fields.
 	 */
 	static parseURL (source) {
-		let ret = Object.assign(super.parseURL(source), {
+		let ret = Object.assign({
 			filename: undefined,
 			folder: undefined,
 			fields: undefined
-		});
+		}, super.parseURL(source));
 
-		const path = ret.url.pathname.slice(1).split("/");
-		const type = path[0];
-
-		if (type === "file") {
-			ret.id = path[2];
-		}
-		else if (type === "drive") {
-			if (path[1] === "folders" || path[3] === "folders") {
-				ret.folder = source;
-				ret.folderId = path[1] === "folders" ? path[2] : path[4];
-			}
+		if (ret.folderId) {
+			ret.folder = source;
 		}
 
 		// Apply defaults.

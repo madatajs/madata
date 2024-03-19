@@ -93,7 +93,14 @@ export default class GithubGist extends Github {
 		return this.request(`gists/${ref.gistId}/forks`, {}, "POST");
 	}
 
-	static host = "gist.github.com";
+	static urls = [
+		{hostname: "gist.github.com", pathname: "/:owner/:gistId{/raw}?"},
+		{hostname: "gist.github.com", pathname: "/:owner/:gistId/*/:path"},
+	];
+
+	static urlsKnown = [
+		{hostname: "gist.githubusercontent.com", pathname: "/:owner/:gistId/raw{/:revision}?/:path"},
+	];
 
 	static defaults = {
 		path: "data.json",
@@ -104,16 +111,10 @@ export default class GithubGist extends Github {
 	 */
 	static parseURL (source) {
 		let ret = super.parseURL(source);
-		let path = ret.url.pathname.slice(1).split("/");
-
-		ret.owner = path.shift();
-		ret.gistId = path.shift();
 
 		if (ret.gistId === "NEW") {
 			ret.gistId = undefined;
 		}
-
-		ret.path = path.pop();
 
 		return ret;
 	}

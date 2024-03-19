@@ -290,8 +290,13 @@ export default class Firebase extends AuthBackend {
 	};
 
 	static urls = [
-		{ host: "*.firebaseio.com" },
-		{ host: "firebasestorage.googleapis.com" },
+		{ hostname: "{*.}?firebaseio.com" },
+		{ hostname: "firebasestorage.googleapis.com" },
+	];
+
+	static urlsKnown = [
+		{ protocol: "gs", pathname: "//*.appspot.com/*" },
+		{ protocol: "gs", hostname: "*.appspot.com" }, // works correctly in Node with the polyfill
 	];
 
 	/**

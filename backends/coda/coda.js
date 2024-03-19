@@ -32,7 +32,6 @@ export default class Coda extends OAuthBackend {
 	}
 
 	static apiDomain = "https://coda.io/apis/v1/";
-	static host = "coda.io";
 
 	static phrases = {
 		"login_prompt": "Enter your Coda API token. You can find it in your Coda account settings."

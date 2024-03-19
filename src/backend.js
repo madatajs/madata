@@ -1,7 +1,7 @@
 /** @module Base */
 
 import hooks from "./hooks.js";
-import { toArray, phrase, type, testURL } from "./util.js";
+import { toArray, phrase, type, testURLs, matchURLs, URLPattern } from "./util.js";
 import Format from "./format.js";
 import JSON from "../formats/json/index.js";
 
@@ -253,20 +253,30 @@ export default class Backend extends EventTarget {
 	}
 
 	static test (source) {
-		let {protocol, host, path, urls} = this;
+		return testURLs(source, this.urls);
+	}
 
-		if (!protocol && !host && !urls) {
-			// No URL criteria specified, backend needs to override test() to match anything
-			return false;
+	/**
+	 * Return the hostname of the first URL pattern in the `urls` array, if not variable.
+	 * This is used to facilitate relative URLs when constructing Backends directly.
+	 * Subclasses with variable hostnames can override this.
+	 */
+	static get host () {
+		if (!this.urls) {
+			return undefined;
 		}
 
-		let url;
-		try {
-			url = new URL(source);
+		if (!(this.urls[0] instanceof URLPattern)) {
+			this.urls[0] = new URLPattern(this.urls[0]);
 		}
-		catch (e) {}
 
-		return testURL(url, urls ?? {protocol, host, path});
+		let host = this.urls[0].hostname;
+
+		if (host === "*") {
+			return undefined;
+		}
+
+		return host;
 	}
 
 	static parseURL (source) {
@@ -280,15 +290,7 @@ export default class Backend extends EventTarget {
 			url: base ? new URL(source, base) : new URL(source)
 		};
 
-		if (this.patterns) {
-			for (let pattern in this.patterns) {
-				let match = ret.url.pathname.match(this.patterns[pattern]);
-
-				if (match) {
-					return Object.assign(ret, match.groups);
-				}
-			}
-		}
+		Object.assign(ret, matchURLs(source, this.urls) ?? matchURLs(source, this.urlsKnown));
 
 		return ret;
 	}
