@@ -8,7 +8,7 @@ const urlPatterns = [
 	{hostname: "gist.githubusercontent.com", pathname: "/:owner/:gistId/raw{/:revision}?/:path"},
 	{hostname: "calendar.google.com", pathname: "/calendar{/*}?", search: "{cid=:cid}?{src=:src}?"},
 	{hostname: "docs.google.com", pathname: "/spreadsheets/d/:id/*", hash: "{gid=:sheetId}?"},
-	"https://coda.io/d/*_d:docId/*:tentativePageId(_s[^\/]+)/*?",
+	"https://coda.io/d/*_d:docId/*:tentativePageId(_su.+)",
 	"http{s}?://raw.githubusercontent.com/:owner/:repo/:branch/:path(.+)",
 ];
 

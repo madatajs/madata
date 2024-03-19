@@ -96,7 +96,7 @@ export default class CodaTable extends Coda {
 	static urls = [
 		// Browser link to a page
 		// Example URL: https://coda.io/d/State-of-HTML-Planning_dTGBFYq175J/All-considered-features_suY7G#In-Part-1_tuBsZ/r1
-		"https://coda.io/d/*_d:docId/*:tentativePageId(_s[^\/]+)/*?",
+		"https://coda.io/d/*_d:docId/*:tentativePageId(_su.+)",
 	];
 
 	static urlsKnown = [
