@@ -1,7 +1,7 @@
 import Backend from "../src/backend.js";
 
 const backends = {
-	"Element": [
+	"Local": [
 		"local:foo",
 	],
 	"Remote": [
