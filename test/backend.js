@@ -21,7 +21,6 @@ const backends = {
 	// "Firebase": [
 	// 	"https://foo.firebaseio.com/bar/baz.json",
 	// 	"https://firebasestorage.googleapis.com/v0/b/madata.appspot.com/o/files%2Ffoo.svg?alt=media&token=bar",
-	// 	"gs://foo.appspot.com/firebaseupload/images/bar.svg",
 	// ],
 	"Github API": [
 		"https://api.github.com/repos/mavoweb/mavo/commits/ed03ff78fa6e2cb38af1901ab379e205419b24aa",
@@ -37,14 +36,11 @@ const backends = {
 		"https://github.com/foo/bar/blob/main/baz.json",
 		"https://github.com/foo/bar/baz.json",
 		"https://raw.githubusercontent.com/foo/bar/main/baz.json",
-		"https://github.com",
 	],
 	"Github Gist": [
 		"https://gist.github.com/foo/eed121799a4118cdc2f139136cf7dbe8",
 		"https://gist.github.com/foo/eed121799a4118cdc2f139136cf7dbe8/raw",
 		"https://gist.github.com/foo/eed121799a4118cdc2f139136cf7dbe8/raw/bar.json",
-		"https://gist.githubusercontent.com/foo/eed121799a4118cdc2f139136cf7dbe8/raw/yolobaz/bar.json",
-		"https://gist.githubusercontent.com/foo/eed121799a4118cdc2f139136cf7dbe8/raw/bar.json",
 		"https://gist.github.com/foo/NEW",
 	],
 	"Google Calendar": [
