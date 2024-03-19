@@ -93,11 +93,13 @@ export default class CodaTable extends Coda {
 		return items;
 	}
 
-	static urlsKnown = [
+	static urls = [
 		// Browser link to a page
 		// Example URL: https://coda.io/d/State-of-HTML-Planning_dTGBFYq175J/All-considered-features_suY7G#In-Part-1_tuBsZ/r1
 		"https://coda.io/d/*_d:docId/*:tentativePageId(_s[^\/]+)/*?",
+	];
 
+	static urlsKnown = [
 		// API call
 		"https://coda.io/apis/v1/docs/:docId/tables/:tableId/*?",
 	];
