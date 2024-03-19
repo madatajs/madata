@@ -1,4 +1,4 @@
-import Backend from "../src/backend.js";
+import Backend from "../src/index.js";
 
 const backends = {
 	"Local": [
