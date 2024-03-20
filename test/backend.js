@@ -65,7 +65,13 @@ const backends = {
 const fromTests = [];
 for (const backend in backends) {
 	const urls = backends[backend];
-	urls.forEach(url => fromTests.push({ arg: url, expect: backend }));
+	const ret = {
+		name: backend,
+		tests: [],
+	};
+
+	urls.forEach(url => ret.tests.push({ arg: url, expect: backend }));
+	fromTests.push(ret);
 }
 
 export default {
