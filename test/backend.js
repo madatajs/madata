@@ -35,6 +35,7 @@ const backends = {
 	GithubFile: [
 		"https://github.com/foo/bar/blob/main/baz.json",
 		"https://github.com/foo/bar/baz.json",
+		"https://github.com/foo/bar",
 		"https://raw.githubusercontent.com/foo/bar/main/baz.json",
 	],
 	GithubGist: [

@@ -423,7 +423,7 @@ export default class GithubFile extends Github {
 
 	static urls = [
 		"http{s}?://github.com/:owner/:repo/blob/:branch/:path(.+)",
-		"http{s}?://github.com/:owner/:repo/:path(.+)",
+		"http{s}?://github.com/:owner/:repo{/:path(.+)}?",
 		"http{s}?://raw.githubusercontent.com/:owner/:repo/:branch/:path(.+)",
 	];
 
