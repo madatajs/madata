@@ -93,7 +93,7 @@ export default class GithubFile extends Github {
 	}
 
 	async #write (type, ref, ...args) {
-		await this.fetchRepoInfo(ref);
+		ref = await this.fetchRepoInfo(ref);
 
 		if (ref.repoInfo === null) {
 			// Create repo if it doesn’t exist
@@ -187,23 +187,23 @@ export default class GithubFile extends Github {
 
 			if (this.ref.repo) {
 				// TODO move to load()?
-				this.ref.repoInfo = await this.fetchRepoInfo();
+				this.ref = await this.fetchRepoInfo();
 			}
 		}
 
 		return user;
 	}
 
-	async upload (file, path = this.path) {
+	async upload (file, path = this.ref.path) {
 		let dataURL = await readFile(file);
 
 		let base64 = dataURL.slice(5); // remove data:
 		let media = base64.match(/^\w+\/[\w+]+/)[0];
 		media = media.replace("+", "\\+"); // Fix for #608
 		base64 = base64.replace(RegExp(`^${media}(;base64)?,`), "");
-		path = this.path.replace(/[^/]+$/, "") + path; // make upload path relative to existing path
+		path = this.ref.path.replace(/[^/]+$/, "") + path; // make upload path relative to existing path
 
-		let fileInfo = await this.put(base64, {path, isEncoded: true});
+		let fileInfo = await this.put(base64, {ref: path, isEncoded: true});
 		return this.getFileURL(path, {sha: fileInfo.commit.sha});
 	}
 
@@ -404,8 +404,8 @@ export default class GithubFile extends Github {
 	/**
 	 * Get a public URL for a file in a repo
 	 */
-	async getFileURL (path = this.path, {repoInfo = this.ref.repoInfo, ...options} = {}) {
-		let repoURL = this.getRepoURL(repoInfo, options);
+	async getFileURL (path = this.ref.path, {ref = this.ref, ...options} = {}) {
+		let repoURL = await this.getRepoURL(ref, options);
 
 		if (!repoURL.endsWith("/")) {
 			repoURL += "/";
