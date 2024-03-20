@@ -86,7 +86,7 @@ export default class Dropbox extends OAuthBackend {
 
 	// Transform the dropbox shared URL into something raw and CORS-enabled
 	static #fixShareURL = url => {
-		url = new URL(url, location);
+		url = new URL(url, globalThis.location);
 		url.hostname = "dl.dropboxusercontent.com";
 		url.search = url.search.replace(/\bdl=0|^$/, "raw=1");
 		return url;
