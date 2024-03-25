@@ -267,6 +267,11 @@ export default class Firebase extends AuthBackend {
 		}
 	}
 
+	deleteLocalUserInfo () {
+		// Nothing to delete. Everything is handled automatically by the Firebase library.
+		// We need to implement it so that the parent AuthBackend class can correctly handle the user logging out.
+	}
+
 	#applyDefaults (ref = this.ref) {
 		for (const part in Firebase.defaults) {
 			ref[part] = this.options[part] ?? Firebase.defaults[part];
