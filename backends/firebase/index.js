@@ -280,9 +280,6 @@ export default class Firebase extends AuthBackend {
 		return ref;
 	}
 
-	stringify = data => data;
-	parse = data => data;
-
 	static #isCollection (ref) {
 		const path = ref.path.split("/");
 
