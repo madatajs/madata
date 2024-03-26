@@ -18,17 +18,32 @@ export default class Dropbox extends OAuthBackend {
 	}
 
 	async upload (file, path) {
-		if (this.path) {
+		if (this.ref.path) {
+			path = this.ref.path.replace(/[^/]+$/, "") + path; // make upload path relative to existing path
+		}
+		else {
 			path = path.startsWith("/") ? path : "/" + path;
-			path = this.path + path;
 		}
 
-		await this.put(file, {path});
+		await this.put(file, {ref: path, isUploading: true});
 		return this.getURL(path);
 	}
 
 	async getURL (path) {
-		let shareInfo = await this.request("sharing/create_shared_link_with_settings", {path}, "POST");
+		let shareInfo;
+		try {
+			shareInfo = await this.request("sharing/create_shared_link_with_settings", {path}, "POST");
+		}
+		catch (err) {
+			if (err.error["shared_link_already_exists"]) {
+				const metadata = err.error["shared_link_already_exists"].metadata;
+				shareInfo = metadata ?? (await this.request("sharing/list_shared_links", {path}, "POST")).links[0];
+			}
+			else {
+				throw err;
+			}
+		}
+
 		return Dropbox.#fixShareURL(shareInfo.url);
 	}
 
@@ -37,11 +52,15 @@ export default class Dropbox extends OAuthBackend {
 	 * @param {Object} file - An object with name & data keys
 	 * @return {Promise} A promise that resolves when the file is saved.
 	 */
-	put (serialized, {path = this.path, ...o} = {}) {
+	async put (data, {ref, isUploading} = {}) {
+		ref = this._getRef(ref);
+
+		const serialized = isUploading ? data : await this.stringify(data, {ref});
+
 		return this.request("https://content.dropboxapi.com/2/files/upload", serialized, "POST", {
 			headers: {
 				"Dropbox-API-Arg": JSON.stringify({
-					path,
+					path: ref.path,
 					mode: "overwrite"
 				}),
 				"Content-Type": "application/octet-stream"
@@ -60,8 +79,8 @@ export default class Dropbox extends OAuthBackend {
 		avatar: "profile_photo_url",
 	};
 
-	async login ({passive = false} = {}) {
-		await super.login({passive});
+	async login (...args) {
+		await super.login(...args);
 
 		if (this.user) {
 			// Check if can actually edit the file
@@ -70,8 +89,10 @@ export default class Dropbox extends OAuthBackend {
 				"url": this.source
 			}, "POST");
 
-			this.path = info.path_lower;
-			this.updatePermissions({edit: true, save: true});
+			if (info.path_lower) {
+				this.ref.path = info.path_lower;
+				this.updatePermissions({edit: true, save: true});
+			}
 		}
 
 		return this.user;
