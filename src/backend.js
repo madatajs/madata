@@ -89,7 +89,7 @@ export default class Backend extends EventTarget {
 
 		if (!format && this.constructor.fileBased && ref) {
 			// If file-based, try to match the filename first
-			let extension = (ref.filename ?? ref.path ?? ref.url).match(/\.(\w+)$/)?.[1];
+			let extension = (ref.filename ?? ref.path ?? ref.url.pathname).match(/\.(\w+)$/)?.[1];
 			if (extension) {
 				format = Format.find({extension});
 			}
