@@ -25,7 +25,9 @@ export default class Dropbox extends OAuthBackend {
 			path = path.startsWith("/") ? path : "/" + path;
 		}
 
-		await this.put(file, {ref: path, isUploading: true});
+		const ref = this._getRef(path);
+		await this.put(file, {ref, isUploading: true});
+
 		return this.getURL(path);
 	}
 
@@ -53,8 +55,6 @@ export default class Dropbox extends OAuthBackend {
 	 * @return {Promise} A promise that resolves when the file is saved.
 	 */
 	async put (data, {ref, isUploading} = {}) {
-		ref = this._getRef(ref);
-
 		const serialized = isUploading ? data : await this.stringify(data, {ref});
 
 		return this.request("https://content.dropboxapi.com/2/files/upload", serialized, "POST", {
