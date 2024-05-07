@@ -280,15 +280,14 @@ export default class Backend extends EventTarget {
 	}
 
 	static parseURL (source) {
+		let ret = Object.assign({}, this.defaults);
+
 		if (!source) {
-			return {};
+			return ret;
 		}
 
 		let base = this.host ? "https://" + this.host.replace(/^(\*\.)+/, "") : null;
-
-		let ret = {
-			url: base ? new URL(source, base) : new URL(source)
-		};
+		ret.url = base ? new URL(source, base) : new URL(source);
 
 		Object.assign(ret, matchURLs(source, this.urls) ?? matchURLs(source, this.urlsKnown));
 

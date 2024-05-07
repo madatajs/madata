@@ -428,36 +428,11 @@ export default class GithubFile extends Github {
 	];
 
 	static defaults = {
+		owner: undefined,
 		repo: "mv-data",
+		branch: undefined,
 		path: "data.json",
 	};
-
-	/**
-	 * Parse Github URLs, return username, repo, branch, path
-	 */
-	static parseURL (source) {
-		let ret = {
-			owner: undefined,
-			repo: undefined,
-			branch: undefined,
-			path: undefined,
-		};
-
-		if (!source) {
-			return ret;
-		}
-
-		Object.assign(ret, super.parseURL(source));
-
-		// Apply defaults
-		for (let part in ret) {
-			if (ret[part] === undefined && part in this.defaults) {
-				ret[part] = this.defaults[part];
-			}
-		}
-
-		return ret;
-	}
 }
 
 // Fix atob() and btoa() so they can handle Unicode
