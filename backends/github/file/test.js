@@ -34,7 +34,7 @@ export default {
 				{
 					name: "No URL",
 					arg: undefined,
-					expect: {owner: undefined, repo: undefined, branch: undefined, path: undefined},
+					expect: GithubFile.defaults,
 				},
 			],
 		},
