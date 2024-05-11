@@ -46,19 +46,19 @@ export default class GithubLabels extends GithubAPI {
 		// Create new labels
 		// https://docs.github.com/en/rest/issues/labels?apiVersion=2022-11-28#create-a-label
 		if (toCreate.length) {
-			ret.created = await this.#labels("create", toCreate, ref);
+			ret.created = await this.#write("create", toCreate, ref);
 		}
 
 		// Update existing labels
 		// https://docs.github.com/en/rest/issues/labels?apiVersion=2022-11-28#update-a-label
 		if (toUpdate.length) {
-			ret.updated = await this.#labels("update", toUpdate, ref);
+			ret.updated = await this.#write("update", toUpdate, ref);
 		}
 
 		// Delete existing labels
 		// https://docs.github.com/en/rest/issues/labels?apiVersion=2022-11-28#delete-a-label
 		if (toDelete.length) {
-			ret.deleted = await this.#labels("delete", toDelete, ref);
+			ret.deleted = await this.#write("delete", toDelete, ref);
 		}
 
 		return ret;
@@ -73,9 +73,9 @@ export default class GithubLabels extends GithubAPI {
 		return this.put([], {ref, force: true});
 	}
 
-	async #labels (action, labels, ref) {
+	async #write (type, labels, ref) {
 		let method;
-		switch (action) {
+		switch (type) {
 			case "update":
 				method = "PATCH";
 				break;
@@ -91,7 +91,7 @@ export default class GithubLabels extends GithubAPI {
 		let result = await Promise.allSettled(labels.map(label => {
 			let apiCall = label.url, data = label, req;
 
-			switch (action) {
+			switch (type) {
 				case "create":
 					apiCall = ref.apiCall;
 					break;
@@ -116,7 +116,7 @@ export default class GithubLabels extends GithubAPI {
 			let label = labels[index];
 
 			if (promise.status === "fulfilled") {
-				if (action === "delete") {
+				if (type === "delete") {
 					// For deleted labels there is no additional information returned
 					label = { name: label.name };
 				}
@@ -132,11 +132,11 @@ export default class GithubLabels extends GithubAPI {
 		}
 
 		if (success.length) {
-			console.info(`${this.constructor.phrase("success", action)} ${success.map(l => l.name).join(", ")}.`);
+			console.info(`${this.constructor.phrase("success", type)} ${success.map(l => l.name).join(", ")}.`);
 		}
 
 		if (failure.length) {
-			console.warn(`${this.constructor.phrase("failure", action)} ${failure.map(l => l.name).join(", ")}.`);
+			console.warn(`${this.constructor.phrase("failure", type)} ${failure.map(l => l.name).join(", ")}.`);
 		}
 
 		return { success, failure };
