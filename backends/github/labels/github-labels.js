@@ -114,16 +114,21 @@ export default class GithubLabels extends GithubAPI {
 
 		let success = [], failure = [];
 		for (let [index, promise] of result.entries()) {
-			let name = labels[index].name;
-			if (action === "update" && labels[index].new_name) {
-				name += ` (${labels[index].new_name})`;
-			}
+			let label = labels[index];
 
 			if (promise.status === "fulfilled") {
-				success.push(name);
+				if (action === "delete") {
+					// For deleted labels there is no additional information returned
+					label = { name: label.name };
+				}
+				else {
+					label = promise.value;
+				}
+
+				success.push(label);
 			}
 			else {
-				failure.push({name, reason: promise.reason});
+				failure.push({label, reason: promise.reason});
 			}
 		}
 
