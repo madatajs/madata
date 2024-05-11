@@ -1,6 +1,7 @@
 import GithubAPI from "../api/github-api.js";
 
 export default class GithubLabels extends GithubAPI {
+	// Do we need this at all?
 	static urlsKnown = [
 		{hostname: "api.github.com", pathname: "repos/:owner/:repo/labels"},
 		{hostname: "github.com", pathname: "/:owner/:repo/labels"},
@@ -140,5 +141,14 @@ export default class GithubLabels extends GithubAPI {
 		}
 
 		return { success, failure };
+	}
+
+	// Why do we need this if we can provide static urls = []?
+	// All URLs supported by this backend are also supported by the parent (GithubAPI) class,
+	// and we want them to be parsed by the parent class, not this one.
+	// OTOH, we need a way to tell Madata when to use this class instead of the parent one.
+	static test (url) {
+		let {hostname, pathname} = new URL(url);
+		return hostname === "api.github.com" && /\/labels\/?$/.test(pathname);
 	}
 }
