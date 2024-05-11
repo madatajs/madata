@@ -21,13 +21,13 @@ export default class GithubLabels extends GithubAPI {
 	async put (data, {ref = this.ref, force = false} = {}) {
 		if (!this.isAuthenticated()) {
 			console.warn(this.constructor.phrase("not_authenticated"));
-			return;
+			return null;
 		}
 
 		if (!data?.length && !force) {
 			// We don't want to delete all existing labels accidentally
 			console.warn(this.constructor.phrase("no_labels"));
-			return;
+			return null;
 		}
 
 		if (!this.data) {
