@@ -1,5 +1,9 @@
 import GithubAPI from "../api/github-api.js";
 
+/**
+ * Backend for performing operations with labels on GitHub repositories.
+ * @category GitHub
+ */
 export default class GithubLabels extends GithubAPI {
 	// Do we need this at all?
 	static urlsKnown = [
