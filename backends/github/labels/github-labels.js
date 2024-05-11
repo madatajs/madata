@@ -17,7 +17,7 @@ export default class GithubLabels extends GithubAPI {
 	/**
 	 * Performs operations (create, update, delete) with labels.
 	 * @param {Array<any>} data Labels to create, update, or delete.
-	 * @returns {Promise<Array<any>>} Promise that is resolved with an array of results of performed operations.
+	 * @returns {Promise<Object>} Promise that is resolved with an object based on the results of performed operations.
 	 */
 	async put (data, {ref = this.ref, force = false} = {}) {
 		if (!this.isAuthenticated()) {
@@ -68,7 +68,7 @@ export default class GithubLabels extends GithubAPI {
 	/**
 	 * Delete all existing labels in one go.
 	 * @param {Object} ref
-	 * @returns {Promise<Array<any>>} Promise that is resolved with an array of deletion results.
+	 * @returns {Promise<Object>} Promise that is resolved with an object based on the results of label deletion.
 	 */
 	async delete (ref = this.ref) {
 		return this.put([], {ref, force: true});
