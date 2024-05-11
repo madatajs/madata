@@ -96,15 +96,27 @@ export default class GithubLabels extends GithubAPI {
 			return this.request(apiCall, data, method, req);
 		}));
 
-		let success = result.filter(p => p.status === "fulfilled").map(p => p.value).map((l, i) => (action === "delete" ? labels[i] : l).name);
-		let failed = result.filter(p => p.status === "rejected").map(p => p.value).map(l => l.name);
+		let success = [], failure = [];
+		for (let [index, promise] of result.entries()) {
+			let name = labels[index].name;
+			if (action === "update" && labels[index].new_name) {
+				name += ` (${labels[index].new_name})`;
+			}
+
+			if (promise.status === "fulfilled") {
+				success.push(name);
+			}
+			else {
+				failure.push({name, reason: promise.reason});
+			}
+		}
 
 		console.info(`${this.constructor.phrase("success", action)} ${success.length ? success.join(", ") : this.constructor.phrase("none")}.`);
 
-		if (failed.length) {
-			console.warn(`${this.constructor.phrase("failure", action)} ${failed.join(", ")}.`);
+		if (failure.length) {
+			console.warn(`${this.constructor.phrase("failure", action)} ${failure.map(l => l.name).join(", ")}.`);
 		}
 
-		return result;
+		return { success, failure };
 	}
 }
