@@ -11,7 +11,6 @@ export default class GithubLabels extends GithubAPI {
 		no_labels: "There are no labels to work with. Use the delete () method if you were to delete all existing labels in one go.",
 		success: (action) => `Labels ${action}d:`,
 		failure: (action) => `Labels failed to ${action}:`,
-		none: "none",
 	};
 
 	/**
@@ -132,7 +131,9 @@ export default class GithubLabels extends GithubAPI {
 			}
 		}
 
-		console.info(`${this.constructor.phrase("success", action)} ${success.length ? success.join(", ") : this.constructor.phrase("none")}.`);
+		if (success.length) {
+			console.info(`${this.constructor.phrase("success", action)} ${success.map(l => l.name).join(", ")}.`);
+		}
 
 		if (failure.length) {
 			console.warn(`${this.constructor.phrase("failure", action)} ${failure.map(l => l.name).join(", ")}.`);
