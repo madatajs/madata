@@ -78,7 +78,7 @@ export default class GithubLabels extends GithubAPI {
 
 			switch (action) {
 				case "create":
-					apiCall = `${ref.apiCall}`;
+					apiCall = ref.apiCall;
 					break;
 
 				case "update":
