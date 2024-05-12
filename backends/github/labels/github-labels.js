@@ -13,7 +13,7 @@ export default class GithubLabels extends GithubAPI {
 
 	static phrases = {
 		not_authenticated: "Please log in to perform actions with labels on GitHub.",
-		no_labels: "There are no labels to work with. Use the delete () method if you were to delete all existing labels in one go.",
+		no_labels: "There are no labels to work with. Use the delete() method if you were to delete all existing labels in one go.",
 		success: (action) => `Labels ${action}d:`,
 		failure: (action) => `Labels failed to ${action}:`,
 	};
