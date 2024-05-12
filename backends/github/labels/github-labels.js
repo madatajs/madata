@@ -37,7 +37,14 @@ export default class GithubLabels extends GithubAPI {
 
 		if (!this.data) {
 			// Existing labels are not yet fetched. Fetching...
-			await this.load(this.source);
+			try {
+				await this.load(this.source);
+			}
+			catch (err) {
+				if (err.status === 404) {
+					return null;
+				}
+			}
 		}
 
 		let ret = {};
