@@ -23,7 +23,7 @@ export default class GithubLabels extends GithubAPI {
 	 * @param {Array<any>} data Labels to create, update, or delete.
 	 * @returns {Promise<Object>} Promise that is resolved with an object based on the results of performed operations.
 	 */
-	async put (data, {ref = this.ref, force = false} = {}) {
+	async put (data, {ref = this.ref, force = false, skipDeletion = false} = {}) {
 		if (!this.isAuthenticated()) {
 			console.warn(this.constructor.phrase("not_authenticated"));
 			return null;
@@ -42,7 +42,7 @@ export default class GithubLabels extends GithubAPI {
 
 		let ret = {};
 		let toCreate = data.filter(label => !this.data.find(l => l.name === label.name));
-		let toDelete = this.data.filter(l => !data.find(label => label.name === l.name));
+		let toDelete = skipDeletion ? [] : this.data.filter(l => !data.find(label => label.name === l.name));
 
 		// Label should be updated if it has a new name (in that case the new_name property is mandatory)
 		// or if any of its properties (color, default, description) have changed
