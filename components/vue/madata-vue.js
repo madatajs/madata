@@ -292,3 +292,4 @@ function parseTime (time) {
 }
 
 export default MaData;
+export { Backend };
