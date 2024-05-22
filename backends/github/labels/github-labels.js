@@ -143,10 +143,6 @@ export default class GithubLabels extends GithubAPI {
 			}
 		}
 
-		if (success.length) {
-			console.info(`${this.constructor.phrase("success", type)} ${success.map(l => l.name).join(", ")}.`);
-		}
-
 		if (failure.length) {
 			console.warn(`${this.constructor.phrase("failure", type)} ${failure.map(l => l.name).join(", ")}.`);
 		}
