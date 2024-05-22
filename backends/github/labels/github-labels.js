@@ -93,21 +93,18 @@ export default class GithubLabels extends GithubAPI {
 		let result = await Promise.allSettled(labels.map(label => {
 			let apiCall = `${ref.apiCall}/${label.name}`, data = label, req;
 
-			switch (type) {
-				case "create":
-					apiCall = ref.apiCall;
-					break;
-
-				case "update":
-					if (label.new_name) {
-						data = {...label, name: label.new_name};
-					}
-					break;
-
-				case "delete":
-					data = null;
-					req = {responseType: "text"};
-					break;
+			if (type === "create") {
+				apiCall = ref.apiCall;
+			}
+			else if (type === "update") {
+				if (label.new_name) {
+					data = {...label, name: label.new_name};
+				}
+			}
+			else {
+				// type === "delete"
+				data = null;
+				req = {responseType: "text"};
 			}
 
 			return this.request(apiCall, data, method, req);
