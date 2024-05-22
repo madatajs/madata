@@ -87,18 +87,8 @@ export default class GithubLabels extends GithubAPI {
 
 	async #write (type, labels, ref) {
 		let method;
-		switch (type) {
-			case "update":
-				method = "PATCH";
-				break;
-
-			case "delete":
-				method = "DELETE";
-				break;
-
-			default:
-				method = "POST";
-		}
+		const methods = {update: "PATCH", delete: "DELETE"};
+		method = methods[type] ?? "POST";
 
 		let result = await Promise.allSettled(labels.map(label => {
 			let apiCall = `${ref.apiCall}/${label.name}`, data = label, req;
