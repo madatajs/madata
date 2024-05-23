@@ -83,14 +83,11 @@ export default class GithubLabels extends GithubAPI {
 		const methods = {update: "PATCH", delete: "DELETE"};
 		let method = methods[type] ?? "POST";
 
-		// Remove search params if any
-		let endpoint = new URL(ref.apiCall, this.constructor.apiDomain).pathname.slice(1);
-
 		let result = await Promise.allSettled(labels.map(label => {
-			let apiCall = `${endpoint}/${label.name}`, data = label, req;
+			let apiCall = `${ref.endpoint}/${label.name}`, data = label, req;
 
 			if (type === "create") {
-				apiCall = endpoint;
+				apiCall = ref.endpoint;
 			}
 			else if (type === "update") {
 				if (label.new_name) {
@@ -136,7 +133,8 @@ export default class GithubLabels extends GithubAPI {
 	static parseURL (source) {
 		let ret = super.parseURL(source);
 
-		ret.apiCall = ret.url.pathname.slice(1) + ret.url.search;
+		ret.endpoint = ret.url.pathname.slice(1);
+		ret.apiCall = ret.endpoint + ret.url.search; // used by the GithubAPI backend to get data
 
 		return ret;
 	}
