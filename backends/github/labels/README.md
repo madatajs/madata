@@ -10,4 +10,4 @@
 
 Builds on the [Github API](../api/) backend, so it also automatically deals with pagination, just add `max_pages=N` to your URL (where N is the number of pages you want to fetch as a maximum). Note this can incur up to `N` HTTP requests, depending on the size of the data.
 
-On saving, if you don't want to delete existing labels, set `skipDeletion` to `true`, like so: `backend.store(labels, { skipDeletion: true })`.
+By default, you can create, update, and delete labels. Don't want the backend to perform some of these? No problem. You can restrict allowed operations to any subset with the `allow` option if needed. Its value is a _space-separated_ list of permitted operations' names (in any order), like so: `backend.store(labels, { allow: "create update" }`.

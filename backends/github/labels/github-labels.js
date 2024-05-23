@@ -23,7 +23,7 @@ export default class GithubLabels extends GithubAPI {
 	 * @param {Array<any>} data Labels to create, update, or delete.
 	 * @returns {Promise<Object | null>} Promise that is resolved with an object based on the results of performed operations.
 	 */
-	async put (data, {ref = this.ref, skipDeletion = false} = {}) {
+	async put (data, {ref = this.ref, allow = "create update delete"} = {}) {
 		if (!data) {
 			// Nothing to work with
 			console.warn(this.constructor.phrase("no_labels"));
@@ -42,14 +42,17 @@ export default class GithubLabels extends GithubAPI {
 			}
 		}
 
+		// Allowed operations
+		allow = new Set(allow.trim().split(/\s+/));
+
 		// Label properties to monitor—label should be updated if any of these have changed
 		const props = ["name", "color", "default", "description"];
 
 		// Operations to be performed
 		let to = {};
-		to.create = data.filter(label => !label.id || !this.data.find(l => l.id === label.id));
-		to.delete = skipDeletion ? [] : this.data.filter(l => !data.find(label => label.id === l.id));
-		to.update = data.filter(label => this.data.find(l => l.id === label.id && props.some(prop => l[prop] !== label[prop])));
+		to.create = !allow.has("create") ? [] : data.filter(label => !label.id || !this.data.find(l => l.id === label.id));
+		to.update = !allow.has("update") ? [] : data.filter(label => this.data.find(l => l.id === label.id && props.some(prop => l[prop] !== label[prop])));
+		to.delete = !allow.has("delete") ? [] : this.data.filter(l => !data.find(label => label.id === l.id));
 
 		// Results of performed operations
 		let ret = {};
