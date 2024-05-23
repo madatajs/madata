@@ -11,6 +11,8 @@ export default class GithubLabels extends GithubAPI {
 		{hostname: "api.github.com", pathname: "/repos/:owner/:repo/issues/:issue_number/labels"},
 		{hostname: "api.github.com", pathname: "/repos/:owner/:repo/milestones/:milestone_number/labels"},
 		{hostname: "github.com", pathname: "/:owner/:repo/labels"},
+		{hostname: "github.com", pathname: "/:owner/:repo/issues/labels"},
+		{hostname: "github.com", pathname: "/:owner/:repo/milestones"},
 	];
 
 	static phrases = {
