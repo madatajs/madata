@@ -89,9 +89,8 @@ export default class GithubLabels extends GithubAPI {
 	}
 
 	async #write (type, labels, ref) {
-		let method;
 		const methods = {update: "PATCH", delete: "DELETE"};
-		method = methods[type] ?? "POST";
+		let method = methods[type] ?? "POST";
 
 		// Remove search params if any
 		let endpoint = new URL(ref.apiCall, this.constructor.apiDomain).pathname.slice(1);
