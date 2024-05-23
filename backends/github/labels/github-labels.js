@@ -42,30 +42,21 @@ export default class GithubLabels extends GithubAPI {
 			}
 		}
 
-		let ret = {};
-		let toCreate = data.filter(label => !label.id || !this.data.find(l => l.id === label.id));
-		let toDelete = skipDeletion ? [] : this.data.filter(l => !data.find(label => label.id === l.id));
-
-		// Label should be updated if any of its properties (name, color, etc.) have changed
+		// Label properties to monitor—label should be updated if any of these have changed
 		let props = ["name", "color", "default", "description"];
-		let toUpdate = data.filter(label => this.data.find(l => l.id === label.id && props.some(prop => l[prop] !== label[prop])));
 
-		// Create new labels
-		// https://docs.github.com/en/rest/issues/labels?apiVersion=2022-11-28#create-a-label
-		if (toCreate.length) {
-			ret.created = await this.#write("create", toCreate, ref);
-		}
+		// Operations to be performed
+		let to = {};
+		to.create = data.filter(label => !label.id || !this.data.find(l => l.id === label.id));
+		to.delete = skipDeletion ? [] : this.data.filter(l => !data.find(label => label.id === l.id));
+		to.update = data.filter(label => this.data.find(l => l.id === label.id && props.some(prop => l[prop] !== label[prop])));
 
-		// Update existing labels
-		// https://docs.github.com/en/rest/issues/labels?apiVersion=2022-11-28#update-a-label
-		if (toUpdate.length) {
-			ret.updated = await this.#write("update", toUpdate, ref);
-		}
-
-		// Delete existing labels
-		// https://docs.github.com/en/rest/issues/labels?apiVersion=2022-11-28#delete-a-label
-		if (toDelete.length) {
-			ret.deleted = await this.#write("delete", toDelete, ref);
+		// Results of performed operations
+		let ret = {};
+		for (let action in to) {
+			if (to[action].length) {
+				ret[`${action}d`] = await this.#write(action, to[action], ref);
+			}
 		}
 
 		return ret;
