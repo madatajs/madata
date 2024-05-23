@@ -93,11 +93,14 @@ export default class GithubLabels extends GithubAPI {
 		const methods = {update: "PATCH", delete: "DELETE"};
 		method = methods[type] ?? "POST";
 
+		// Remove search params if any
+		let endpoint = new URL(ref.apiCall, this.constructor.apiDomain).pathname.slice(1);
+
 		let result = await Promise.allSettled(labels.map(label => {
-			let apiCall = `${ref.apiCall}/${label.name}`, data = label, req;
+			let apiCall = `${endpoint}/${label.name}`, data = label, req;
 
 			if (type === "create") {
-				apiCall = ref.apiCall;
+				apiCall = endpoint;
 			}
 			else if (type === "update") {
 				if (label.new_name) {
