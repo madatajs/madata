@@ -15,7 +15,6 @@ export default class GithubLabels extends GithubAPI {
 	];
 
 	static phrases = {
-		not_authenticated: "Please log in to perform actions with labels on GitHub.",
 		no_labels: "There are no labels to work with. Pass an empty array if you were to delete all existing labels in one go.",
 		failure: (action) => `Labels failed to ${action}:`,
 	};
@@ -26,11 +25,6 @@ export default class GithubLabels extends GithubAPI {
 	 * @returns {Promise<Object>} Promise that is resolved with an object based on the results of performed operations.
 	 */
 	async put (data, {ref = this.ref, skipDeletion = false} = {}) {
-		if (!this.isAuthenticated()) {
-			console.warn(this.constructor.phrase("not_authenticated"));
-			return null;
-		}
-
 		if (!data) {
 			// Nothing to work with
 			console.warn(this.constructor.phrase("no_labels"));
