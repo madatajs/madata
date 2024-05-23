@@ -110,7 +110,7 @@ export default class GithubLabels extends GithubAPI {
 		}
 
 		if (failure.length) {
-			console.warn(`${this.constructor.phrase("failure", type)} ${failure.map(l => l.name).join(", ")}.`);
+			console.warn(`${this.constructor.phrase("failure", type)} ${failure.map(({label}) => label.name).join(", ")}.`);
 		}
 
 		return { success, failure };
