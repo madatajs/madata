@@ -5,7 +5,6 @@ import GithubAPI from "../api/github-api.js";
  * @category GitHub
  */
 export default class GithubLabels extends GithubAPI {
-	// Do we need this at all?
 	static urls = [
 		{hostname: "api.github.com", pathname: "repos/:owner/:repo/labels"},
 		{hostname: "api.github.com", pathname: "/repos/:owner/:repo/labels"},
