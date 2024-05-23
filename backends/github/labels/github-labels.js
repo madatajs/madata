@@ -21,7 +21,7 @@ export default class GithubLabels extends GithubAPI {
 	/**
 	 * Performs operations (create, update, delete) with labels.
 	 * @param {Array<any>} data Labels to create, update, or delete.
-	 * @returns {Promise<Object>} Promise that is resolved with an object based on the results of performed operations.
+	 * @returns {Promise<Object | null>} Promise that is resolved with an object based on the results of performed operations.
 	 */
 	async put (data, {ref = this.ref, skipDeletion = false} = {}) {
 		if (!data) {

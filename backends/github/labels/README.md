@@ -8,4 +8,6 @@
 * Labels for an issue: `/repos/{owner}/{repo}/issues/{issue_number}/labels`
 * Labels for issues in a milestone: `/repos/{owner}/{repo}/milestones/{milestone_number}/labels`
 
-Builds on the [Github API](../api/) backend, so it also automatically deals with pagination, just add `max_pages=N` to your URL (where N is the number of pages you want to fetch as a maximum). Note this can incur up to N HTTP requests, depending on the size of the data.
+Builds on the [Github API](../api/) backend, so it also automatically deals with pagination, just add `max_pages=N` to your URL (where N is the number of pages you want to fetch as a maximum). Note this can incur up to `N` HTTP requests, depending on the size of the data.
+
+On saving, if you don't want to delete existing labels, set `skipDeletion` to `true`, like so: `backend.store(labels, { skipDeletion: true })`.
