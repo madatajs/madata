@@ -84,14 +84,15 @@ export default class GithubAPI extends Github {
 	static parseURL (source) {
 		let ret = super.parseURL(source);
 
-		if (ret.apiCall) {
-			// Raw API call
-			ret.apiCall += ret.url.search;
-		}
-		else if (ret.query) {
+		if (ret.query) {
 			// GraphQL
 			ret.query = source.match(/#([\S\s]+)/)?.[1]; // Why? url.hash drops line breaks
 			ret.url.hash = "";
+		}
+		else {
+			// Raw API call
+			ret.endpoint = ret.apiCall ?? ret.url.pathname.slice(1);
+			ret.apiCall = ret.endpoint + ret.url.search;
 		}
 
 		return ret;

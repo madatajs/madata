@@ -109,13 +109,4 @@ export default class GithubLabels extends GithubAPI {
 
 		return { success, failure };
 	}
-
-	static parseURL (source) {
-		let ret = super.parseURL(source);
-
-		ret.endpoint = ret.url.pathname.slice(1);
-		ret.apiCall = ret.endpoint + ret.url.search; // used by the GithubAPI backend to get data
-
-		return ret;
-	}
 }
