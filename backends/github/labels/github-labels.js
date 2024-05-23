@@ -43,7 +43,7 @@ export default class GithubLabels extends GithubAPI {
 		}
 
 		// Label properties to monitor—label should be updated if any of these have changed
-		let props = ["name", "color", "default", "description"];
+		const props = ["name", "color", "default", "description"];
 
 		// Operations to be performed
 		let to = {};
