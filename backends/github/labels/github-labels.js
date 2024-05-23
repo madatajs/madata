@@ -16,7 +16,7 @@ export default class GithubLabels extends GithubAPI {
 
 	static phrases = {
 		not_authenticated: "Please log in to perform actions with labels on GitHub.",
-		no_labels: "There are no labels to work with. Use the delete() method if you were to delete all existing labels in one go.",
+		no_labels: "There are no labels to work with. Pass an empty array if you were to delete all existing labels in one go.",
 		success: (action) => `Labels ${action}d:`,
 		failure: (action) => `Labels failed to ${action}:`,
 	};
@@ -26,14 +26,14 @@ export default class GithubLabels extends GithubAPI {
 	 * @param {Array<any>} data Labels to create, update, or delete.
 	 * @returns {Promise<Object>} Promise that is resolved with an object based on the results of performed operations.
 	 */
-	async put (data, {ref = this.ref, force = false, skipDeletion = false} = {}) {
+	async put (data, {ref = this.ref, skipDeletion = false} = {}) {
 		if (!this.isAuthenticated()) {
 			console.warn(this.constructor.phrase("not_authenticated"));
 			return null;
 		}
 
-		if (!data?.length && !force) {
-			// We don't want to delete all existing labels accidentally
+		if (!data) {
+			// Nothing to work with
 			console.warn(this.constructor.phrase("no_labels"));
 			return null;
 		}
@@ -77,15 +77,6 @@ export default class GithubLabels extends GithubAPI {
 		}
 
 		return ret;
-	}
-
-	/**
-	 * Delete all existing labels in one go.
-	 * @param {Object} ref
-	 * @returns {Promise<Object>} Promise that is resolved with an object based on the results of label deletion.
-	 */
-	async delete (ref = this.ref) {
-		return this.put([], {ref, force: true});
 	}
 
 	async #write (type, labels, ref) {
