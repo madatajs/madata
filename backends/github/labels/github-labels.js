@@ -108,4 +108,17 @@ export default class GithubLabels extends GithubAPI {
 
 		return { success, failure };
 	}
+
+	static parseURL (source) {
+		let ret = super.parseURL(source);
+
+		// Some fix-ups for URLs with host === "github.com"
+		// `endpoint` and `apiCall` should start with `repos/`
+		if (!ret.endpoint.startsWith("repos/")) {
+			ret.endpoint = `repos/${ret.endpoint}`;
+			ret.apiCall = `repos/${ret.apiCall}`;
+		}
+
+		return ret;
+	}
 }
