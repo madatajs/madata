@@ -44,12 +44,12 @@ export default class GithubLabels extends GithubAPI {
 		}
 
 		let ret = {};
-		let toCreate = data.filter(label => !this.data.find(l => l.name === label.name));
-		let toDelete = skipDeletion ? [] : this.data.filter(l => !data.find(label => label.name === l.name));
+		let toCreate = data.filter(label => !label.id || !this.data.find(l => l.id === label.id));
+		let toDelete = skipDeletion ? [] : this.data.filter(l => !data.find(label => label.id === l.id));
 
-		// Label should be updated if it has a new name (in that case the new_name property is mandatory)
-		// or if any of its properties (color, default, description) have changed
-		let toUpdate = data.filter(label => label.new_name || this.data.find(l => l.name === label.name && ["color", "default", "description"].some(prop => l[prop] !== label[prop])));
+		// Label should be updated if any of its properties (name, color, etc.) have changed
+		let props = ["name", "color", "default", "description"];
+		let toUpdate = data.filter(label => this.data.find(l => l.id === label.id && props.some(prop => l[prop] !== label[prop])));
 
 		// Create new labels
 		// https://docs.github.com/en/rest/issues/labels?apiVersion=2022-11-28#create-a-label
@@ -77,18 +77,12 @@ export default class GithubLabels extends GithubAPI {
 		let method = methods[type] ?? "POST";
 
 		let result = await Promise.allSettled(labels.map(label => {
-			let apiCall = `${ref.endpoint}/${label.name}`, data = label, req;
+			let apiCall = label.url, data = label, req;
 
 			if (type === "create") {
 				apiCall = ref.endpoint;
 			}
-			else if (type === "update") {
-				if (label.new_name) {
-					data = {...label, name: label.new_name};
-				}
-			}
-			else {
-				// type === "delete"
+			else if (type === "delete") {
 				data = null;
 				req = {responseType: "text"};
 			}
