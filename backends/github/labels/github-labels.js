@@ -8,6 +8,7 @@ export default class GithubLabels extends GithubAPI {
 	// Do we need this at all?
 	static urlsKnown = [
 		{hostname: "api.github.com", pathname: "repos/:owner/:repo/labels"},
+		{hostname: "api.github.com", pathname: "/repos/:owner/:repo/labels"},
 		{hostname: "github.com", pathname: "/:owner/:repo/labels"},
 	];
 
