@@ -374,7 +374,21 @@ export default class Backend extends EventTarget {
 
 	static register (Class) {
 		Backend[Class.name] = Class;
-		Backend._all.push(Class);
+
+		// We should find the right place for a backend to be registered among the registered backends:
+		// it should be placed before its parent, if any.
+		let index = Backend._all.length; // place the backend at the end by default
+		for (let i = 0; i < Backend._all.length; i++) {
+			let backend = Backend._all[i];
+			if (Class.prototype instanceof backend) {
+				// Found a parent class, place before it
+				index = i;
+				break;
+			}
+		}
+
+		Backend._all.splice(index, 0, Class);
+
 		return Class;
 	}
 
