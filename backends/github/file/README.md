@@ -17,7 +17,7 @@ Note that if the branch name is not in the URL, Madata will try `main`, and then
 
 The simplified URLs like `https://github.com/:owner/:repo/:path` could clash with the ones supported by the [GitHub Labels](../labels/) backend in the (unlikely) case the path starts from a directory called `issues`, `labels`, or `milestones`.
 
-In that case, you can construct the backend object directly from the `GithubFile` class: `new GithubFile("https://github.com/leaverou/health-data/milestones/2024/labels").`
+To avoid that, you can use one of the other URL formats or construct the backend object directly from the `GithubFile` class: `new GithubFile("https://github.com/leaverou/health-data/milestones/2024/labels").`
 
 </div>
 
