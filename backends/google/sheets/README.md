@@ -11,21 +11,32 @@ Use [Google Sheets](https://www.google.com/sheets/about/) as a data source and s
 
 Or simply open your spreadsheet in a browser and use the **URL** from the address bar. In this case, the URL has format like `https://docs.google.com/spreadsheets/d/1IMFDv0aWWZ8F4GIdk_gmOwl60DD4-eCnLEX1CV9WBho/edit#gid=0`.
 
-To write data back to the spreadsheet (if allowed by specified permissions), you *must* be logged-in.
+## Basics
 
-To read data from and write them back to a *private spreadsheet*, you *must* be logged-in. Madata won't let you work with *other's private spreadsheets*, only yours.
+By default, Madata returns data from the spreadsheet as an *array of arrays*, where each element corresponds to a row of data. If you specify the `headerRow` or `keys` constructor option (see below), Madata will return an *array of objects* instead.
+
+<div class=note>
+
+Keep in mind that you must be logged in to write data back to the spreadsheet, and the spreadsheet permissions should allow this operation.
+
+To read data from and write it back to a *private spreadsheet*, you must be logged in. Madata will not let you work with others' private spreadsheets, only yours.
+
+</div>
 
 ## Constructor options
 
-- `sheet`: A sheet to read/write data from/to. If not provided, Madata will try to use the sheet specified via the `sheetIndex` option or in the URL. If everything fails, Madata will try to use the first visible sheet.
-- `sheetIndex`: An index (starting from `0`) of the sheet in the spreadsheet to read/write data from/to.
-- `range`: A range with data in *A1 notation*. If not provided, Madata will try to use all data on the sheet.
-- `headerRow`: Whether the first row of data is a row with column headings. If so, Madata will return an array of objects where each object corresponds to one row of data. Column headings will become objects keys and the cells values will become keys values. In this case, the header row won't be a part of the returned data. Defaults to `false`.
-- `transpose`: Whether to transpose data before returning it. This option might be useful, e.g., when your data has headings *not in the first row*, but *in the first column*. Simply transpose the data, so that the first column becomes the first row, the second column becomes the second row, and so on. Defaults to `false`.
-- `keys`: Accepts an array of strings or a function. If provided, Madata will return an array of objects. Objects keys are either taken from the specified array or are returned by the provided mapping function. The function should return an object key and take header text, column index, and array of headers as arguments. This option might be useful when your data has no headings (and you'd like to provide ones that might be used as object keys), or your data headings can't be used as object keys (they are too lengthy, or contain not allowed characters, etc.), or you simply want to tweak them. If you want Madata to automatically generate object keys for you (zero-based indices), simply provide `[]` (an empty array) as the value of this option. If you provide not enough keys in the array or the mapping function returns `undefined` or `null` in some cases, Madata will use a corresponding (zero-based) index as the default object key. If your data headings have duplicates, you may find the `GoogleSheets.keys()` static method useful—it'll return unique object keys based on your data headings.
-- `allowAddingSheets`: Whether to add a new sheet on save if there is no sheet with the specified title. Defaults to `false`.
-- `serializeDates`: Whether dates, times, and durations should be represented as strings in their given number format (which depends on the spreadsheet locale). For example, instead of default `44963` might be returned `2/6/2023 12:15:00`. Defaults to `false`.
-- `smartValues`: Whether the strings will be parsed (as formulas, booleans, or numbers) as if the user typed them into a cell via the Google Sheets UI. For example, the `Mar 1, 2016` string becomes a date, and `=1+2` becomes a formula. Formats can also be inferred, so `$100.15` becomes a number with currency formatting. Defaults to `false`.
+| Option | Type | Default value | Description |
+|--------|------|---------------|-------------|
+| `sheet` | `String` | – | The title of a sheet to work with. If not provided, Madata will try to use the sheet specified via the `sheetIndex` option or in the URL. If it fails, Madata will try to use *the first visible sheet*. |
+| `sheetIndex` | `Number` | – | An index (starting from `0`) of the sheet to work with. |
+| `range` | `String` | – | A range with data in [A1 notation](#a1-notation-for-specifying-cell-ranges). If not provided, Madata will try to use all the data on the sheet. |
+| `headerRow` | `Boolean` | `false` | Whether the first row of data is a row with column headings. If so, Madata will return an array of objects where each object corresponds to one row of data in the spreadsheet. Column headings will become keys, and the values of the cells will be values. In this case, the header row won't be a part of the returned data. |
+| `transpose` | `Boolean` | `false` | Whether to transpose data before returning it. This option might be helpful, e.g., when your data has headings *not in the first row*, but *in the first column*. Simply transpose the data so that the first column becomes the first row, the second column becomes the second row, and so on. |
+| `keys` | `Array<String>` &#124; `Function` | – | If specified, Madata will return an array of objects with the provided (or generated by a mapping function) keys where each object corresponds to one row of data in the spreadsheet. It is helpful when the data has no headings or cannot be used as object keys. If your data has more columns than the keys you specified (or generate with the function), Madata will use a corresponding (zero-based) index of the column as the default object key. A mapping function takes a *column heading*, its *index* in the array of headings, and the *array of headings* and returns a *string* - object key. You can use `GoogleSheets.keys()` to return a unique object key if there are duplicates among headings. |
+| `allowAddingSheets` | `Boolean` | `false` | Whether to add a new sheet on save if there is no sheet with the specified title or index in the spreadsheet. |
+| `serializeDates` | `Boolean` | `false` | Whether dates, times, and durations should be represented as strings in their given number format (which depends on the spreadsheet locale). For example, instead of the default `44963`, Madata might return `2/6/2023 12:15:00`. |
+| `smartValues` | `Boolean` | `false` | Whether the strings will be parsed (as formulas, booleans, or numbers) as if the user typed them into a cell via the Google Sheets UI. For example, the `Mar 1, 2016` string becomes a date, and `=1+2` becomes a formula. Formats can also be inferred, so `$100.15` becomes a number with currency formatting. |
+
 
 ## A1 notation for specifying cell ranges
 
@@ -44,3 +55,15 @@ This is a string like `A1:B2` that refers to a group of cells in the sheet and i
 With the backend, you can take advantage of the [Google Sheets version history system](https://www.ablebits.com/office-addins-blog/google-sheets-edit-history/). Before storing the data back, simply replace *unchanged* data with `null`, and the Google Sheets backend will leave them *untouched* in the sheet.
 
 If you want to remove data from the sheet (i.e., clear the corresponding cell), replace every piece of data which needs to be deleted with *an empty string* before you store the data.
+
+## Example
+
+```js
+let backend = Backend.from(
+	"https://docs.google.com/spreadsheets/d/1IMFDv0aWWZ8F4GIdk_gmOwl60DD4-eCnLEX1CV9WBho/edit?usp=sharing",
+	{ sheetIndex: 0, headerRow: true, keys: ["item", "cost", "stocked", "ship_date"] }
+);
+
+let data = backend.load();
+console.log(data);
+```
