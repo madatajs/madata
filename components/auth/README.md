@@ -10,7 +10,7 @@ A barebones but highly customizable framework-agnostic web component to facilita
 <script type="module">
 import Backend from "https://madata.dev/src/index.js";
 let auth = document.querySelector("#gh_auth");
-let backend = Backend.from("https://github.com");
+let backend = Backend.from("https://github.com/leaverou/mv-data");
 auth.backend = backend;
 </script>
 ```
