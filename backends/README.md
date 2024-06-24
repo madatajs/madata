@@ -9,6 +9,7 @@ You can read about how to use them in the [docs](/docs/).
 | [GitHub Files](/backends/github/file/) | ✅ [GitHub](/backends/github/) | ✅ | ✅ |
 | [GitHub Gist](/backends/github/gist/) | ✅ [GitHub](/backends/github/) | ✅ |  |
 | [GitHub API](/backends/github/api/) | ✅ [GitHub](/backends/github/) |  |  |
+| [GitHub Labels](/backends/github/labels/) | ✅ [GitHub](/backends/github/) | ✅ |  |
 | [Dropbox](/backends/dropbox/) | ✅ | ✅ | ✅ |
 | [Firebase](/backends/firebase/) | ✅ | ✅ | ✅ |
 | [Google Drive](/backends/google/drive/) | ✅ [Google](/backends/google/) | ✅ | ✅ |
