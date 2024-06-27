@@ -48,7 +48,7 @@ For example, here we want to store data as CSV,
 and thus we are using the PapaParse library to parse and stringify the data:
 
 ```js
-let backend = Backend.create("https://...", {
+let backend = Backend.from("https://...", {
 	parse: Papa.parse,
 	stringify: Papa.unparse
 });
