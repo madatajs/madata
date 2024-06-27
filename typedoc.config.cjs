@@ -28,6 +28,7 @@ module.exports = {
 	exclude: [
 		"src/node-shims.js",
 	],
+	excludeExternals: true,
 	excludeReferences: true,
 	navigation: {
 		includeCategories: true,
