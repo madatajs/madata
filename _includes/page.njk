@@ -17,8 +17,9 @@
 
 {% if page.url and page.url !== "/" %}
 <header>
-	<img src="{{ page | relative }}/logo.svg" alt="logo" />
-	<a href="/" class="home">Home</a>
+	<a href="/">
+		<img src="{{ page | relative }}/logo.svg" width="100" alt="Logo showing a cloud presented as a tree" />
+	</a>
 
 	<h1 class="logo"><span class="ma">ma</span>data</h1>
 
@@ -42,7 +43,7 @@
 
 <footer>
 	<div class="logo">
-		<img src="{{ page | relative }}/logo.svg" alt="logo" /> madata
+		<img src="{{ page | relative }}/logo.svg" alt="Logo showing a cloud presented as a tree" /> madata
 	</div>
 
 	<nav>

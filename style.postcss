@@ -267,29 +267,13 @@ body > * {
 			}
 		}
 
-		& img {
+		& a {
 			position: absolute;
 			right: var(--space-x);
-			width: auto;
-			height: 7em;
-		}
 
-		& a {
-			color: inherit;
-		}
-
-		& .home {
-			text-transform: uppercase;
-			font-weight: 900;
-			font-size: 75%;
-
-			&:not(:hover) {
-				text-decoration: none;
-			}
-
-			&::before {
-				content: "🏠";
-				margin-right: .3em;
+			& img {
+				width: auto;
+				height: 7em;
 			}
 		}
 	}

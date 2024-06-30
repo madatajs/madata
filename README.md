@@ -1,6 +1,8 @@
-<header class="home no-home-link">
+<header>
 
-<img src="/logo.svg" width="100" alt="Logo showing a cloud presented as a tree" />
+<a href="/">
+	<img src="/logo.svg" width="100" alt="Logo showing a cloud presented as a tree" />
+</a>
 
 <h1 class="logo"><span class="ma">ma</span>data</h1>
 
