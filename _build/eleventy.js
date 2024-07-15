@@ -1,5 +1,6 @@
 import { createRequire } from "module";
 import md from "./md.js";
+import * as filters from "./filters.js";
 
 const require = createRequire(import.meta.url);
 
@@ -26,15 +27,9 @@ export default config => {
 
 	config.addPlugin(md);
 
-	config.addFilter(
-		"relative",
-		page => {
-			let path = page.url.replace(/[^/]+$/, "");
-			let ret = require("path").relative(path, "/");
-
-			return ret || ".";
-		}
-	);
+	for (let f in filters) {
+		config.addFilter(f, filters[f]);
+	}
 
 	return {
 		markdownTemplateEngine: "njk",
