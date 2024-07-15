@@ -8,7 +8,7 @@ api/
 
 # Frontend
 *.html
-*.postcss
+*.css
 logo.svg
 avatar.png
 _headers

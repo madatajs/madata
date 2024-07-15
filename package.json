@@ -6,12 +6,10 @@
   "type": "module",
   "scripts": {
     "test": "npx htest test/index.js",
-    "build:css": "npx postcss \"**/*.postcss\" --base . --dir . --ext .css --config _build/postcss.config.cjs",
     "build:html": "npx @11ty/eleventy --config=_build/.eleventy.cjs",
     "build:lib": "node _build/lib.mjs",
     "build:docs": "npx typedoc",
-    "build": "npm run build:lib && npm run build:html && npm run build:css && npm run build:docs",
-    "watch:css": "npx postcss \"**/*.postcss\" --base . --dir . --ext .css --config _build/postcss.config.cjs --watch",
+    "build": "npm run build:lib && npm run build:html && npm run build:docs",
     "watch:html": "npx @11ty/eleventy --config=_build/.eleventy.cjs --watch",
     "watch:docs": "npx typedoc --watch --preserveWatchOutput",
     "watch": "npx concurrently -n w: npm:watch:*",
@@ -25,8 +23,9 @@
     "url": "git+https://github.com/madatajs/madata.git"
   },
   "keywords": [
-    "CSS",
-    "forms"
+    "data",
+    "APIs",
+    "backend"
   ],
   "author": "Lea Verou",
   "license": "MIT",
@@ -36,20 +35,17 @@
   "homepage": "https://github.com/madatajs/madata#readme",
   "devDependencies": {
     "@11ty/eleventy": "^2.0.0",
-    "concurrently": "^7.6.0",
-    "eslint": "latest",
     "@stylistic/eslint-plugin": "latest",
     "@typescript-eslint/eslint-plugin": "latest",
     "@typescript-eslint/parser": "latest",
+    "concurrently": "^7.6.0",
+    "eslint": "latest",
+    "htest.dev": "latest",
     "markdown-it-anchor": "^8.6.7",
     "markdown-it-attrs": "^4.1.6",
-    "postcss": "^8.3.9",
-    "postcss-cli": "^9.0.1",
-    "postcss-nesting": "^12.0.1",
     "release-it": "^16.2.1",
     "typedoc": "latest",
-    "typedoc-plugin-merge-modules": "latest",
-    "htest.dev": "latest"
+    "typedoc-plugin-merge-modules": "latest"
   },
   "dependencies": {
     "csv": "^6.3.1",

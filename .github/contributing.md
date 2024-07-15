@@ -21,7 +21,6 @@ After cloning the repo locally, run `npm install` to install dependencies.
 
 Then run:
 
-- `npm run watch:css` before you work on any `.postcss` files or `npm run build:css` after
 - `npm run watch:html` before you work on any `.md` files or `npm run build:html` after
 - If you're gonna be doing both of the above, you can run `npm run watch`
 - `npm run docs` after you modify any JSDoc annotations (there's no watcher for this)
