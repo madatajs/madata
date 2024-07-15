@@ -6,11 +6,11 @@
   "type": "module",
   "scripts": {
     "test": "npx htest test/index.js",
-    "build:html": "npx @11ty/eleventy --config=_build/.eleventy.cjs",
+    "build:html": "npx @11ty/eleventy --config=_build/eleventy.js",
     "build:lib": "node _build/lib.mjs",
     "build:docs": "npx typedoc",
     "build": "npm run build:lib && npm run build:html && npm run build:docs",
-    "watch:html": "npx @11ty/eleventy --config=_build/.eleventy.cjs --watch",
+    "watch:html": "npx @11ty/eleventy --config=_build/eleventy.js --watch",
     "watch:docs": "npx typedoc --watch --preserveWatchOutput",
     "watch": "npx concurrently -n w: npm:watch:*",
     "dev": "http-server -p 58504 --cors & open http://localhost:58504",
@@ -34,7 +34,7 @@
   },
   "homepage": "https://github.com/madatajs/madata#readme",
   "devDependencies": {
-    "@11ty/eleventy": "^2.0.0",
+    "@11ty/eleventy": "^3.0.0-alpha.16",
     "@stylistic/eslint-plugin": "latest",
     "@typescript-eslint/eslint-plugin": "latest",
     "@typescript-eslint/parser": "latest",

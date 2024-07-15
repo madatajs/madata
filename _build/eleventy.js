@@ -1,8 +1,9 @@
-let markdownIt = require("markdown-it");
-let markdownItAnchor = require("markdown-it-anchor");
-let markdownItAttrs = require('markdown-it-attrs');
+import { createRequire } from "module";
+import md from "./md.js";
 
-module.exports = config => {
+const require = createRequire(import.meta.url);
+
+export default config => {
 	let data = {
 		"layout": "page.njk",
 		"permalink": "{{ page.filePathStem | replace('README', '') }}/index.html",
@@ -23,30 +24,7 @@ module.exports = config => {
 
 	config.setDataDeepMerge(true);
 
-	let md = markdownIt({
-		html: true,
-		linkify: true,
-	})
-	.disable("code");
-
-	config.setLibrary("md", markdownIt({
-			html: true,
-		})
-		.use(markdownItAttrs)
-		.use(markdownItAnchor, {
-			permalink: markdownItAnchor.permalink.headerLink(),
-			level: 2,
-		})
-		.disable("code")
-	);
-
-	config.addFilter("md", (value) => {
-		return md.render(value);
-	});
-
-	config.addFilter("md_inline", (value) => {
-		return md.renderInline(value);
-	});
+	config.addPlugin(md);
 
 	config.addFilter(
 		"relative",
