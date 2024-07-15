@@ -1,0 +1,12 @@
+---
+permalink: _redirects
+layout: null
+eleventyExcludeFromCollections: true
+---
+
+{% for module, version in pkg.dependencies -%}
+node_modules/{{ module }}/* https://cdn.jsdelivr.net/npm/{{ module }}@{{ (module | version) or "latest" }}/:splat 200
+{% endfor %}
+
+# Catch all NPM fallback
+node_modules/:modulename/* https://cdn.jsdelivr.net/npm/:modulename@latest/:splat 200

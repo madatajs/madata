@@ -7,4 +7,4 @@ index.html
 api/
 !backends/github/api/
 !backends/coda/api/
-lib
+_redirects

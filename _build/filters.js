@@ -1,4 +1,5 @@
 import path from "path";
+import packageLock from "../package-lock.json" with { type: "json" };
 
 export function relative (page) {
 	if (!page) {
@@ -10,4 +11,13 @@ export function relative (page) {
 	let ret = path.relative(pagePath, "/");
 
 	return ret || ".";
+}
+
+/**
+ * Convert a package.json dependency version to
+ * @param {*} semver
+ * @returns
+ */
+export function version (module) {
+	return packageLock.packages[`node_modules/${module}`]?.version;
 }
