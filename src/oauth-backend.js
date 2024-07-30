@@ -56,8 +56,8 @@ export default class OAuthBackend extends AuthBackend {
 	}
 
 	// Any extra params to be passed to the oAuth URL.
-	oAuthParams () {
-		return "";
+	static get oAuthParams () {
+		return `&redirect_uri=${ encodeURIComponent(this.authProvider) }&response_type=code`;
 	}
 
 	/**
@@ -238,7 +238,7 @@ export default class OAuthBackend extends AuthBackend {
 			backend: oAuthBackend.name
 		};
 
-		this.authPopup = open(`${this.constructor.oAuth}?client_id=${this.clientId}&state=${encodeURIComponent(JSON.stringify(state))}` + this.oAuthParams(),
+		this.authPopup = open(`${this.constructor.oAuth}?client_id=${this.clientId}&state=${encodeURIComponent(JSON.stringify(state))}` + this.constructor.oAuthParams,
 			"popup", `width=${popup.width},height=${popup.height},left=${popup.left},top=${popup.top}`);
 
 		if (!this.authPopup) {
