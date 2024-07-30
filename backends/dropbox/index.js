@@ -68,10 +68,6 @@ export default class Dropbox extends OAuthBackend {
 		});
 	}
 
-	oAuthParams () {
-		return `&redirect_uri=${encodeURIComponent(this.constructor.authProvider)}&response_type=code`;
-	}
-
 	static userCall = ["users/get_current_account", "null", "POST"];
 	static userSchema = {
 		username: "email",
