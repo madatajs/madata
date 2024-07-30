@@ -5,11 +5,7 @@ import OAuthBackend from "../../src/oauth-backend.js";
  * @category GitHub
  */
 export default class Github extends OAuthBackend {
-	constructor (url, o) {
-		super(url, o);
-
-		this.updatePermissions({ read: true });
-	}
+	static defaultPermissions = { read: true };
 
 	oAuthParams () {
 		return "&scope=user%20repo";

@@ -6,15 +6,15 @@ import { localStorage } from "../../src/node-shims.js";
  * @category Basic
  */
 export default class Local extends Backend {
-	constructor (url, o) {
-		super(url, o);
+	static urls = [
+		{protocol: "local", pathname: ":key"},
+	];
 
-		this.updatePermissions({
-			read: true,
-			edit: true,
-			save: true
-		});
-	}
+	static defaultPermissions = {
+		read: true,
+		edit: true,
+		save: true
+	};
 
 	async get () {
 		if (this.ref.key in localStorage) {
@@ -34,8 +34,4 @@ export default class Local extends Backend {
 		localStorage[this.ref.key] = await this.stringify(data);
 		return {type: exists ? "update" : "create"};
 	}
-
-	static urls = [
-		{protocol: "local", pathname: ":key"},
-	];
 }

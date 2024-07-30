@@ -10,11 +10,7 @@ import { getStorage, ref, uploadString, getDownloadURL, deleteObject } from "htt
  * Firebase backend.
  */
 export default class Firebase extends AuthBackend {
-	constructor (url, o) {
-		super(url, o);
-
-		this.updatePermissions({ read: true });
-	}
+	static defaultPermissions = { read: true };
 
 	ready = Promise.all([
 		super.ready,

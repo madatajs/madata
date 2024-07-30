@@ -5,11 +5,7 @@ import OAuthBackend from "../../src/oauth-backend.js";
  * @category Google
  */
 export default class Google extends OAuthBackend {
-	constructor (url, o) {
-		super(url, o);
-
-		this.updatePermissions({ read: true });
-	}
+	static defaultPermissions = { read: true };
 
 	static userCall = "https://www.googleapis.com/oauth2/v2/userinfo";
 	static userSchema = {
