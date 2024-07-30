@@ -10,10 +10,11 @@ export default class Local extends Backend {
 		{protocol: "local", pathname: ":key"},
 	];
 
+	static capabilities = { put: true };
 	static defaultPermissions = {
 		read: true,
 		edit: true,
-		save: true
+		save: true,
 	};
 
 	async get () {

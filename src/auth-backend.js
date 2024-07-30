@@ -9,6 +9,7 @@ import { toArray } from "./util.js";
  */
 export default class AuthBackend extends Backend {
 	static defaultPermissions = { login: true };
+	static capabilities = { auth: true };
 
 	constructor (url, o = {}) {
 		super(url, o);

@@ -11,6 +11,7 @@ import { getStorage, ref, uploadString, getDownloadURL, deleteObject } from "htt
  */
 export default class Firebase extends AuthBackend {
 	static defaultPermissions = { read: true };
+	static capabilities = { auth: true, put: true, upload: true };
 
 	ready = Promise.all([
 		super.ready,

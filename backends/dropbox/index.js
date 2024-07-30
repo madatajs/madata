@@ -11,6 +11,7 @@ export default class Dropbox extends OAuthBackend {
 		{hostname: "{*.}?dropbox.com"},
 	];
 	static defaultPermissions = { read: true };
+	static capabilities = { auth: true, put: true, upload: true };
 
 	async upload (file, path) {
 		if (this.ref.path) {
@@ -61,10 +62,6 @@ export default class Dropbox extends OAuthBackend {
 				"Content-Type": "application/octet-stream"
 			}
 		});
-	}
-
-	oAuthParams () {
-		return `&redirect_uri=${encodeURIComponent(this.constructor.authProvider)}&response_type=code`;
 	}
 
 	static userCall = ["users/get_current_account", "null", "POST"];

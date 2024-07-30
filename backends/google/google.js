@@ -14,8 +14,8 @@ export default class Google extends OAuthBackend {
 		avatar: ["picture", "photoURL"],
 	};
 
-	oAuthParams () {
-		return `&redirect_uri=${this.constructor.authProvider}&response_type=code&scope=${encodeURIComponent(this.constructor.scopes.join(" "))}`;
+	static get oAuthParams () {
+		return super.oAuthParams + `&scope=${ encodeURIComponent(this.scopes.join(" ")) }`;
 	}
 
 	static oAuth = "https://accounts.google.com/o/oauth2/auth";

@@ -10,6 +10,7 @@ export default class GithubLabels extends GithubAPI {
 		{hostname: "(api.)?github.com", pathname: "(/repos)?/:owner/:repo/issues/:issue_number(.+)?/labels"},
 		{hostname: "(api.)?github.com", pathname: "(/repos)?/:owner/:repo/milestones/:milestone_number(.+)?/labels"},
 	];
+	static capabilities = { auth: true, put: true };
 
 	static phrases = {
 		no_labels: "There are no labels to work with. Pass an empty array if you were to delete all existing labels in one go.",

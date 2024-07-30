@@ -26,6 +26,8 @@ export default class Backend extends EventTarget {
 		this.update(source, o);
 	}
 
+	static capabilities = {};
+
 	static get title () {
 		return this.name.replace(/([a-z])([A-Z])/g, "$1 $2");
 	}

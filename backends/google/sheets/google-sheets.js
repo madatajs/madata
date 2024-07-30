@@ -5,6 +5,8 @@ import Google from "../google.js";
  * @category Google
  */
 export default class GoogleSheets extends Google {
+	static capabilities = { auth: true, put: true };
+
 	/**
 	 * Read data from the spreadsheet.
 	 * @param {string} ref Spreadsheet to work with.
