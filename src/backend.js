@@ -21,7 +21,7 @@ export default class Backend extends EventTarget {
 		super();
 
 		// Permissions of this particular backend.
-		this.permissions = {};
+		this.permissions = Object.assign({}, this.constructor.defaultPermissions);
 
 		this.update(source, o);
 	}

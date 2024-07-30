@@ -6,17 +6,12 @@ import {$} from "../../src/util.js";
  * @category Basic
  */
 export default class Element extends Backend {
+	static defaultPermissions = {
+		read: true,
+		edit: true,
+		save: true,
+	};
 	static capabilities = { put: true };
-
-	constructor (url, o) {
-		super(url, o);
-
-		this.updatePermissions({
-			read: true,
-			edit: true,
-			save: true
-		});
-	}
 
 	update (url, o) {
 		super.update(url, o);

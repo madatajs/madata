@@ -4,11 +4,7 @@ import OAuthBackend from "../../src/oauth-backend.js";
  * @category Coda
  */
 export default class Coda extends OAuthBackend {
-	constructor (url, o) {
-		super(url, o);
-
-		this.updatePermissions({ });
-	}
+	static defaultPermissions = { read: true };
 
 	static userCall = "whoami";
 	static userSchema = {

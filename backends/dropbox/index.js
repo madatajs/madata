@@ -10,13 +10,8 @@ export default class Dropbox extends OAuthBackend {
 	static urls = [
 		{hostname: "{*.}?dropbox.com"},
 	];
+	static defaultPermissions = { read: true };
 	static capabilities = { auth: true, put: true, upload: true };
-
-	constructor (url, o) {
-		super(url, o);
-
-		this.updatePermissions({ read: true });
-	}
 
 	async upload (file, path) {
 		if (this.ref.path) {

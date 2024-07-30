@@ -5,10 +5,7 @@ import Backend from "../../src/backend.js";
  * @category Basic
  */
 export default class Remote extends Backend {
-	constructor (url, o) {
-		super(url, o);
-		this.updatePermissions({read: true});
-	}
+	static defaultPermissions = { read: true };
 
 	static test (url) {
 		return false;
