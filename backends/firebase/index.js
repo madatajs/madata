@@ -10,6 +10,8 @@ import { getStorage, ref, uploadString, getDownloadURL, deleteObject } from "htt
  * Firebase backend.
  */
 export default class Firebase extends AuthBackend {
+	static capabilities = { auth: true, put: true, upload: true };
+
 	constructor (url, o) {
 		super(url, o);
 

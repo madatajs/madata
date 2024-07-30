@@ -4,6 +4,8 @@ import Coda from "../coda.js";
  * @category Coda
  */
 export default class CodaTable extends Coda {
+	static capabilities = { auth: true, put: false, upload: false };
+
 	async get (ref = this.ref) {
 		if (!ref.tableId) {
 			// Resolve table id

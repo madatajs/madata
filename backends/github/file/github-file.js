@@ -8,6 +8,7 @@ import {readFile, delay} from "../../../src/util.js";
  */
 export default class GithubFile extends Github {
 	static fileBased = true;
+	static capabilities = { auth: true, put: true, upload: true };
 
 	/**
 	 * Low-level method to fetch a file from GitHub

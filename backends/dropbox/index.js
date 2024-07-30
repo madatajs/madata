@@ -10,6 +10,7 @@ export default class Dropbox extends OAuthBackend {
 	static urls = [
 		{hostname: "{*.}?dropbox.com"},
 	];
+	static capabilities = { auth: true, put: true, upload: true };
 
 	constructor (url, o) {
 		super(url, o);

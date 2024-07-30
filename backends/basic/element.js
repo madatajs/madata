@@ -6,6 +6,8 @@ import {$} from "../../src/util.js";
  * @category Basic
  */
 export default class Element extends Backend {
+	static capabilities = { put: true };
+
 	constructor (url, o) {
 		super(url, o);
 
