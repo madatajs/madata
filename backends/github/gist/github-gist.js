@@ -6,6 +6,8 @@ import hooks from "../../../src/hooks.js";
  * @category GitHub
  */
 export default class GithubGist extends Github {
+	static capabilities = { auth: true, put: true };
+
 	async get (ref = this.ref) {
 		if (this.isAuthenticated()) {
 			// Authenticated API call

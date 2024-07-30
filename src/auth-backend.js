@@ -8,6 +8,8 @@ import { toArray } from "./util.js";
  * @abstract
  */
 export default class AuthBackend extends Backend {
+	static capabilities = { auth: true };
+
 	constructor (url, o = {}) {
 		super(url, o);
 

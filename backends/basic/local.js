@@ -6,6 +6,8 @@ import { localStorage } from "../../src/node-shims.js";
  * @category Basic
  */
 export default class Local extends Backend {
+	static capabilities = { put: true };
+
 	constructor (url, o) {
 		super(url, o);
 
