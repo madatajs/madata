@@ -39,7 +39,7 @@ export default class Gitlab extends OAuthBackend {
 		let { apiCall, path, branch } = ref;
 		let body = {
 			branch,
-			content: await this.stringify(data),
+			content: await this.stringify(data, {ref}),
 			commit_message: `Update file ${ path }`,
 		};
 		return this.request(apiCall, body, "PUT");
