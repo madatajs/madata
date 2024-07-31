@@ -30,6 +30,10 @@ export default class Gitlab extends OAuthBackend {
 		return ret;
 	}
 
+	static phrases = {
+		"updated_file": (name = "file") => "Updated " + name,
+	};
+
 	get (ref = this.ref) {
 		let { apiCall, branch } = ref;
 		return this.request(`${ apiCall }/raw?ref=${ branch }`);
@@ -40,7 +44,7 @@ export default class Gitlab extends OAuthBackend {
 		let body = {
 			branch,
 			content: await this.stringify(data, {ref}),
-			commit_message: `Update file ${ path }`,
+			commit_message: this.constructor.phrase("updated_file", path),
 		};
 		return this.request(apiCall, body, "PUT");
 	}
