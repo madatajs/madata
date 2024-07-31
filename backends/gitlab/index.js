@@ -26,7 +26,7 @@ export default class Gitlab extends OAuthBackend {
 
 	static parseURL (source) {
 		let ret = super.parseURL(source);
-		ret.apiCall = `projects/${ encodeURIComponent(ret.id) }/repository/files/${ ret.path }`;
+		ret.fileCall = `projects/${ encodeURIComponent(ret.id) }/repository/files/${ ret.path }`;
 		return ret;
 	}
 
@@ -35,17 +35,17 @@ export default class Gitlab extends OAuthBackend {
 	};
 
 	get (ref = this.ref) {
-		let { apiCall, branch } = ref;
-		return this.request(`${ apiCall }/raw?ref=${ branch }`);
+		let { fileCall, branch } = ref;
+		return this.request(`${ fileCall }/raw?ref=${ branch }`);
 	}
 
 	async put (data, {ref = this.ref} = {}) {
-		let { apiCall, path, branch } = ref;
+		let { fileCall, path, branch } = ref;
 		let body = {
 			branch,
 			content: await this.stringify(data, {ref}),
 			commit_message: this.constructor.phrase("updated_file", path),
 		};
-		return this.request(apiCall, body, "PUT");
+		return this.request(fileCall, body, "PUT");
 	}
 }
