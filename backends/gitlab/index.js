@@ -30,7 +30,8 @@ export default class Gitlab extends OAuthBackend {
 
 	static parseURL (source) {
 		let ret = super.parseURL(source);
-		ret.fileCall = `projects/${ encodeURIComponent(ret.id) }/repository/files/${ ret.path }`;
+		ret.id = encodeURIComponent(ret.id);
+		ret.fileCall = `projects/${ ret.id }/repository/files/${ ret.path }`;
 		return ret;
 	}
 
