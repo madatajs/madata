@@ -24,15 +24,15 @@ export default class Gitlab extends OAuthBackend {
 	static apiDomain = "https://gitlab.com/api/v4/";
 	static oAuth = "https://gitlab.com/oauth/authorize";
 
+	static phrases = {
+		"updated_file": (name = "file") => "Updated " + name,
+	};
+
 	static parseURL (source) {
 		let ret = super.parseURL(source);
 		ret.fileCall = `projects/${ encodeURIComponent(ret.id) }/repository/files/${ ret.path }`;
 		return ret;
 	}
-
-	static phrases = {
-		"updated_file": (name = "file") => "Updated " + name,
-	};
 
 	get (ref = this.ref) {
 		let { fileCall, branch } = ref;
