@@ -13,6 +13,11 @@ Format.register(JSON);
  * Base class for all backends.
  */
 export default class Backend extends EventTarget {
+	static capabilities = {};
+	static _all = [];
+	static hooks = hooks;
+	static defaultFormat = "JSON";
+
 	/**
 	 * @param {string} source - URL string describing the data location
 	 * @param {object} o - Options
@@ -25,8 +30,6 @@ export default class Backend extends EventTarget {
 
 		this.update(source, o);
 	}
-
-	static capabilities = {};
 
 	static get title () {
 		return this.name.replace(/([a-z])([A-Z])/g, "$1 $2");
@@ -347,8 +350,6 @@ export default class Backend extends EventTarget {
 		}
 	}
 
-	static _all = [];
-
 	// Get all descendant backends
 	static get all () {
 		if (this === Backend) {
@@ -393,9 +394,6 @@ export default class Backend extends EventTarget {
 
 		return Class;
 	}
-
-	static hooks = hooks;
-	static defaultFormat = "JSON";
 
 	static phrase (id, ...args) {
 		return phrase(this, id, ...args);
