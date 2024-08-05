@@ -51,24 +51,13 @@ export default class Gitlab extends OAuthBackend {
 		let { id, branch } = this.ref;
 		let fileCall = `projects/${ id }/repository/files/${ encodeURIComponent(path) }`;
 
-		let type = file.type;
-		let isText = type.startsWith("text/") || type.startsWith("application/") && !type.endsWith("pdf");
-		let content;
-		if (isText) {
-			content = await readFile(file, "Text");
-		}
-		else {
-			content = await readFile(file);
-			content = content.slice(5); // remove “data:”
-			type = type.replace("+", "\\+"); // escape “+” in, e.g., “image/svg+xml”
-			content = content.replace(RegExp(`^${type}(;base64)?,`), "");
-		}
+		let content = await readFile(file);
 
 		let body = {
 			branch,
-			content,
+			content: content.data,
 			commit_message: this.constructor.phrase("uploaded_file", path),
-			encoding: isText ? "text" : "base64",
+			encoding: content.encoding,
 		};
 		return this.request(fileCall, body, "POST");
 	}

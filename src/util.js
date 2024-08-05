@@ -16,14 +16,51 @@ export function type (o) {
  * @param {File | Blob} file - File or Blob object to read
  * @param {"DataURL" | "Text" | "ArrayBuffer" | "BinaryString"} [format="DataURL"] - Read as what? Must correspond to a `readAs` method on FileReader
  */
-export function readFile (file, format = "DataURL") {
+export function readFile (file, format = "dataURL") {
 	let reader = new FileReader();
 
 	return new Promise((resolve, reject) => {
-		reader.onload = f => resolve(reader.result);
+		let isText = !isBinary(file);
+
+		reader.onload = f => {
+			let ret = {
+				data: reader.result,
+				encoding: isText ? "text" : "base64",
+			};
+			if (!isText) {
+				ret.dataURL = ret.data;
+				// ret.data should only contain the base64 data
+				let data = ret.dataURL.slice(5); // remove data:
+				let media = data.match(/^\w+\/[\w+]+/)[0];
+				media = media.replace("+", "\\+"); // Fix for #608
+				ret.data = data.replace(RegExp(`^${media}(;base64)?,`), "");
+			}
+			resolve(ret);
+		};
+
 		reader.onerror = reader.onabort = reject;
-		reader["readAs" + format](file);
+		reader[!isText || format === "DataURL" ? "readAsDataURL" : "readAsText"](file);
 	});
+}
+
+export function isBinary ({type}) {
+	if (type.startsWith("text/") || type.endsWith("+xml")) {
+		return false;
+	}
+
+	if (type.endsWith("+zip")) {
+		return true;
+	}
+
+	if (type.startsWith("application/")) {
+		let subtype = type.slice(12);
+
+		if (subtype.endsWith("script") || ["json", "xml", "octet-stream"].includes(subtype)) {
+			return false;
+		}
+	}
+
+	return true;
 }
 
 /**
@@ -147,3 +184,5 @@ export function matchURL (source, urlPattern) {
 
 	return ret;
 }
+
+export function

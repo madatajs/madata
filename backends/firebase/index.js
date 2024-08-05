@@ -182,7 +182,7 @@ export default class Firebase extends AuthBackend {
 	}
 
 	async upload (file, path) {
-		const dataURL = await readFile(file);
+		const {dataURL} = await readFile(file, {format: "dataURL"});
 
 		try {
 			const storage = getStorage(this.app);

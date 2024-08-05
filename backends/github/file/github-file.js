@@ -84,9 +84,9 @@ export default class GithubFile extends Github {
 	 * @param {String} path - Optional file path
 	 * @return {Promise} A promise that resolves when the file is saved.
 	 */
-	async put (data, {ref, isEncoded} = {}) {
+	async put (data, {ref, encoding} = {}) {
 		const serialized = await this.stringify(data, {ref});
-		return this.#write("put", ref, serialized, {isEncoded});
+		return this.#write("put", ref, serialized, {encoding});
 	}
 
 	async delete (ref = this.ref) {
@@ -127,9 +127,9 @@ export default class GithubFile extends Github {
 		});
 
 		if (type === "put") {
-			let [serialized, {isEncoded} = {}] = args;
+			let [serialized, {encoding} = {}] = args;
 
-			serialized = isEncoded ? serialized : toBase64(serialized);
+			serialized = encoding === "base64" ? serialized : toBase64(serialized);
 
 			if (fileInfo !== null) {
 				// Write file
@@ -144,8 +144,8 @@ export default class GithubFile extends Github {
 				// File doesn't exist yet, create it
 				fileInfo = await this.request(fileCall, {
 					message: commitPrefix + this.constructor.phrase("created_file", ref.path),
+					branch: ref.branch,
 					content: serialized,
-					branch: ref.branch
 				}, "PUT");
 			}
 		}
@@ -196,15 +196,12 @@ export default class GithubFile extends Github {
 	}
 
 	async upload (file, path = this.ref.path) {
-		let dataURL = await readFile(file);
+		let content = await readFile(file, {format: "dataURL"});
 
-		let base64 = dataURL.slice(5); // remove data:
-		let media = base64.match(/^\w+\/[\w+]+/)[0];
-		media = media.replace("+", "\\+"); // Fix for #608
-		base64 = base64.replace(RegExp(`^${media}(;base64)?,`), "");
-		path = this.ref.path.replace(/[^/]+$/, "") + path; // make upload path relative to existing path
+		 // make upload path relative to existing path
+		path = this.ref.path.replace(/[^/]+$/, "") + path;
 
-		let fileInfo = await this.put(base64, {ref: path, isEncoded: true});
+		let fileInfo = await this.put(content.data, {ref: path, encoding: content.encoding});
 		return this.getFileURL(path, {sha: fileInfo.commit.sha});
 	}
 
