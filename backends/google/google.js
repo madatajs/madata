@@ -20,8 +20,4 @@ export default class Google extends OAuthBackend {
 
 	static oAuth = "https://accounts.google.com/o/oauth2/auth";
 	static useCache = false;
-
-	static phrases = {
-		access_token_invalid: "Access token is invalid. Please, log in again."
-	};
 }

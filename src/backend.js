@@ -14,6 +14,14 @@ Format.register(JSON);
  */
 export default class Backend extends EventTarget {
 	static capabilities = {};
+	static phrases = {
+		"created_file": (name = "file") => "Created " + name,
+		"updated_file": (name = "file") => "Updated " + name,
+		"uploaded_file": (name = "file") => "Uploaded " + name,
+		"deleted_file": (name = "file") => "Deleted " + name,
+		"no_write_permission": "You do not have permission to write files.",
+		"no_upload_permission": "You do not have permission to upload files."
+	};
 	static _all = [];
 	static hooks = hooks;
 	static defaultFormat = "JSON";

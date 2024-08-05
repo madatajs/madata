@@ -113,7 +113,7 @@ export default class GithubFile extends Github {
 				ref.repoInfo = forkInfo;
 			}
 			else {
-				throw new Error(this.constructor.phrase("no_push_permission", `${ref.owner}/${ref.repo}`));
+				throw new Error(this.constructor.phrase("no_write_permission", ));
 			}
 		}
 
@@ -416,10 +416,7 @@ export default class GithubFile extends Github {
 	}
 
 	static phrases = {
-		"updated_file": (name = "file") => "Updated " + name,
-		"created_file": (name = "file") => "Created " + name,
-		"deleted_file": (name = "file") => "Deleted " + name,
-		"no_push_permission": (repo) => `You do not have permission to write to repository ${repo}`,
+		"no_write_permission": (ref) => `You do not have permission to write to repository ${ref.owner}/${ref.repo}`,
 	};
 
 	static urls = [

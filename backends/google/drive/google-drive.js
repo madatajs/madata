@@ -54,7 +54,7 @@ export default class GoogleDrive extends Google {
 		catch ({ error }) {
 			if (error.code === 401) {
 				await this.logout(); // Access token we have is invalid. Discard it.
-				throw new Error(this.constructor.phrase("access_token_invalid"));
+				throw new Error(this.constructor.phrase("invalid_access_token"));
 			}
 
 			if (error.code === 404) {
@@ -80,7 +80,7 @@ export default class GoogleDrive extends Google {
 			catch ({ error }) {
 				if (error.code === 401) {
 					await this.logout(); // Access token we have is invalid. Discard it.
-					throw new Error(this.constructor.phrase("access_token_invalid"));
+					throw new Error(this.constructor.phrase("invalid_access_token"));
 				}
 
 				throw new Error(error.message);
@@ -93,7 +93,7 @@ export default class GoogleDrive extends Google {
 		catch ({ error }) {
 			if (error.code === 401) {
 				await this.logout(); // Access token we have is invalid. Discard it.
-				throw new Error(this.constructor.phrase("access_token_invalid"));
+				throw new Error(this.constructor.phrase("invalid_access_token"));
 			}
 			else if (error.code === 403) {
 				// No write permissions
@@ -111,14 +111,14 @@ export default class GoogleDrive extends Google {
 					catch ({ error }) {
 						if (error.code === 401) {
 							await this.logout(); // Access token we have is invalid. Discard it.
-							throw new Error(this.constructor.phrase("access_token_invalid"));
+							throw new Error(this.constructor.phrase("invalid_access_token"));
 						}
 
 						throw new Error(error.message);
 					}
 				}
 				else {
-					throw new Error(this.constructor.phrase("no_write_permission", ref.url.href));
+					throw new Error(this.constructor.phrase("no_write_permission", ref));
 				}
 			}
 
@@ -149,7 +149,7 @@ export default class GoogleDrive extends Google {
 		catch ({ error }) {
 			if (error.code === 401) {
 				await this.logout(); // Access token we have is invalid. Discard it.
-				throw new Error(this.constructor.phrase("access_token_invalid"));
+				throw new Error(this.constructor.phrase("invalid_access_token"));
 			}
 			else if (error.code === 403) {
 				throw new Error(this.constructor.phrase("no_upload_permission"));
@@ -170,7 +170,7 @@ export default class GoogleDrive extends Google {
 		catch ({ error }) {
 			if (error.code === 401) {
 				await this.logout(); // Access token we have is invalid. Discard it.
-				throw new Error(this.constructor.phrase("access_token_invalid"));
+				throw new Error(this.constructor.phrase("invalid_access_token"));
 			}
 
 			throw new Error(error.message);
@@ -240,8 +240,7 @@ export default class GoogleDrive extends Google {
 	};
 
 	static phrases = {
-		"no_write_permission": (file) => `You do not have permission to write to file ${file}. Try enabling the allowCreatingFiles option to create a copy of it in your “My Drive” folder.`,
-		"no_upload_permission": "You do not have permission to upload files."
+		"no_write_permission": (file) => `You do not have permission to write to file ${file.url.href}. Try enabling the allowCreatingFiles option to create a copy of it in your “My Drive” folder.`,
 	};
 
 	/**

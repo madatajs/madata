@@ -30,7 +30,7 @@ export default class GoogleSheets extends Google {
 			catch ({ error }) {
 				if (error.code === 401) {
 					await this.logout(); // Access token we have is invalid. Discard it.
-					throw new Error(this.constructor.phrase("access_token_invalid"));
+					throw new Error(this.constructor.phrase("invalid_access_token"));
 				}
 
 				throw new Error(error.message);
@@ -91,7 +91,7 @@ export default class GoogleSheets extends Google {
 		catch ({ error }) {
 			if (error.code === 401) {
 				await this.logout(); // Access token we have is invalid. Discard it.
-				throw new Error(this.constructor.phrase("access_token_invalid"));
+				throw new Error(this.constructor.phrase("invalid_access_token"));
 			}
 			else if (error.code === 400) {
 				const message = error.message;
@@ -135,7 +135,7 @@ export default class GoogleSheets extends Google {
 			catch ({ error }) {
 				if (error.code === 401) {
 					await this.logout(); // Access token we have is invalid. Discard it.
-					throw new Error(this.constructor.phrase("access_token_invalid"));
+					throw new Error(this.constructor.phrase("invalid_access_token"));
 				}
 
 				throw new Error(error.message);
@@ -187,7 +187,7 @@ export default class GoogleSheets extends Google {
 						catch ({ error }) {
 							if (error.code === 401) {
 								await this.logout(); // Access token we have is invalid. Discard it.
-								throw new Error(this.constructor.phrase("access_token_invalid"));
+								throw new Error(this.constructor.phrase("invalid_access_token"));
 							}
 
 							throw new Error(error.message);
@@ -222,7 +222,7 @@ export default class GoogleSheets extends Google {
 						catch ({ error }) {
 							if (error.code === 401) {
 								await this.logout(); // Access token we have is invalid. Discard it.
-								throw new Error(this.constructor.phrase("access_token_invalid"));
+								throw new Error(this.constructor.phrase("invalid_access_token"));
 							}
 
 							throw new Error(error.message);
@@ -236,7 +236,7 @@ export default class GoogleSheets extends Google {
 			else {
 				if (error.code === 401) {
 					await this.logout(); // Access token we have is invalid. Discard it.
-					throw new Error(this.constructor.phrase("access_token_invalid"));
+					throw new Error(this.constructor.phrase("invalid_access_token"));
 				}
 
 				throw new Error(error.message);
@@ -315,7 +315,7 @@ export default class GoogleSheets extends Google {
 		catch ({ error }) {
 			if (error.code === 401) {
 				await this.logout(); // Access token we have is invalid. Discard it.
-				throw new Error(this.constructor.phrase("access_token_invalid"));
+				throw new Error(this.constructor.phrase("invalid_access_token"));
 			}
 
 			throw new Error(error.message);
