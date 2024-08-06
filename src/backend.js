@@ -25,6 +25,7 @@ export default class Backend extends EventTarget {
 	static _all = [];
 	static hooks = hooks;
 	static defaultFormat = "JSON";
+	static api = {};
 
 	/**
 	 * @param {string} source - URL string describing the data location

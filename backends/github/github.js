@@ -6,20 +6,24 @@ import OAuthBackend from "../../src/oauth-backend.js";
  */
 export default class Github extends OAuthBackend {
 	static defaultPermissions = { read: true };
-
+	static apiDomain = "https://api.github.com/";
+	static oAuth = "https://github.com/login/oauth/authorize";
 	static get oAuthParams () {
 		return super.oAuthParams + "&scope=user%20repo";
 	}
 
-	static userSchema = {
-		username: "login",
-		name: ["name", "login"],
-		avatar: "avatar_url",
-		url: function () {
-			return "https://github.com/" + this.username;
+	static api = {
+		...super.api,
+		user: {
+			get: "user",
+			schema: {
+				username: "login",
+				name: ["name", "login"],
+				avatar: "avatar_url",
+				url: function () {
+					return "https://github.com/" + this.username;
+				},
+			},
 		},
 	};
-
-	static apiDomain = "https://api.github.com/";
-	static oAuth = "https://github.com/login/oauth/authorize";
 }

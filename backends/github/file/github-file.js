@@ -10,6 +10,12 @@ export default class GithubFile extends Github {
 	static fileBased = true;
 	static capabilities = { auth: true, put: true, upload: true };
 
+	static api = {
+		...super.api,
+		get: ref => `repos/${ref.owner}/${ref.repo}/contents/${ref.path}`,
+		put: ref => `repos/${ref.owner}/${ref.repo}/contents/${ref.path}`,
+	}
+
 	/**
 	 * Low-level method to fetch a file from GitHub
 	 * @param {Object} ref
@@ -17,7 +23,7 @@ export default class GithubFile extends Github {
 	 */
 	async get (ref = this.ref) {
 		if (this.isAuthenticated()) {
-			let call = `repos/${ref.owner}/${ref.repo}/contents/${ref.path}`;
+			let call = this.constructor.api.get(ref);
 
 			let response;
 
@@ -118,7 +124,7 @@ export default class GithubFile extends Github {
 		}
 
 		let fileInfo;
-		let fileCall = `repos/${ref.owner}/${ref.repo}/contents/${ref.path}`;
+		let fileCall = this.constructor.api.put(ref);
 		let commitPrefix = this.options.commitPrefix || "";
 
 		// Read file, so we can get a SHA

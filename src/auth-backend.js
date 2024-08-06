@@ -10,6 +10,11 @@ import { toArray } from "./util.js";
 export default class AuthBackend extends Backend {
 	static defaultPermissions = { login: true };
 	static capabilities = { auth: true };
+	static api = {
+		user: {
+			get: "user",
+		},
+	};
 
 	constructor (url, o = {}) {
 		super(url, o);
@@ -30,8 +35,6 @@ export default class AuthBackend extends Backend {
 		return !!this.user;
 	}
 
-	static userCall = "user";
-
 	/**
 	 * Get info about the current user, if logged in.
 	 * Subclasses are generally expected to override this.
@@ -43,13 +46,14 @@ export default class AuthBackend extends Backend {
 		}
 
 		let Class = this.constructor;
-		const info = await this.request(...toArray(Class.userCall));
+		const info = await this.request(...toArray(Class.api.user.get));
 
-		// Use userSchema to map the user info to a standard format
+		// Map the user info to a standard format
+		let userAPI = Class.api.user;
 		let ret = {};
 
-		for (let destKey in Class.userSchema) {
-			let sourceKeys = Class.userSchema[destKey];
+		for (let destKey in userAPI.schema) {
+			let sourceKeys = userAPI.schema[destKey];
 			sourceKeys = toArray(sourceKeys);
 
 			for (let sourceKey of sourceKeys) {

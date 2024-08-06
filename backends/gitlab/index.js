@@ -7,23 +7,27 @@ import { readFile } from "../../src/util.js";
 export default class Gitlab extends OAuthBackend {
 	static capabilities = { auth: true, put: true, upload: true };
 	static defaultPermissions = { read: true };
-
+	static apiDomain = "https://gitlab.com/api/v4/";
+	static oAuth = "https://gitlab.com/oauth/authorize";
 	static fileBased = true;
 
 	static urls = [
 		"http{s}?://gitlab.com/:id(.+)/-/blob/:branch/:path(.+)",
 	];
 
-	static userCall = "user";
-	static userSchema = {
-		username: "username",
-		name: ["name", "username"],
-		avatar: "avatar_url",
-		url: "web_url",
+	static api = {
+		...super.api,
+		user: {
+			get: "user",
+			schema: {
+				username: "username",
+				name: ["name", "username"],
+				avatar: "avatar_url",
+				url: "web_url",
+			},
+		},
+		put: ref => `projects/${ ref.id }/repository/files/${ encodeURIComponent(ref.path) }`,
 	};
-
-	static apiDomain = "https://gitlab.com/api/v4/";
-	static oAuth = "https://gitlab.com/oauth/authorize";
 
 	static parseURL (source) {
 		let ret = super.parseURL(source);

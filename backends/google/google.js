@@ -6,18 +6,21 @@ import OAuthBackend from "../../src/oauth-backend.js";
  */
 export default class Google extends OAuthBackend {
 	static defaultPermissions = { read: true };
-
-	static userCall = "https://www.googleapis.com/oauth2/v2/userinfo";
-	static userSchema = {
-		username: "email",
-		name: ["name", "displayName"],
-		avatar: ["picture", "photoURL"],
+	static oAuth = "https://accounts.google.com/o/oauth2/auth";
+	static useCache = false;
+	static api = {
+		...super.api,
+		user: {
+			get: "https://www.googleapis.com/oauth2/v2/userinfo",
+			schema: {
+				username: "email",
+				name: ["name", "displayName"],
+				avatar: ["picture", "photoURL"],
+			},
+		},
 	};
 
 	static get oAuthParams () {
 		return super.oAuthParams + `&scope=${ encodeURIComponent(this.scopes.join(" ")) }`;
 	}
-
-	static oAuth = "https://accounts.google.com/o/oauth2/auth";
-	static useCache = false;
 }

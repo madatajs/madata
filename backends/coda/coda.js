@@ -5,15 +5,19 @@ import OAuthBackend from "../../src/oauth-backend.js";
  */
 export default class Coda extends OAuthBackend {
 	static defaultPermissions = { read: true };
-
-	static userCall = "whoami";
-	static userSchema = {
-		username: "name",
-		name: "name",
-		avatar: "pictureLink",
-		email: "loginId",
-		url: function () {
-			return "https://coda.io/@" + this.username;
+	static api = {
+		...super.api,
+		user: {
+			get: "whoami",
+			schema: {
+				username: "name",
+				name: "name",
+				avatar: "pictureLink",
+				email: "loginId",
+				url: function () {
+					return "https://coda.io/@" + this.username;
+				},
+			},
 		},
 	};
 

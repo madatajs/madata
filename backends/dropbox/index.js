@@ -12,6 +12,16 @@ export default class Dropbox extends OAuthBackend {
 	];
 	static defaultPermissions = { read: true };
 	static capabilities = { auth: true, put: true, upload: true };
+	static api = {
+		...super.api,
+		user: {
+			get: ["users/get_current_account", "null", "POST"],
+			schema: {
+				username: "email",
+				name: "name.display_name",
+				avatar: "profile_photo_url",
+			},
+		},
 
 	async upload (file, path) {
 		if (this.ref.path) {
@@ -64,12 +74,6 @@ export default class Dropbox extends OAuthBackend {
 		});
 	}
 
-	static userCall = ["users/get_current_account", "null", "POST"];
-	static userSchema = {
-		username: "email",
-		name: "name.display_name",
-		avatar: "profile_photo_url",
-	};
 
 	async login (...args) {
 		await super.login(...args);
