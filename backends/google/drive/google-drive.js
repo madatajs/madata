@@ -126,9 +126,11 @@ export default class GoogleDrive extends Google {
 		}
 	}
 
-	async upload (file, {filename = file.name, folder} = {}) {
+	async upload (file, {folder} = {}) {
+		// FIXME is folder a path or a URL?
+		// it should be possible to specify a path!
 		const metadata = {
-			name: filename
+			name: file.name
 		};
 
 		if (folder) {
@@ -211,6 +213,7 @@ export default class GoogleDrive extends Google {
 	}
 
 	static #getFolderId (url) {
+		// FIXME this should probably use parseURL, not reimplement it
 		url = new URL(url);
 		const path = url.pathname.slice(1).split("/");
 
@@ -249,6 +252,7 @@ export default class GoogleDrive extends Google {
 	 * @returns URL, filename, [folder URL], [folder id], fields.
 	 */
 	static parseURL (source) {
+		// FIXME use defaults field
 		let ret = Object.assign({
 			filename: undefined,
 			folder: undefined,
