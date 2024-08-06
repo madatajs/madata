@@ -36,11 +36,6 @@ export default class Gitlab extends OAuthBackend {
 		return ret;
 	}
 
-	get (ref = this.ref) {
-		let { fileCall, branch } = ref;
-		return this.request(`${ fileCall }/raw?ref=${ branch }`);
-	}
-
 	async put (data, {ref = this.ref} = {}) {
 		let { fileCall, path, branch } = ref;
 		let body = {

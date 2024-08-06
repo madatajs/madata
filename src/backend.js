@@ -20,7 +20,8 @@ export default class Backend extends EventTarget {
 		"uploaded_file": (name = "file") => "Uploaded " + name,
 		"deleted_file": (name = "file") => "Deleted " + name,
 		"no_write_permission": "You do not have permission to write files.",
-		"no_upload_permission": "You do not have permission to upload files."
+		"no_upload_permission": "You do not have permission to upload files.",
+		"something_went_wrong_while_connecting": name => "Something went wrong while connecting to " + name,
 	};
 	static _all = [];
 	static hooks = hooks;
@@ -168,8 +169,10 @@ export default class Backend extends EventTarget {
 
 		req.body = data;
 
+		call = new URL(call, this.constructor.apiDomain ?? this.constructor.host ?? globalThis.location?.origin);
+
 		// Prevent getting a cached response. Cache-control is often not allowed via CORS
-		if (req.method == "GET" && this.constructor.useCache !== false) {
+		if (req.method == "GET" && call.protocol != "data:" && this.constructor.useCache !== false) {
 			call.searchParams.set("timestamp", Date.now());
 		}
 
@@ -226,16 +229,8 @@ export default class Backend extends EventTarget {
 			url.searchParams.set("timestamp", Date.now()); // ensure fresh copy
 		}
 
-		try {
-			let response = await fetch(url.href);
-
-			if (response.ok) {
-				return response.text();
-			}
-		}
-		catch (e) {}
-
-		return null;
+		let call = this.constructor.api.get(ref) ?? ref.url;
+		return this.request(call);
 	}
 
 	_getRef (ref) {
