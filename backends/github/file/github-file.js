@@ -9,6 +9,22 @@ import {readFile, delay} from "../../../src/util.js";
 export default class GithubFile extends Github {
 	static fileBased = true;
 	static capabilities = { auth: true, put: true, upload: true };
+	static phrases = {
+		"no_write_permission": (ref) => `You do not have permission to write to repository ${ref.owner}/${ref.repo}`,
+	};
+
+	static urls = [
+		"http{s}?://github.com/:owner/:repo/blob/:branch/:path(.+)",
+		"http{s}?://github.com/:owner/:repo{/:path(.+)}?",
+		"http{s}?://raw.githubusercontent.com/:owner/:repo/:branch/:path(.+)",
+	];
+
+	static defaults = {
+		owner: undefined,
+		repo: "mv-data",
+		branch: undefined,
+		path: "data.json",
+	};
 
 	static api = {
 		...super.api,
@@ -93,6 +109,16 @@ export default class GithubFile extends Github {
 	async put (data, {ref, encoding} = {}) {
 		const serialized = await this.stringify(data, {ref});
 		return this.#write("put", ref, serialized, {encoding});
+	}
+
+	async upload (file, path = this.ref.path) {
+		let content = await readFile(file, {format: "dataURL"});
+
+		 // make upload path relative to existing path
+		path = this.ref.path.replace(/[^/]+$/, "") + path;
+
+		let fileInfo = await this.put(content.data, {ref: path, encoding: content.encoding});
+		return this.getFileURL(path, {sha: fileInfo.commit.sha});
 	}
 
 	async delete (ref = this.ref) {
@@ -199,16 +225,6 @@ export default class GithubFile extends Github {
 		}
 
 		return user;
-	}
-
-	async upload (file, path = this.ref.path) {
-		let content = await readFile(file, {format: "dataURL"});
-
-		 // make upload path relative to existing path
-		path = this.ref.path.replace(/[^/]+$/, "") + path;
-
-		let fileInfo = await this.put(content.data, {ref: path, encoding: content.encoding});
-		return this.getFileURL(path, {sha: fileInfo.commit.sha});
 	}
 
 	async canPush (ref = this.ref) {
@@ -417,23 +433,6 @@ export default class GithubFile extends Github {
 
 		return repoURL + path;
 	}
-
-	static phrases = {
-		"no_write_permission": (ref) => `You do not have permission to write to repository ${ref.owner}/${ref.repo}`,
-	};
-
-	static urls = [
-		"http{s}?://github.com/:owner/:repo/blob/:branch/:path(.+)",
-		"http{s}?://github.com/:owner/:repo{/:path(.+)}?",
-		"http{s}?://raw.githubusercontent.com/:owner/:repo/:branch/:path(.+)",
-	];
-
-	static defaults = {
-		owner: undefined,
-		repo: "mv-data",
-		branch: undefined,
-		path: "data.json",
-	};
 }
 
 // Fix atob() and btoa() so they can handle Unicode
