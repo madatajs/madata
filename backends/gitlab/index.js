@@ -26,6 +26,7 @@ export default class Gitlab extends OAuthBackend {
 				url: "web_url",
 			},
 		},
+		get: ref => `projects/${ ref.id }/repository/files/${ ref.path }?ref=${ ref.branch }`,
 		put: ref => `projects/${ ref.id }/repository/files/${ encodeURIComponent(ref.path) }`,
 	};
 
@@ -37,13 +38,13 @@ export default class Gitlab extends OAuthBackend {
 	}
 
 	async put (data, {ref = this.ref} = {}) {
-		let { fileCall, path, branch } = ref;
+		let { path, branch } = ref;
 		let body = {
 			branch,
 			content: await this.stringify(data, {ref}),
 			commit_message: this.constructor.phrase("updated_file", path),
 		};
-		return this.request(fileCall, body, "PUT");
+		return this.request(this.constructor.api.put(ref), body, "PUT");
 	}
 
 	async upload (file, path = file.name) {
@@ -52,12 +53,11 @@ export default class Gitlab extends OAuthBackend {
 
 		let content = await readFile(file);
 
-		let body = {
+		return this.request(this.constructor.api.put(ref), {
 			branch,
 			content: content.data,
 			commit_message: this.constructor.phrase("uploaded_file", path),
 			encoding: content.encoding,
-		};
-		return this.request(fileCall, body, "POST");
+		}, "POST");
 	}
 }
