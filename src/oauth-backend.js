@@ -70,67 +70,17 @@ export default class OAuthBackend extends AuthBackend {
 	 * @param {object} [req.headers] - Extra headers
 	 * @return {Promise<object>} - JSON response
 	 */
-	async request (call, data, method = "GET", req = {}) {
+	async request (call, data, method = "GET", req) {
 		req = Object.assign({}, req); // clone
-		req.method = req.method || method;
-		req.responseType = req.responseType || "json";
-
-		req.headers = Object.assign({
-			"Content-Type": "application/json; charset=utf-8"
-		}, req.headers || {});
 
 		if (this.isAuthenticated()) {
 			req.headers["Authorization"] = req.headers["Authorization"] || `Bearer ${this.accessToken}`;
 		}
 
-		req.body = data;
-
 		call = new URL(call, this.constructor.apiDomain);
 
-		// Prevent getting a cached response. Cache-control is often not allowed via CORS
-		if (req.method == "GET" && this.constructor.useCache !== false) {
-			call.searchParams.set("timestamp", Date.now());
-		}
 
-		if (type(req.body) === "object") {
-			if (req.method === "GET" || req.method === "HEAD") {
-				for (let p in req.body) {
-					let action = req.body[p] === undefined ? "delete" : "set";
-					call.searchParams[action](p, req.body[p]);
-				}
-
-				delete req.body;
-			}
-			else {
-				req.body = JSON.stringify(req.body);
-			}
-		}
-
-		let response;
-
-		try {
-			response = await fetch(call, req);
-		}
-		catch (err) {
-			throw new Error(this.constructor.phrase("something_went_wrong_while_connecting", this.constructor.name), err);
-		}
-
-		if (response?.ok) {
-			if (req.method === "HEAD" || req.responseType === "response") {
-				return response;
-			}
-			else {
-				return response[req.responseType]();
-			}
-		}
-		else if (response.status === 404 && req.method === "GET") {
-			return null;
-		}
-		else {
-			let isJSON = response.headers.get("content-type")?.includes("application/json");
-			let error = isJSON ? await response.json() : await response.text();
-			throw error;
-		}
+		return super.request(call, data, method, req);
 	}
 
 	static getOAuthBackend () {

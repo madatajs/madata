@@ -148,6 +148,73 @@ export default class Backend extends EventTarget {
 	}
 
 	/**
+	 * Helper for making HTTP requests with JSON-based APIs.
+	 * @param {string} call - API endpoint
+	 * @param {object} [data] - Data to send with the request
+	 * @param {string} [method=GET] - HTTP method
+	 * @param {object} [req] - Extra request options
+	 * @param {string} [req.responseType=json] - Response type
+	 * @param {object} [req.headers] - Extra headers
+	 * @return {Promise<object>} - JSON response
+	 */
+	async request (call, data, method = "GET", req) {
+		req = Object.assign({}, req); // clone
+		req.method = req.method || method;
+		req.responseType = req.responseType || "json";
+
+		req.headers = Object.assign({
+			"Content-Type": "application/json; charset=utf-8"
+		}, req.headers || {});
+
+		req.body = data;
+
+		// Prevent getting a cached response. Cache-control is often not allowed via CORS
+		if (req.method == "GET" && this.constructor.useCache !== false) {
+			call.searchParams.set("timestamp", Date.now());
+		}
+
+		if (type(req.body) === "object") {
+			if (req.method === "GET" || req.method === "HEAD") {
+				for (let p in req.body) {
+					let action = req.body[p] === undefined ? "delete" : "set";
+					call.searchParams[action](p, req.body[p]);
+				}
+
+				delete req.body;
+			}
+			else {
+				req.body = JSON.stringify(req.body);
+			}
+		}
+
+		let response;
+
+		try {
+			response = await fetch(call, req);
+		}
+		catch (err) {
+			throw new Error(this.constructor.phrase("something_went_wrong_while_connecting", this.constructor.name), err);
+		}
+
+		if (response?.ok) {
+			if (req.method === "HEAD" || req.responseType === "response") {
+				return response;
+			}
+			else {
+				return response[req.responseType]();
+			}
+		}
+		else if (response.status === 404 && req.method === "GET") {
+			return null;
+		}
+		else {
+			let isJSON = response.headers.get("content-type")?.includes("application/json");
+			let error = isJSON ? await response.json() : await response.text();
+			throw error;
+		}
+	}
+
+	/**
 	 * Low-level method to fetch data from the backend. Subclasses should override this method.
 	 * Clients should not call this method directly, but use `load()` instead.
 	 * @param {object} ref - reference to data to fetch, if different from that provided in the constructor
