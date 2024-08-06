@@ -47,7 +47,7 @@ export default class Gitlab extends OAuthBackend {
 		return this.request(this.constructor.api.put(ref), body, "PUT");
 	}
 
-	async upload (file, path = file.name) {
+	async upload (file, {path = file.name} = {}) {
 		let { id, branch } = this.ref;
 		let ref = { id, branch, path };
 		let content = await readFile(file);

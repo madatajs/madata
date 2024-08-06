@@ -24,9 +24,10 @@ export default class Dropbox extends OAuthBackend {
 		},
 	};
 
-	async upload (file, path) {
+	async upload (file, {path} = {}) {
 		if (this.ref.path) {
-			path = this.ref.path.replace(/[^/]+$/, "") + path; // make upload path relative to existing path
+			// make upload path relative to existing path
+			path = this.ref.path.replace(/[^/]+$/, "") + path;
 		}
 		else {
 			path = path.startsWith("/") ? path : "/" + path;
