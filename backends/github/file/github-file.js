@@ -137,15 +137,16 @@ export default class GithubFile extends Github {
 			if (this.options.allowForking) {
 				// Does not have permission to commit, create a fork
 				let forkInfo = await this.fork(ref);
-
-				ref.forked = true;
-				ref.original = Object.assign({}, ref);
-				ref.owner = forkInfo.owner.login;
-				ref.repo = forkInfo.name;
-				ref.repoInfo = forkInfo;
+				Object.assign(ref, {
+					forked: true,
+					original: Object.assign({}, ref),
+					owner: forkInfo.owner.login,
+					repo: forkInfo.name,
+					repoInfo: forkInfo,
+				});
 			}
 			else {
-				throw new Error(this.constructor.phrase("no_write_permission", ));
+				throw new Error(this.constructor.phrase("no_write_permission"));
 			}
 		}
 
@@ -158,39 +159,32 @@ export default class GithubFile extends Github {
 			ref: ref.branch
 		});
 
+		let params = {
+			branch: ref.branch,
+		};
+
+		if (fileInfo === null) {
+			if (type === "delete") {
+				console.warn(`File ${ ref.path } does not exist, nothing to delete`);
+				return null;
+			}
+		}
+		else {
+			params.sha = fileInfo.sha;
+		}
+
+		let phrase = type === "put"? fileInfo !== null ? "updated_file" : "created_file" : "deleted_file";
+
 		if (type === "put") {
 			let [serialized, {encoding} = {}] = args;
 
 			serialized = encoding === "base64" ? serialized : toBase64(serialized);
+			params.content = serialized;
+		}
 
-			if (fileInfo !== null) {
-				// Write file
-				fileInfo = await this.request(fileCall, {
-					message: commitPrefix + this.constructor.phrase("updated_file", ref.path),
-					content: serialized,
-					branch: ref.branch,
-					sha: fileInfo.sha
-				}, "PUT");
-			}
-			else {
-				// File doesn't exist yet, create it
-				fileInfo = await this.request(fileCall, {
-					message: commitPrefix + this.constructor.phrase("created_file", ref.path),
-					branch: ref.branch,
-					content: serialized,
-				}, "PUT");
-			}
-		}
-		else if (type === "delete") {
-			if (fileInfo !== null) {
-				// Delete file
-				fileInfo = await this.request(fileCall, {
-					message: commitPrefix + this.constructor.phrase("deleted_file", ref.path),
-					branch: ref.branch,
-					sha: fileInfo.sha
-				}, "DELETE");
-			}
-		}
+		params.message = commitPrefix + this.constructor.phrase(phrase, ref.path);
+		let method = type.toUpperCase();
+		fileInfo = await this.request(fileCall, params, method);
 
 		const env = {context: this, fileInfo, type};
 
