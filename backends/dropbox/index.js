@@ -22,6 +22,7 @@ export default class Dropbox extends OAuthBackend {
 				avatar: "profile_photo_url",
 			},
 		},
+	};
 
 	async upload (file, path) {
 		if (this.ref.path) {
@@ -73,7 +74,6 @@ export default class Dropbox extends OAuthBackend {
 			}
 		});
 	}
-
 
 	async login (...args) {
 		await super.login(...args);
