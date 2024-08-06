@@ -16,7 +16,7 @@ export default class Github extends OAuthBackend {
 		...super.api,
 		user: {
 			get: "user",
-			schema: {
+			fields: {
 				username: "login",
 				name: ["name", "login"],
 				avatar: "avatar_url",

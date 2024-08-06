@@ -52,8 +52,8 @@ export default class AuthBackend extends Backend {
 		let userAPI = Class.api.user;
 		let ret = {};
 
-		for (let destKey in userAPI.schema) {
-			let sourceKeys = userAPI.schema[destKey];
+		for (let destKey in userAPI.fields) {
+			let sourceKeys = userAPI.fields[destKey];
 			sourceKeys = toArray(sourceKeys);
 
 			for (let sourceKey of sourceKeys) {

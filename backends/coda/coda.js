@@ -9,7 +9,7 @@ export default class Coda extends OAuthBackend {
 		...super.api,
 		user: {
 			get: "whoami",
-			schema: {
+			fields: {
 				username: "name",
 				name: "name",
 				avatar: "pictureLink",

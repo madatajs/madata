@@ -12,7 +12,7 @@ export default class Google extends OAuthBackend {
 		...super.api,
 		user: {
 			get: "https://www.googleapis.com/oauth2/v2/userinfo",
-			schema: {
+			fields: {
 				username: "email",
 				name: ["name", "displayName"],
 				avatar: ["picture", "photoURL"],

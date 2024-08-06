@@ -16,7 +16,7 @@ export default class Dropbox extends OAuthBackend {
 		...super.api,
 		user: {
 			get: ["users/get_current_account", "null", "POST"],
-			schema: {
+			fields: {
 				username: "email",
 				name: "name.display_name",
 				avatar: "profile_photo_url",

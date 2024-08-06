@@ -19,7 +19,7 @@ export default class Gitlab extends OAuthBackend {
 		...super.api,
 		user: {
 			get: "user",
-			schema: {
+			fields: {
 				username: "username",
 				name: ["name", "username"],
 				avatar: "avatar_url",
