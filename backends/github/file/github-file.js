@@ -111,7 +111,7 @@ export default class GithubFile extends Github {
 		return this.#write("put", ref, serialized, {encoding});
 	}
 
-	async upload (file, path = this.ref.path) {
+	async upload (file, {path = this.ref.path} = {}) {
 		let content = await readFile(file, {format: "dataURL"});
 
 		 // make upload path relative to existing path
