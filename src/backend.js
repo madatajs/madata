@@ -224,6 +224,20 @@ export default class Backend extends EventTarget {
 		return this.data;
 	}
 
+	async put (data, options) {
+		if (!this.constructor.capabilities.put) {
+			// TODO localize
+			throw new Error("This backend does not support writing files");
+		}
+	}
+
+	async upload (file, options) {
+		if (!this.constructor.capabilities.upload) {
+			// TODO localize
+			throw new Error("This backend does not support uploading files");
+		}
+	}
+
 	/**
 	 * Higher-level method for writing data to the backend.
 	 * Subclasses should usually NOT override this method.
