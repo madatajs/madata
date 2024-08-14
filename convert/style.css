@@ -1,0 +1,60 @@
+* {
+	margin: 0;
+	padding: 0;
+}
+
+:root {
+
+}
+
+html {
+	font: 100%/1.5 system-ui, sans-serif;
+}
+
+body {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	grid-template-rows: auto 1fr;
+	gap: 1em 2em;
+	padding: 1em;
+	box-sizing: border-box;
+	height: 100vh;
+
+	> header {
+		grid-column: 1 / -1;
+	}
+
+	> section {
+		display: flex;
+		flex-flow: column;
+		gap: .5em;
+
+		> form {
+			display: flex;
+			gap: .5em;
+			align-items: baseline;
+		}
+
+		.url {
+			flex: 1;
+			display: flex;
+			gap: .3em;
+			align-items: baseline;
+
+			input {
+				flex: 1;
+			}
+		}
+
+
+
+		textarea {
+			flex: 1;
+		}
+	}
+}
+
+input, button, select {
+	font: inherit;
+	padding: .3em .5em;
+}

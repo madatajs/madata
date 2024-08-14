@@ -4,6 +4,7 @@
 
 # Generated files
 index.html
+!convert/index.html
 api/
 !backends/github/api/
 !backends/coda/api/

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Convert</title>
+	<link rel="stylesheet" href="style.css">
+	<script type="module" src="index.js"></script>
+</head>
+<body>
+	<header>
+		<h1>Convert</h1>
+		<p>Convert between formats, backends, or both!</p>
+	</header>
+	<section id="backend1_section">
+
+		<h2>
+			Backend 1
+		</h2>
+		<form>
+			<label class="url">
+				URL: <input type="url" id="url1">
+			</label>
+			<button>Go</button>
+			<button type="button" onclick="this.parentNode.nextElementSibling.backend.load();">Load</button>
+		</form>
+
+		<madata-auth id="backend1_auth"></madata-auth>
+		<textarea id="data1"></textarea>
+	</section>
+	<section id="backend2_section">
+		<h2>
+			Backend 2
+		</h2>
+
+		<form>
+			<label class="url">
+				URL: <input type="url" id="url2">
+			</label>
+			<button>Go</button>
+			<button type="button" onclick="this.parentNode.nextElementSibling.backend.load();">Load</button>
+		</form>
+
+		<madata-auth id="backend2_auth"></madata-auth>
+		<textarea id="data2"></textarea>
+	</section>
+</body>
+</html>
