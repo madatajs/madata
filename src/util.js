@@ -184,5 +184,3 @@ export function matchURL (source, urlPattern) {
 
 	return ret;
 }
-
-export function
