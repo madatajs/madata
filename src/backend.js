@@ -229,7 +229,7 @@ export default class Backend extends EventTarget {
 			url.searchParams.set("timestamp", Date.now()); // ensure fresh copy
 		}
 
-		let call = this.constructor.api.get(ref) ?? ref.url;
+		let call = this.constructor.api.get?.(ref) ?? ref.url;
 		return this.request(call);
 	}
 
