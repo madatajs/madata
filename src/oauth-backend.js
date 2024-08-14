@@ -72,6 +72,7 @@ export default class OAuthBackend extends AuthBackend {
 	 */
 	async request (call, data, method = "GET", req) {
 		req = Object.assign({}, req); // clone
+		req.headers ??= {};
 
 		if (this.isAuthenticated()) {
 			req.headers["Authorization"] = req.headers["Authorization"] || `Bearer ${this.accessToken}`;
@@ -139,7 +140,7 @@ export default class OAuthBackend extends AuthBackend {
 			this.updatePermissions({login: false, logout: true});
 			return currentUser;
 		}
-		else if (this.isAuthenticated()) {
+		else if (!this.isAuthenticated()) {
 			throw new Error(this.constructor.phrase("invalid_access_token"));
 		}
 	}
