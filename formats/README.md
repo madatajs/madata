@@ -5,3 +5,4 @@
 - [YAML](./yaml/)
 - [CSV](./csv/)
 - [TOML](./toml/)
+- [BibTeX](./bibtex/)
